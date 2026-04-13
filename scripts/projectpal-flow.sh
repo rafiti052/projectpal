@@ -17,6 +17,7 @@ usage:
   sh scripts/projectpal-flow.sh build-phase-input <critic|judge|tech-spec|tickets> <approved-artifact-ref> <handoff-package-path> [memory-summary-file] [extra-artifact-ref]
   sh scripts/projectpal-flow.sh sync-resume-bridge <state-path> <approved-artifact-ref> <bridge-summary-file> [resume-source]
   sh scripts/projectpal-flow.sh reduction-report <baseline-summary-path> <new-flow-summary-path> [output-path]
+  sh scripts/projectpal-flow.sh phase7-batch-close-check <ticket-bundle-path>
   sh scripts/projectpal-flow.sh generate-implementation-aid <output-path> <source-file>...
 EOF
   exit 1
@@ -399,6 +400,52 @@ EOF
   printf '%s\n' "$report"
 }
 
+command_phase7_batch_close_check() {
+  if [ "$#" -ne 1 ]; then
+    usage
+  fi
+
+  bundle_path=$1
+  require_file "$bundle_path"
+
+  has_final_report=false
+  has_wave_summaries=false
+  has_active_owners=false
+  has_ownership_collisions=false
+  has_blocked_items=false
+  has_verification_results=false
+  has_final_batch_status=false
+
+  grep -q '^## Final Integration Report' "$bundle_path" && has_final_report=true || true
+  grep -iq 'wave summaries\|wave summary' "$bundle_path" && has_wave_summaries=true || true
+  grep -iq 'active owners' "$bundle_path" && has_active_owners=true || true
+  grep -iq 'ownership collisions\|collisions' "$bundle_path" && has_ownership_collisions=true || true
+  grep -iq 'blocked items\|blocked work' "$bundle_path" && has_blocked_items=true || true
+  grep -iq 'verification results' "$bundle_path" && has_verification_results=true || true
+  grep -iq 'final batch status\|final status' "$bundle_path" && has_final_batch_status=true || true
+
+  close_ready=false
+  if [ "$has_final_report" = "true" ] &&
+     [ "$has_wave_summaries" = "true" ] &&
+     [ "$has_active_owners" = "true" ] &&
+     [ "$has_ownership_collisions" = "true" ] &&
+     [ "$has_blocked_items" = "true" ] &&
+     [ "$has_verification_results" = "true" ] &&
+     [ "$has_final_batch_status" = "true" ]; then
+    close_ready=true
+  fi
+
+  printf '%s\n' "artifact_ref: $bundle_path"
+  printf '%s\n' "has_final_integration_report: $has_final_report"
+  printf '%s\n' "has_wave_summaries: $has_wave_summaries"
+  printf '%s\n' "has_active_owners: $has_active_owners"
+  printf '%s\n' "has_ownership_collisions: $has_ownership_collisions"
+  printf '%s\n' "has_blocked_items: $has_blocked_items"
+  printf '%s\n' "has_verification_results: $has_verification_results"
+  printf '%s\n' "has_final_batch_status: $has_final_batch_status"
+  printf '%s\n' "close_ready: $close_ready"
+}
+
 command_generate_implementation_aid() {
   if [ "$#" -lt 2 ]; then
     usage
@@ -428,8 +475,13 @@ command_generate_implementation_aid() {
     printf '%s\n' "## Phase 7 Guidance"
     printf '\n'
     printf '%s\n' "- Build from handoff packages, not from full-thread replay."
+    printf '%s\n' "- Schedule work by wave order; do not open a later wave until the current wave exit criteria are met or remaining work is explicitly deferred."
+    printf '%s\n' "- Within a wave, run only tickets whose true dependencies are satisfied and whose exclusive write surfaces do not overlap."
     printf '%s\n' "- Keep memory retrieval repo-scoped and summary-first."
     printf '%s\n' "- Preserve resume continuity by syncing approved artifact refs and bridge summaries into \`.projectpal/state.yml\`."
+    printf '%s\n' "- Record ticket state with the vocabulary \`queued\`, \`blocked\`, \`running\`, \`complete\`, or \`deferred\`."
+    printf '%s\n' "- Treat \`builder\` as the default owner; add \`reviewer\` or \`verifier\` only as optional role slots when risk justifies them."
+    printf '%s\n' "- Do not close a batch without a Final Integration Report covering wave summaries, active owners, collisions, blocked items, verification results, and final batch status."
     printf '%s\n' "- When artifacts exceed the default budget, require an explicit exception note or split the work."
     printf '\n'
     for source_file in "$@"; do
@@ -456,6 +508,7 @@ case "$command" in
   build-phase-input) command_build_phase_input "$@" ;;
   sync-resume-bridge) command_sync_resume_bridge "$@" ;;
   reduction-report) command_reduction_report "$@" ;;
+  phase7-batch-close-check) command_phase7_batch_close_check "$@" ;;
   generate-implementation-aid) command_generate_implementation_aid "$@" ;;
   *) usage ;;
 esac

@@ -19,6 +19,8 @@ run_flow() {
   sh "$ROOT_DIR/scripts/projectpal-flow.sh" "$@"
 }
 
+FIXTURE_PATH="$ROOT_DIR/scripts/parallel-batch-fixture.md"
+
 cat > "$TMP_DIR/sample.md" <<'EOF'
 ---
 project: sample
@@ -114,6 +116,13 @@ phase_input_output=$(run_flow build-phase-input tickets .projectpal/artifacts/te
 assert_contains "$phase_input_output" "- Approved artifact ref: \`.projectpal/artifacts/tech-spec/example-spec.md\`"
 assert_contains "$phase_input_output" "- Extra artifact ref: \`.projectpal/artifacts/implementation-aid.md\`"
 
+fixture_close_output=$(run_flow phase7-batch-close-check "$FIXTURE_PATH")
+assert_contains "$fixture_close_output" "has_final_integration_report: true"
+assert_contains "$fixture_close_output" "has_wave_summaries: true"
+assert_contains "$fixture_close_output" "has_active_owners: true"
+assert_contains "$fixture_close_output" "has_blocked_items: true"
+assert_contains "$fixture_close_output" "close_ready: true"
+
 run_flow sync-resume-bridge "$TMP_DIR/state.yml" .projectpal/artifacts/tech-spec/example-spec.md "$TMP_DIR/bridge-summary.md" repo-bridge > /dev/null
 synced_state=$(cat "$TMP_DIR/state.yml")
 assert_contains "$synced_state" "resume_source: repo-bridge"
@@ -129,5 +138,6 @@ implementation_aid=$(cat "$TMP_DIR/implementation-aid.md")
 assert_contains "$implementation_aid" "## Sources"
 assert_contains "$implementation_aid" "- \`$TMP_DIR/source-a.md\`"
 assert_contains "$implementation_aid" "## Phase 7 Guidance"
+assert_contains "$implementation_aid" "Do not close a batch without a Final Integration Report"
 
 printf '%s\n' "projectpal-flow tests passed"

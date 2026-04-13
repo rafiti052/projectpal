@@ -498,12 +498,21 @@ After tickets are generated and saved, implementation begins. Do not clean up ar
 
 **Implementation rules:**
 - Read the ticket set from `.projectpal/artifacts/tickets/`.
-- Work ticket-by-ticket unless tickets are clearly independent.
-- Parallelize independent implementation work when it improves speed without risking merge conflicts or incoherent design.
+- Read the bundle by wave order first. Do not start a later wave until the current wave's exit criteria are satisfied or the remaining blocked work is explicitly deferred.
+- Within a wave, parallelize only the tickets whose `depends_on` chain is satisfied and whose `allowed_writes` do not overlap on an exclusive file or subsystem boundary.
 - Keep write ownership clear when parallelizing: each worker gets a distinct file/module responsibility and must not revert other workers' edits.
+- Treat `builder` as the default execution owner. Use `reviewer` or `verifier` only when the wave or ticket explicitly asks for an optional role slot.
+- Update ticket state in place as `queued`, `blocked`, `running`, `complete`, or `deferred`.
+- When a ticket is blocked, record the exact dependency or ownership boundary that caused the block before moving on.
 - Prefer existing codebase patterns and small, verifiable changes over broad rewrites.
 - After each meaningful batch, run the smallest useful verification for the changed surface.
+- Before any likely interruption point or long-running batch, sync `.projectpal/state.yml` so resume starts from the latest finished wave or ticket group.
 - If a ticket cannot be implemented in the current session, leave artifacts intact and write the exact next ticket/action to the diary.
+
+**Batch close rules:**
+- A wave is only closed when its runnable tickets are `complete` or explicitly `deferred`, its blocked tickets explain why they are blocked, and its exit criteria are satisfied.
+- Phase 7 cannot close without a Final Integration Report in the ticket bundle.
+- The Final Integration Report must record wave summaries, active owners, ownership collisions or confirmation of none, blocked items, verification results, and final batch status.
 
 **Implementation completion gate:**
 Phase 7 is complete only when:
@@ -588,13 +597,14 @@ This is distinct from individual decisions (already routed via A|B|C). The summa
 
 ### Artifact cleanup (final step)
 
-After the implementation review, optional GitHub PR flow, decision routing, and project summary are handled, delete the `.projectpal/artifacts/` directory:
+After the implementation review, optional GitHub PR flow, decision routing, and project summary are handled, remove only the stale artifacts for the feature that is being closed. Never delete the entire `.projectpal/artifacts/` directory.
 
-```
-rm -rf .projectpal/artifacts/
-```
-
-Keep `.projectpal/parking-lot.md` — it belongs to the workspace, not the project. Do this automatically unless the user says otherwise. The canonical record lives in MemPalace; the local artifacts are working files. Never clean up artifacts immediately after ticket generation.
+Cleanup rules:
+- Keep `.projectpal/artifacts/` as a long-lived workspace directory.
+- Remove only files tied to the closing feature, such as its PRD, tech spec, debate file, ticket bundle, and numbered ticket files that would become stale.
+- Keep unrelated artifacts for other features.
+- Keep `.projectpal/parking-lot.md` — it belongs to the workspace, not the project.
+- Never clean up artifacts immediately after ticket generation.
 
 ## Artifacts
 
@@ -726,11 +736,7 @@ Step 4: NEEDS REWORK routing:
         - NEEDS REWORK → stop, surface Critic's top issue, revise PRD. Return to Phase 1.
 Step 5: Agent(Judge) receives: judge-agent.md + full PRD text + Critic output (inline)
 Step 6: Pal saves debated PRD (status: debated) → presents at Phase 3 checkpoint
-        Append one line to ~/.projectpal/debate-log.md:
-        [date] [project] [Critic verdict] [meaningful change: yes/no] [Judge summary in one sentence]
 ```
-
-**Meaningful change definition:** A meaningful change is any addition, removal, or substantive rewrite of a requirement, assumption, success criterion, or risk that the Judge explicitly cites as prompted by the Critic. Rewording that preserves meaning does not qualify. Structural reordering alone does not qualify.
 
 ---
 
