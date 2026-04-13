@@ -1,7 +1,7 @@
 # PRD v4: ProjectPal — MVP CLI with Claude Code
 
 **Version:** 4.0  
-**Status:** Draft — Awaiting Human Checkpoint 1  
+**Status:** Approved — Shipped as v0.1  
 **Evolves from:** PRD v3 (north star preserved in `docs/PRD-v3-north-star.md`)  
 **Key decision:** Validate the core loop before scaling the infrastructure
 
@@ -15,7 +15,7 @@ The MVP validates the central hypothesis with the smallest possible infrastructu
 
 - Claude Code as runtime (no LangGraph, no Docker, no state machine)
 - CLAUDE.md as the Pal's persona and rules
-- Multi-agent debate via sub-agents (Task tool) with distinct personas
+- Multi-agent debate via sub-agents (Agent tool) with distinct personas
 - MemPalace via MCP for long-term memory
 - Local files for session state and Parking Lot
 
@@ -80,7 +80,7 @@ The PRD v3 infrastructure solves problems that don't exist yet. The real risk is
 | Need               | PRD v3 Solution                       | Claude Code Solution                               |
 | ------------------ | ------------------------------------- | -------------------------------------------------- |
 | Pal conversation   | LangGraph node `pal-conversation`     | CLAUDE.md loaded automatically                     |
-| Multi-agent debate | Separate LLM instances                | Sub-agents via Task tool — real, distinct personas |
+| Multi-agent debate | Separate LLM instances                | Sub-agents via Agent tool (built-in) — real, distinct personas |
 | Human checkpoints  | `interrupt()` + `updateState()`       | Conversation turn — "Sound right?"                 |
 | State persistence  | MemorySaver / checkpointer            | MemPalace (long-term) + `.projectpal/` (session)   |
 | Cynefin routing    | LLM classifier node with auto-routing | Pal suggests, user confirms                        |
@@ -99,7 +99,7 @@ The PRD v3 infrastructure solves problems that don't exist yet. The real risk is
 
 - **Iteration speed** — prompts, not code. Behavior change = edit a .md file.
 - **Immediate start** — zero setup beyond Claude Code + MemPalace.
-- **Real debate** — sub-agents via Task tool are separate instances with isolated context. Not self-review.
+- **Real debate** — sub-agents via Agent tool are separate instances with isolated context. Not self-review.
 - **Portability** — prompts, phase model, and MemPalace schema migrate intact to LangGraph when needed.
 
 ---
@@ -134,7 +134,7 @@ The Pal generates a PRD draft using the `prompts/prd-generate.md` prompt, consul
 
 ### Phase 2: Agent Debate
 
-The PRD draft is submitted to two sub-agents invoked via Task tool:
+The PRD draft is submitted to two sub-agents invoked via Agent tool:
 
 1. **Critic Agent** (`prompts/critic-agent.md`) — Analyzes problem clarity, technical feasibility, and success criteria. Persona: constructive skeptic, direct, cites specific sections.
 2. **Judge Agent** (`prompts/judge-agent.md`) — Receives the original PRD + Critic's output. Accepts, partially rejects, or discards each critique. Produces the final (debated) PRD. Persona: senior arbiter, fair, decisive.
@@ -181,7 +181,7 @@ The Pal generates granular tickets in `artifacts/tickets/`, one at a time, calib
 
 ### 8.1 Multi-Agent Debate
 
-**Implementation:** Sub-agents via Claude Code's Task tool.
+**Implementation:** Sub-agents via Claude Code's Agent tool.
 
 ```
 Pal generates PRD draft
@@ -298,7 +298,7 @@ _(Unchanged from PRD v3. These are the product's DNA.)_
 | ----------- | ---------------------------------- | ------------------------------------------------ |
 | Runtime     | Claude Code CLI                    | Zero infrastructure; native conversation + tools |
 | Persona     | CLAUDE.md                          | Loaded automatically by Claude Code              |
-| Multi-agent | Task tool (sub-agents)             | Isolated instances with distinct personas        |
+| Multi-agent | Agent tool (sub-agents)             | Isolated instances with distinct personas        |
 | Memory      | MemPalace via MCP                  | Structured long-term memory                      |
 | Local state | `.projectpal/` (YAML + MD)         | Session state without a database                 |
 | Artifacts   | `artifacts/` (MD with frontmatter) | Git-versionable documents                        |
@@ -331,10 +331,12 @@ projectpal/
 │   ├── prd-generate.md            ← PRD generation
 │   ├── tech-spec-generate.md      ← Tech spec generation
 │   └── tickets-generate.md        ← Ticket generation
-├── artifacts/
-│   ├── prd/                       ← Generated PRDs
-│   ├── tech-spec/                 ← Generated specs
-│   └── tickets/                   ← Generated tickets
+└── .projectpal/                   ← Per-project local state (managed by the Pal)
+    ├── artifacts/
+    │   ├── prd/                   ← Generated PRDs
+    │   ├── tech-spec/             ← Generated specs
+    │   ├── tickets/               ← Generated tickets
+    │   └── debate/                ← Debate records
 ├── docs/
 │   ├── PRD-v3-north-star.md       ← Full vision (LangGraph, Docker, etc.)
 │   └── PRD-v4-mvp.md             ← This document
@@ -353,7 +355,7 @@ projectpal/
 | **M0**       | Scaffold + MemPalace connected        | Pal converses and reads/writes memory            |
 | **M1**       | Cynefin classification working        | Pal classifies, user confirms                    |
 | **M2**       | Simple path                           | Conversation → tickets in `artifacts/`           |
-| **M3**       | Complicated path: PRD + Debate        | Critic + Judge produce debated PRD via Task tool |
+| **M3**       | Complicated path: PRD + Debate        | Critic + Judge produce debated PRD via Agent tool |
 | **M4**       | Tech Spec + Tickets from approved PRD | Full pipeline for one real project               |
 | **M5**       | Parking Lot + Session Resumption      | Context survives a 24h+ gap via MemPalace        |
 | **The Test** | **The company website was rewritten** | **It shipped**                                   |
@@ -415,11 +417,11 @@ projectpal/
 
 ### ADR-MVP-001: Claude Code as runtime
 
-Eliminates all orchestration infrastructure. CLAUDE.md defines persona and rules. Task tool enables real multi-agent debate. Reversible: prompts migrate to LangGraph without changes.
+Eliminates all orchestration infrastructure. CLAUDE.md defines persona and rules. Agent tool enables real multi-agent debate. Reversible: prompts migrate to LangGraph without changes.
 
-### ADR-MVP-002: Sub-agents via Task tool for debate
+### ADR-MVP-002: Sub-agents via Agent tool (built-in) for debate
 
-Task tool instantiates sub-agents with isolated context and distinct system prompts. Not self-review — they are separate invocations. Validates the debate hypothesis before investing in dedicated infrastructure.
+Agent tool instantiates sub-agents with isolated context and distinct system prompts. Not self-review — they are separate invocations. Validates the debate hypothesis before investing in dedicated infrastructure.
 
 ### ADR-MVP-003: State in local files + MemPalace
 
@@ -446,7 +448,7 @@ MVP (now)                            PRD v3 (when validated)
 ─────────────                        ─────────────────────────
 Claude Code CLI                  →   LangGraph.js + Node.js
 CLAUDE.md                        →   pal-conversation node
-Task tool sub-agents             →   Dedicated LLM instances
+Agent tool sub-agents             →   Dedicated LLM instances
 Conversation as checkpoint       →   interrupt() + updateState()
 .projectpal/state.yml            →   MemorySaver / checkpointer
 Cynefin suggested by Pal         →   Classifier node with auto-routing

@@ -1,4 +1,4 @@
-# ProjectPal
+# ProjectPal `v0.1.1`
 
 A patient AI companion that turns chaotic ideas into shipped projects.
 
@@ -24,30 +24,33 @@ It works through conversation, not forms. It remembers context between sessions.
 git clone git@github.com:rafiti052/projectpal.git
 cd projectpal
 
-# 2. Configure MemPalace MCP
-# Edit .mcp.json with your MemPalace connection details
+# 2. Deploy as a Claude Code skill (recommended)
+./sync-skill.sh
+# This syncs CLAUDE.md → ~/.claude/skills/projectpal/SKILL.md
+# making /projectpal available as a slash command in any project
 
-# 3. Run Claude Code in the project directory
+# 3. Run Claude Code anywhere and invoke the Pal
 claude
-
-# 4. Invoke the Pal
-# Type /projectpal to start, or just start talking
+# Type /projectpal to start
 ```
 
 The Pal loads automatically from `CLAUDE.md`. For non-Claude-Code environments, use `AGENTS.md` (identical content, standard filename).
 
-### Deploying as a Claude Code skill
+### MemPalace (long-term memory)
 
+The Pal detects MemPalace automatically on first run. If it's not connected, it will explain what it is and offer to install and register it for you — no manual setup required.
+
+If you prefer to set it up manually:
 ```bash
-./sync-skill.sh
+pip install mempalace
+claude mcp add mempalace --command "python3 -m mempalace.mcp_server"
+# Restart Claude Code to activate
 ```
-
-This syncs `CLAUDE.md` → `~/.claude/skills/projectpal/SKILL.md`, making `/projectpal` available as a slash command in any project.
 
 ### Dependencies
 
 - [Claude Code](https://claude.ai/code) (CLI or desktop)
-- [MemPalace](https://github.com/rafiti052/mempalace) MCP server for long-term memory
+- [MemPalace](https://github.com/rafiti052/mempalace) — optional but recommended for cross-session memory
 
 ## Project Structure
 
@@ -74,7 +77,7 @@ projectpal/
 
 Generated artifacts (PRDs, specs, tickets) are saved to `.projectpal/artifacts/` within the current project directory — not here.
 
-## MVP Milestones
+## Milestones
 
 | # | Deliverable | Status |
 |---|------------|--------|
@@ -84,6 +87,8 @@ Generated artifacts (PRDs, specs, tickets) are saved to `.projectpal/artifacts/`
 | M3 | Complicated path: PRD + debate | ✅ |
 | M4 | Tech spec + tickets | ✅ |
 | M5 | Parking Lot + session resumption | ✅ |
+| M6 | MemPalace onboarding — graceful detection, install guidance, local-only fallback | ✅ |
+| M7 | Full sub-agent pipeline — all 6 agents wired (Cynefin, PRD, Critic, Judge, Spec, Tickets) | ✅ |
 | **The Test** | **The website gets rewritten** | **pending** |
 
 ## The North Star

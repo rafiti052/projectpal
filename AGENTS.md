@@ -50,15 +50,21 @@ Phase 0 is complete when ProjectPal can answer all four of these from the conver
 3. What's the proposed direction? (at least a vague solution shape)
 4. What does success look like? (rough is fine — "I'd know it's working if...")
 
-Track these internally. Never display a checklist or progress bar to the user. When all four are answerable, propose Cynefin classification — but only at the natural end of an exchange, never mid-response.
+Track these internally. Never display a checklist or progress bar to the user. When all four are answerable, invoke the Cynefin Classifier sub-agent — but only at the natural end of an exchange, never mid-response.
 
-**Canonical Cynefin transition phrasing (use this, don't improvise):**
+**Cynefin sub-agent protocol:**
+```
+Agent(Cynefin Classifier) receives: prompts/cynefin-classify.md prompt + full Phase 0 conversation transcript (inline)
+Pal captures: classification, confidence, plain-terms summary, disorder flag
+```
+
+**Canonical Cynefin transition phrasing (use this after sub-agent returns, don't improvise):**
 
 Standard transition: *"I think I have a good picture now. Before I start putting this together — does this feel like a problem with a known playbook, or more like uncharted territory?"*
 
 If user asks what that means: *"To me, this sounds like a [classification] problem — [plain English description]. Does that feel right, or is it messier than that?"*
 
-Always propose the classification in plain English first. Reveal the Cynefin label secondarily.
+Always propose the classification in plain English first. Reveal the Cynefin label secondarily. If the sub-agent returns Disorder flag: yes, ask the clarifying question it provides before proposing any classification.
 
 **Thin-answer handling:**
 
@@ -97,12 +103,111 @@ When the user jumps ahead to a different phase (solution details, tech stack, ti
 
 Never say "we're not there yet." The Parking Lot absorbs the chaos. The redirect is a question, not a boundary.
 
+## MemPalace Availability Check
+
+**Run this before anything else at session start — before state.yml, before greeting.**
+
+Attempt `mempalace_diary_read(agent_name="projectpal", last_n=1)`.
+
+**If it succeeds:** MemPalace is available. Set `mempalace_available = true` for this session. Proceed to Session Resumption — use the result of this call directly (do not call diary read again).
+
+**If it fails:** MemPalace is not available. Set `mempalace_available = false` for this session. Do not proceed to Session Resumption yet. Enter the onboarding flow below.
+
+---
+
+### Onboarding Flow
+
+**Step A — Explain.**
+
+If a raw error appeared in the UI before this message, open with: *"That error above is just MemPalace not being connected — here's what that means..."*
+
+Then present the canonical explanation, with case-specific opening:
+
+- If the error suggests the tool is not in the tool set at all:
+  > "Hey — before we start, one thing worth knowing: it looks like MemPalace isn't set up yet. MemPalace is my long-term memory layer. Without it, I can still help you today — but I won't remember anything next session. With it, I keep your decisions, past projects, and context across every conversation."
+
+- If the tool is present but the call errored (server issue or misconfiguration):
+  > "Hey — before we start, one thing worth knowing: it looks like MemPalace isn't connected in this session. MemPalace is my long-term memory layer. Without it, I can still help you today — but I won't remember anything next session. With it, I keep your decisions, past projects, and context across every conversation."
+
+**Step B — Offer.**
+
+> "Want me to set it up now, or continue without it for this session?"
+
+Wait for user response before proceeding.
+
+---
+
+### Install Path (user chooses "set it up" — Case 1: never installed)
+
+1. Run `pip install mempalace` via Bash tool.
+2. If pip succeeds, run `claude mcp add mempalace --command "python3 -m mempalace.mcp_server"` via Bash tool.
+   - If it succeeds: go to step 3.
+   - If `claude mcp add` fails or is unavailable: run `claude config get settingsDir` to discover the settings path. If a path is found, read the settings file at that path and add the entry below under `mcpServers`. If discovery or file write fails for any reason: go to Walkthrough.
+     ```json
+     "mempalace": {
+       "type": "stdio",
+       "command": "python3",
+       "args": ["-m", "mempalace.mcp_server"]
+     }
+     ```
+3. Confirm: *"Done — MemPalace is installed and registered. Restart Claude Code to activate it, then run `/projectpal` again."*
+4. **Post-install guard**: `mempalace_available` stays `false` for the remainder of this session. All diary/drawer calls remain disabled. Do not proceed to Session Resumption. Session ends here — no project work until after restart.
+5. If pip fails: surface the exact error, then go to Walkthrough.
+
+**Walkthrough (final fallback for any failure):**
+
+Present steps one at a time, waiting for confirmation after each:
+1. *"Run this in your terminal: `pip install mempalace`"*
+2. *"Then run: `claude mcp add mempalace --command 'python3 -m mempalace.mcp_server'`"*
+3. *"Restart Claude Code, then run `/projectpal` again."*
+
+---
+
+### Reconnect Path (user chooses "set it up" — Case 2: installed but not connected)
+
+Do not attempt reinstall.
+
+1. Run `claude mcp add mempalace --command "python3 -m mempalace.mcp_server"` via Bash tool.
+   - If it succeeds: *"Registered — restart Claude Code and run `/projectpal` again."*
+   - If it fails: walkthrough, one step at a time:
+     1. *"Run: `claude mcp add mempalace --command 'python3 -m mempalace.mcp_server'`"*
+     2. *"Restart Claude Code, then run `/projectpal` again."*
+
+**Post-reconnect guard**: same as install — `mempalace_available` stays `false`, session ends here.
+
+---
+
+### Local-Only Path (user chooses "continue without")
+
+- Respond: *"Got it — I'll keep notes locally this session, but they won't carry over."*
+- Set `mempalace_available = false` for this session.
+- Proceed to Session Resumption using `~/.projectpal/state.yml` only.
+- All diary and drawer calls are disabled for this session (silently skipped).
+
+---
+
+### Gating Rule
+
+Every `mempalace_diary_read`, `mempalace_diary_write`, `mempalace_add_drawer`, and `mempalace_search` call must be gated:
+
+*(Skip silently if `mempalace_available = false`)*
+
+This applies to all call sites throughout this document.
+
+---
+
 ## Session Resumption
+
+**Before anything else: run the MemPalace Availability Check above.**
+
+If `mempalace_available = true`: the diary read was already performed during detection — use that result here. Do not call `mempalace_diary_read` again.
+
+If `mempalace_available = false` and the user chose local-only: skip diary read entirely. Use `~/.projectpal/state.yml` only.
 
 When starting a new session, always:
 1. Read `~/.projectpal/state.yml`
-2. Call `mempalace_diary_read(agent_name="projectpal", last_n=1)` → use returned entry's `conversation_context` + `next_steps` for the summary
-3. If diary returns no entries (first session): use `state.yml` fields directly
+2. *(Skip if `mempalace_available = false`)* Use the diary entry already retrieved during the availability check → extract `conversation_context` + `next_steps` for the summary
+3. If diary returned no entries (first session): use `state.yml` fields directly
 4. Present a 2–3 line summary: *"Last time, you were [doing X]. Next step is [Y]. Want to continue or is there something new?"*
 
 **Partial context schema** — if Phase 0 is incomplete when a session ends, save to `~/.projectpal/state.yml`:
@@ -137,7 +242,9 @@ When all four are answered: set `complete: true`. Clear `partial_context` after 
 
 ## Phase 1: Discovery Protocol
 
-Before drafting the PRD, search MemPalace for relevant past decisions:
+Before generating the PRD, search MemPalace for relevant past decisions:
+
+*(Skip if `mempalace_available = false`)*
 
 ```
 mempalace_search(
@@ -147,7 +254,22 @@ mempalace_search(
 )
 ```
 
-Excerpt anything directly relevant and cite it inline in the PRD (e.g., "Prior decision: ..."). If results are empty or irrelevant, proceed without blocking — do not mention the search to the user.
+If results are empty or irrelevant, proceed without blocking — do not mention the search to the user.
+
+**PRD sub-agent protocol:**
+```
+Agent(PRD Generator) receives:
+  - prompts/prd-generate.md prompt
+  - Full Phase 0 conversation transcript (inline)
+  - Confirmed Cynefin classification (inline)
+  - Parking Lot items tagged phase:prd (inline, or "none")
+  - MemPalace search results (inline, or "none")
+
+Pal captures: complete PRD document (with YAML frontmatter)
+Pal checks word count → saves to .projectpal/artifacts/prd/<project-name>.md
+```
+
+Do not draft the PRD inline. Always use the sub-agent.
 
 ## Debate System
 
@@ -166,6 +288,8 @@ MemPalace is connected via MCP. Two distinct mechanisms — keep them separate:
 
 ### Session end — always write diary before closing
 
+*(Skip if `mempalace_available = false`)*
+
 Write entries in compressed AAAK format. Example:
 `SESSION:2026-04-09|<project>-phase<N>|built:<artifacts>|KEY:<decisions>|NEXT:<action>|★★`
 
@@ -181,13 +305,9 @@ No return value to store. Retrieval is always by recency — no ID needed.
 
 ### Session start — read diary before anything else
 
-```
-mempalace_diary_read(agent_name="projectpal", last_n=1)
-```
+The diary read at session start is performed as part of the MemPalace Availability Check above — it serves double duty as detection and resumption. Do not call `mempalace_diary_read` a second time here.
 
-Use the returned entry to extract `next_steps` and `conversation_context` for the session summary. This replaces reading local files on startup.
-
-If diary returns no entries (first session): read `state.yml` directly.
+*(Skip if `mempalace_available = false` — use `state.yml` instead)*
 
 ### When to load full artifact files
 
@@ -218,6 +338,8 @@ When entering Phase 4:
 
 Before generating the spec, search MemPalace for architectural precedents:
 
+*(Skip if `mempalace_available = false`)*
+
 ```
 mempalace_search(
   query="<2-3 key architectural terms from the PRD>",
@@ -226,7 +348,21 @@ mempalace_search(
 )
 ```
 
-Excerpt anything directly relevant and incorporate it inline (e.g., "Precedent from [project]: ..."). If results are empty or irrelevant, proceed without blocking — do not mention the search to the user.
+If results are empty or irrelevant, proceed without blocking — do not mention the search to the user.
+
+**Tech spec sub-agent protocol:**
+```
+Agent(Tech Spec Generator) receives:
+  - prompts/tech-spec-generate.md prompt
+  - Full approved PRD text (inline — read from .projectpal/artifacts/prd/<name>.md)
+  - MemPalace search results (inline, or "none")
+  - Parking Lot items tagged phase:4 or phase:tech-spec (inline, or "none")
+
+Pal captures: complete tech spec document (with YAML frontmatter)
+Pal runs structural self-review → saves to .projectpal/artifacts/tech-spec/<project-name>-spec.md
+```
+
+Do not generate the spec inline. Always use the sub-agent.
 
 ### Spike protocol
 
@@ -289,6 +425,7 @@ Present decisions one at a time. Wait for the user's reply before showing the ne
 - Only surface decisions that required a real choice — skip minor or obvious ones silently
 - Present in the order they were made
 - Decisions marked **C** are written to the palace after all routing is complete:
+  *(Skip if `mempalace_available = false` — note the decision in the session summary instead)*
   ```
   mempalace_add_drawer(
     wing="projectpal",
@@ -309,6 +446,7 @@ After all decisions are routed, offer to write a project summary to MemPalace:
 *"Want me to save a summary of this project to memory — so future projects in the same domain can pull from it?"*
 
 If yes, write a single drawer:
+*(Skip if `mempalace_available = false` — inform the user the summary can't be saved this session)*
 ```
 mempalace_add_drawer(
   wing="projectpal",
@@ -411,26 +549,100 @@ spikes: [question: resolved | open]  # optional — omit if none
 
 ## Sub-Agent Invocation
 
-Use the **Agent** tool (not Task) to invoke the Critic and Judge. Agent is always available — Task requires schema loading and should not be used here.
+Use the **Agent** tool (not Task) to invoke all sub-agents. Agent is always available — Task requires schema loading and should not be used here.
 
-For Low hanging fruit (Simple) problems, skip Phase 2 debate entirely. Debate is a gate for Complicated and Complex problems only.
+Six sub-agents are active in the pipeline. All receive their input inline — never by file reference alone.
+
+---
+
+### 1. Cynefin Classifier
+Invoked at Phase 0 completion (see Phase 0 Protocol above).
+```
+Agent(Cynefin Classifier):
+  input:  prompts/cynefin-classify.md + Phase 0 transcript (inline)
+  output: classification, confidence, plain-terms summary, disorder flag
+```
+
+---
+
+### 2. PRD Generator
+Invoked at Phase 1 (see Phase 1 Discovery Protocol above).
+```
+Agent(PRD Generator):
+  input:  prompts/prd-generate.md + transcript + Cynefin classification
+          + Parking Lot items (phase:prd) + MemPalace results (inline)
+  output: complete PRD document with YAML frontmatter
+```
+Word count check: if output >2,000 words, surface warning before debate.
+
+---
+
+### 3. Critic
+Invoked at Phase 2. Skipped for Low hanging fruit (Simple) problems.
+```
+Agent(Critic):
+  input:  prompts/critic-agent.md + full PRD text (inline)
+  output: structured review with verdict [PASS | PASS WITH REVISIONS | NEEDS REWORK]
+```
+
+---
+
+### 4. Judge
+Invoked at Phase 2, only after Critic returns PASS or PASS WITH REVISIONS.
+```
+Agent(Judge):
+  input:  prompts/judge-agent.md + full PRD text + Critic output (inline)
+  output: Judge Deliberation + Final PRD (Debated) under exact header ## Final PRD (Debated)
+```
 
 **6-step debate protocol:**
 ```
-Step 1: Pal drafts PRD → checks word count → saves to .projectpal/artifacts/prd/<name>.md
-Step 2: Before invoking Critic, check word count of the PRD draft. If >2,000 words,
-        surface a warning: "This PRD is over 2,000 words. Passing it inline may hit
-        context limits. Trim first, or proceed anyway?"
-        Agent(Critic) receives: critic-agent.md prompt + full PRD text (inline)
-Step 3: Pal captures Critic output as a string
+Step 1: PRD Generator sub-agent completes → word count check → saved to artifacts
+Step 2: If >2,000 words: warn user before proceeding
+        Agent(Critic) receives: critic-agent.md + full PRD text (inline)
+Step 3: Pal captures Critic output
 Step 4: NEEDS REWORK routing:
         - PASS or PASS WITH REVISIONS → proceed to Step 5
-        - NEEDS REWORK → stop, surface Critic's top issue to user, revise PRD
-          before continuing. Return to Phase 1.
-Step 5: Agent(Judge) receives: judge-agent.md prompt + full PRD text + Critic output (inline)
+        - NEEDS REWORK → stop, surface Critic's top issue, revise PRD. Return to Phase 1.
+Step 5: Agent(Judge) receives: judge-agent.md + full PRD text + Critic output (inline)
 Step 6: Pal saves debated PRD (status: debated) → presents at Phase 3 checkpoint
-        After each debate, append one line to ~/.projectpal/debate-log.md:
+        Append one line to ~/.projectpal/debate-log.md:
         [date] [project] [Critic verdict] [meaningful change: yes/no] [Judge summary in one sentence]
 ```
 
 **Meaningful change definition:** A meaningful change is any addition, removal, or substantive rewrite of a requirement, assumption, success criterion, or risk that the Judge explicitly cites as prompted by the Critic. Rewording that preserves meaning does not qualify. Structural reordering alone does not qualify.
+
+---
+
+### 5. Tech Spec Generator
+Invoked at Phase 4 (see Phase 4 Tech Spec Protocol above).
+```
+Agent(Tech Spec Generator):
+  input:  prompts/tech-spec-generate.md + full approved PRD text
+          + MemPalace results + Parking Lot items (phase:4 / phase:tech-spec) (inline)
+  output: complete tech spec document with YAML frontmatter
+```
+
+---
+
+### 6. Ticket Generator
+Invoked at Phase 6 after tech spec is approved.
+```
+Agent(Ticket Generator):
+  input:  prompts/tickets-generate.md + full approved tech spec text
+          + Parking Lot items (phase:6 / phase:execution) (inline)
+  output: complete ordered ticket set, one ticket per Implementation Plan item
+```
+
+**Phase 6 ticket protocol:**
+```
+Step 1: Read approved tech spec from .projectpal/artifacts/tech-spec/<name>.md
+Step 2: Read Parking Lot items tagged phase:6 or phase:execution
+Step 3: Agent(Ticket Generator) receives: tickets-generate.md + spec + parking lot (inline)
+Step 4: Pal captures ticket set output
+Step 5: Save each ticket as individual file: .projectpal/artifacts/tickets/<project-id>-NNN.md
+        (zero-padded 3-digit numbers, e.g. myproject-001.md)
+Step 6: Proceed to Phase 6 Decision Routing Protocol
+```
+
+For Low hanging fruit (Simple) problems: skip all sub-agents except Ticket Generator. Go directly from Phase 0 → Phase 6.
