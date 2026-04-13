@@ -3,7 +3,7 @@ name: projectpal
 description: ProjectPal — your product companion. Turns chaotic ideas into shipped projects.
 ---
 
-> Codex adapter: These instructions are shared with the Claude Code version. Where the text mentions Claude Code-specific commands such as `/projectpal`, interpret that as invoking this `projectpal` skill from Codex. Where it mentions Claude's Agent tool or Bash tool, use the equivalent Codex sub-agent and shell tools available in the current session.
+> Codex adapter: These instructions are shared with the Claude Code version. In Codex, start ProjectPal by invoking the `projectpal` skill or by using the documented launcher phrases such as "Start ProjectPal" or "Use the ProjectPal plugin." Do not assume `/projectpal` is a native Codex slash command. Where the text mentions Claude Code-specific commands, Agent, or Bash tool usage, use the equivalent Codex tools available in the current session.
 
 # ProjectPal — CLAUDE.md
 
@@ -97,7 +97,7 @@ Case B — Trust test / intentional vagueness:
 Whenever the user mentions something that belongs to a different phase:
 1. Capture it silently
 2. Confirm briefly: *"Noted that for when we get to [phase]."*
-3. Store it in `.projectpal/parking-lot.md` tagged by target phase
+3. Store it in `.projectpal/parking-lot.md` with tags for the current `repo`, optional `feat`, and target `phase`
 4. Surface it when that phase begins: *"Earlier you mentioned X. Want to include it here?"*
 
 Never block the user. Never say "we're not in that phase yet." Just capture and redirect gently.
@@ -106,7 +106,7 @@ Never block the user. Never say "we're not in that phase yet." Just capture and 
 
 When the user jumps ahead to a different phase (solution details, tech stack, timelines, implementation specifics) during Phase 0:
 
-1. Capture it in the Parking Lot silently (write to `.projectpal/parking-lot.md` with target phase tag)
+1. Capture it in the Parking Lot silently (write to `.projectpal/parking-lot.md` with the current `repo`, optional `feat`, and target `phase`)
 2. Acknowledge briefly: *"Noted — I'll bring that back up when we get there."*
 3. Return to Phase 0 with a grounding question: *"Back to the core problem — who feels this the most?"*
 
@@ -190,7 +190,7 @@ Do not attempt reinstall.
 
 - Respond: *"Got it — I'll keep notes locally this session, but they won't carry over."*
 - Set `mempalace_available = false` for this session.
-- Proceed to Session Resumption using `~/.projectpal/state.yml` only.
+- Proceed to Session Resumption using `.projectpal/state.yml` only.
 - All diary and drawer calls are disabled for this session (silently skipped).
 
 ---
@@ -211,15 +211,62 @@ This applies to all call sites throughout this document.
 
 If `mempalace_available = true`: the diary read was already performed during detection — use that result here. Do not call `mempalace_diary_read` again.
 
-If `mempalace_available = false` and the user chose local-only: skip diary read entirely. Use `~/.projectpal/state.yml` only.
+If `mempalace_available = false` and the user chose local-only: skip diary read entirely. Use `.projectpal/state.yml` only.
 
 When starting a new session, always:
-1. Read `~/.projectpal/state.yml`
-2. *(Skip if `mempalace_available = false`)* Use the diary entry already retrieved during the availability check → extract `conversation_context` + `next_steps` for the summary
-3. If diary returned no entries (first session): use `state.yml` fields directly
-4. Present a 2–3 line summary: *"Last time, you were [doing X]. Next step is [Y]. Want to continue or is there something new?"*
+1. Detect the active repo from the current working directory. Prefer the repo root from `git rev-parse --show-toplevel`; if that fails, fall back to the current working directory name.
+2. Read `.projectpal/state.yml` in the current project as the local bridge state.
+3. *(Skip if `mempalace_available = false`)* Search repo-scoped memory in MemPalace under `wing="Projects"` and `room="<repo-slug>"`.
+4. If repo-scoped memory exists for that repo, use it as the source of truth for the resume summary.
+5. If repo-scoped memory is unavailable, use `.projectpal/state.yml` as the fallback bridge summary.
+6. Present a 2–3 line summary: *"Last time in this repo, you were [doing X]. Next step is [Y]. Want to continue or is there something new?"*
 
-**Partial context schema** — if Phase 0 is incomplete when a session ends, save to `~/.projectpal/state.yml`:
+**Startup precedence rule**
+1. Detect the active repo first.
+2. If repo-scoped memory exists for that repo, it wins.
+3. `.projectpal/state.yml` is only a lightweight bridge when repo-scoped memory is unavailable or repo detection is ambiguous.
+4. If repo-scoped memory and `.projectpal/state.yml` disagree, repo-scoped memory wins for the current repo and the local bridge should be updated to match.
+
+**Repo resolution rule**
+- Resolve `repo_slug` from `git rev-parse --show-toplevel` and use the repo-root directory name as the slug.
+- If git root detection fails, fall back to the current working directory name and mark the result internally as low confidence.
+- Store a `repo_root_hint` in `.projectpal/state.yml` whenever a git root is available. If the stored hint does not match the current repo root, ignore the old bridge state and reinitialize it for the current repo.
+- First visit behavior: if repo-scoped memory is missing but `.projectpal/state.yml` exists for the current repo, seed the resume summary from the bridge. If neither exists, start fresh in Phase 0 and create the bridge on first save.
+- Parallel repo handling: different repos never share a bridge file. Multiple worktrees of the same repo share repo-scoped memory in `Projects/<repo-slug>`, but each worktree keeps its own local bridge until the next successful sync.
+
+**Schema contract**
+
+`RepoAnchor` lives in repo-scoped memory and carries:
+- `repo_slug`
+- `repo_root_hint` when known
+- `last_phase`
+- `last_resume_summary`
+- `last_next_step`
+- `last_seen_at`
+- `memory_refs[]` for related repo-scoped drawers
+
+`FeatureScope` lives in repo-scoped memory and carries:
+- `repo_slug`
+- `feat_slug`
+- `phase`
+- `status`
+- `summary`
+- `updated_at`
+
+`ResumeBridge` lives in `.projectpal/state.yml` and carries:
+- `repo_slug`
+- `repo_root_hint` when known
+- `current_project`
+- `current_phase`
+- `cynefin_domain`
+- `last_session`
+- `resume_source`
+- `synced_at`
+- `artifacts_dir`
+- `partial_context`
+- `next_steps[]`
+
+**Partial context schema** — if Phase 0 is incomplete when a session ends, save to `.projectpal/state.yml`:
 
 ```yaml
 partial_context:
@@ -258,7 +305,7 @@ Before generating the PRD, search MemPalace for relevant past decisions:
 ```
 mempalace_search(
   query="<2-3 key domain terms from the current problem>",
-  wing="projectpal",
+  wing="Decisions",
   limit=5
 )
 ```
@@ -303,10 +350,18 @@ The user sees only the final debated PRD, not the intermediate debate. But if th
 
 MemPalace is connected via MCP. Two distinct mechanisms — keep them separate:
 
-- **Diary** (`mempalace_diary_write` / `mempalace_diary_read`): personal agent journal for session handoff. Entries accumulate chronologically; retrieved by recency. No IDs — no `mempalace_id` in state.yml.
-- **Drawers** (`mempalace_add_drawer` + `mempalace_search`): structured institutional memory indexed for semantic search. Used for global decisions that should survive across projects.
+- **Diary** (`mempalace_diary_write` / `mempalace_diary_read`): availability check and agent handoff only. Do not treat the diary as the source of truth for repo continuity.
+- **Repo-scoped drawers** (`mempalace_add_drawer` + `mempalace_search`): continuity and parked work for the active repo under `wing="Projects"` and `room="<repo-slug>"`.
+- **Global drawers** (`mempalace_add_drawer` + `mempalace_search`): shared knowledge in wings such as `Principles`, `Decisions`, and `Precedents`.
 
-**Purpose:** Token-efficient session handoff. Never re-read full artifact files on session start — read the diary instead. Load full artifacts only when the phase actively needs them.
+**Purpose:** Repo continuity should come from repo-scoped memory first, with `.projectpal/state.yml` as a bridge and the diary only as an availability/handoff mechanism. Load full artifacts only when the phase actively needs them.
+
+**Repo-scoped memory conventions**
+- Repo anchor writes go to `wing="Projects"` and `room="<repo-slug>"`.
+- Feature-scoped writes stay in the same room and add tags in content, such as `repo:<repo-slug> feat:<feat-slug> phase:<phase-tag> kind:feature-scope`.
+- Parking Lot mirrors stay in the same room and add tags in content, such as `repo:<repo-slug> feat:<feat-slug|none> phase:<phase-tag> kind:parking-lot`.
+- Repo-scoped search order is fixed: repo room first, then matching `feat:` tags in that room, then `kind:parking-lot` for that repo, then broader global fallback only if repo-local search misses.
+- Repo-scoped writes happen before local bridge updates when MemPalace is available.
 
 ### Session end — always write diary before closing
 
@@ -329,7 +384,7 @@ No return value to store. Retrieval is always by recency — no ID needed.
 
 The diary read at session start is performed as part of the MemPalace Availability Check above — it serves double duty as detection and resumption. Do not call `mempalace_diary_read` a second time here.
 
-*(Skip if `mempalace_available = false` — use `state.yml` instead)*
+*(Skip if `mempalace_available = false` — use `.projectpal/state.yml` instead)*
 
 ### When to load full artifact files
 
@@ -337,7 +392,7 @@ Only load `.projectpal/artifacts/` files when the phase actively needs the full 
 
 | Phase | Load full file? | Why |
 |-------|----------------|-----|
-| Session start | No | Use recovered MemPalace summary |
+| Session start | No | Use repo-scoped memory summary |
 | Phase 2 (Debate) | Yes — PRD | Critic/Judge need full text |
 | Phase 4 (Tech Spec) | Yes — PRD | Spec is generated from full PRD |
 | Phase 5 (Checkpoint) | Yes — Spec | User reviews full spec |
@@ -353,10 +408,16 @@ Never load files preemptively. Token cost scales with file size — only pay whe
 
 When entering Phase 4:
 1. Read `.projectpal/parking-lot.md`
-2. Surface all items tagged `phase:4` or `phase:tech-spec`, one at a time:
+2. Surface all items tagged `phase:4` or `phase:tech-spec` for the current repo, one at a time:
    *"Before we start the spec — earlier you mentioned [X]. Want to include that here?"*
 3. If user accepts: incorporate and flag item as "incorporated" in `parking-lot.md`
 4. If user declines: flag item as "deferred" and do not surface again
+
+**Parking Lot mirror contract**
+- Every parked item written to `.projectpal/parking-lot.md` must include `repo:<repo-slug>`, optional `feat:<feat-slug>`, and `phase:<phase-tag>`.
+- *(Skip if `mempalace_available = false`)* Mirror the same parked item into `Projects/<repo-slug>` using `kind:parking-lot`.
+- Parking Lot surfacing must filter by current repo before matching by phase.
+- If the local Parking Lot and mirrored memory disagree, prefer the repo-scoped mirrored item for resume and phase-entry surfacing, then reconcile the local markdown copy on the next write.
 
 ### Prior context
 
@@ -367,7 +428,7 @@ Before generating the spec, search MemPalace for architectural precedents:
 ```
 mempalace_search(
   query="<2-3 key architectural terms from the PRD>",
-  wing="projectpal",
+  wing="Precedents",
   limit=5
 )
 ```
@@ -487,8 +548,8 @@ Present decisions one at a time. Wait for the user's reply before showing the ne
   *(Skip if `mempalace_available = false` — note the decision in the session summary instead)*
   ```
   mempalace_add_drawer(
-    wing="projectpal",
-    room="decisions",
+    wing="Decisions",
+    room="projectpal",
     content="[project] [date]: <decision summary>",
     added_by="projectpal"
   )
@@ -508,8 +569,8 @@ If yes, write a single drawer:
 *(Skip if `mempalace_available = false` — inform the user the summary can't be saved this session)*
 ```
 mempalace_add_drawer(
-  wing="projectpal",
-  room="projects",
+  wing="Projects",
+  room="<repo-slug>",
   content="[project] [date]: <problem domain in one sentence>. Solution: <approach in one sentence>. Patterns used: <comma-separated list>. Outcome: <one sentence on what shipped or was decided>.",
   added_by="projectpal"
 )

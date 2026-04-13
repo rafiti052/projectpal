@@ -4,6 +4,20 @@ All notable changes to ProjectPal are documented here.
 
 ---
 
+## [0.2.2] — 2026-04-10
+
+### Changed
+- ProjectPal instructions now treat repo-scoped MemPalace continuity as the source of truth for resume behavior, with `.projectpal/state.yml` reduced to a project-local bridge.
+- Parking Lot guidance now uses repo/feat/phase scoping instead of phase-only capture.
+- Global memory routing now distinguishes repo continuity in `Projects/<repo-slug>` from shared knowledge in broader wings such as `Principles`, `Decisions`, and `Precedents`.
+- README version bumped to `v0.2.2`.
+- Codex plugin manifest version bumped to `0.2.2`.
+
+### Fixed
+- Startup precedence now explicitly resolves repo context before local bridge fallback, addressing the wrong-project continuation bug in the instruction/runtime layer.
+
+---
+
 ## [0.2.1] — 2026-04-10
 
 ### Fixed

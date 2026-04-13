@@ -13,7 +13,7 @@ name: projectpal
 description: ProjectPal — your product companion. Turns chaotic ideas into shipped projects.
 ---
 
-> Codex adapter: These instructions are shared with the Claude Code version. Where the text mentions Claude Code-specific commands such as `/projectpal`, interpret that as invoking this `projectpal` skill from Codex. Where it mentions Claude's Agent tool or Bash tool, use the equivalent Codex sub-agent and shell tools available in the current session.
+> Codex adapter: These instructions are shared with the Claude Code version. In Codex, start ProjectPal by invoking the `projectpal` skill or by using the documented launcher phrases such as "Start ProjectPal" or "Use the ProjectPal plugin." Do not assume `/projectpal` is a native Codex slash command. Where the text mentions Claude Code-specific commands, Agent, or Bash tool usage, use the equivalent Codex tools available in the current session.
 
 HEADER
 

@@ -1,12 +1,12 @@
-# ProjectPal `v0.2.1`
+# ProjectPal `v0.2.2`
 
 A patient AI companion that turns chaotic ideas into shipped projects.
 
 ## What is this?
 
-ProjectPal is a CLI tool powered by Claude Code that helps you go from messy idea to actionable tickets — without requiring you to have your thoughts organized first.
+ProjectPal helps you go from messy idea to actionable tickets without requiring you to have your thoughts organized first.
 
-It works through conversation, not forms. It remembers context between sessions. It captures out-of-phase ideas instead of losing them. And it uses a multi-agent debate system to stress-test your plans before you commit.
+It works through conversation, not forms. It remembers context between sessions. It captures out-of-phase ideas instead of losing them. And it uses a multi-agent debate system to stress-test plans before you commit.
 
 ## How it works
 
@@ -18,35 +18,63 @@ It works through conversation, not forms. It remembers context between sessions.
 6. **Implementation → review** — tickets stay available while the Pal implements, verifies, and reviews progress
 7. **MemPalace** — everything is remembered for next time
 
+## Canonical Instructions
+
+`CLAUDE.md` is the current canonical ProjectPal source artifact in this repo.
+
+The launcher-specific files for Claude Code, Codex CLI, and Gemini CLI are adapters generated or synced from that source. `AGENTS.md` stays as a repo-local mirror for toolchains that expect the standard agents filename.
+
 ## Setup
 
 ```bash
-# 1. Clone the repo
 git clone git@github.com:rafiti052/projectpal.git
 cd projectpal
-
-# 2. Deploy as a Claude Code skill (recommended)
-./sync-skill.sh
-# This syncs CLAUDE.md → ~/.claude/skills/projectpal/SKILL.md
-# making /projectpal available as a slash command in any project
-
-# 3. Run Claude Code anywhere and invoke the Pal
-claude
-# Type /projectpal to start
 ```
 
-The Pal loads automatically from `CLAUDE.md`. For non-Claude-Code environments, use `AGENTS.md` (identical content, standard filename).
-
-### Codex plugin setup
-
-ProjectPal can also be installed as a Codex plugin without changing the Claude Code integration:
+### Claude Code
 
 ```bash
-# Refresh the Codex skill entrypoint from CLAUDE.md
+./sync-skill.sh
+claude
+```
+
+Launcher: `/projectpal`
+
+`./sync-skill.sh` installs the ProjectPal skill into `~/.claude/skills/projectpal/SKILL.md` and refreshes the repo-local `AGENTS.md` mirror.
+
+### Codex CLI
+
+```bash
 ./sync-codex-plugin.sh
 ```
 
-Codex reads the plugin manifest from `.codex-plugin/plugin.json`, which points to `skills/projectpal/SKILL.md` and the repo-local `.mcp.json`.
+Launchers:
+
+- `projectpal` skill
+- `Start ProjectPal`
+- `Use the ProjectPal plugin`
+
+Codex reads the plugin manifest from `.codex-plugin/plugin.json`, which points at `skills/projectpal/SKILL.md` and the repo-local `.mcp.json`.
+
+ProjectPal does **not** claim that `/projectpal` is a native Codex slash command. OpenAI’s Codex docs currently position reusable workflows around skills, and custom prompts are deprecated in favor of skills.
+
+After updating the generator, refresh the generated skill file:
+
+```bash
+./sync-codex-plugin.sh
+```
+
+### Gemini CLI
+
+```bash
+./sync-gemini-commands.sh
+```
+
+Launcher: `/projectpal`
+
+This syncs the repo-managed Gemini command wrapper to `.gemini/commands/projectpal.toml`. The command wrapper references the shared ProjectPal instructions from `CLAUDE.md` instead of forking the persona into a second handwritten file.
+
+If your Gemini session is already open, reload commands before testing.
 
 ### MemPalace (long-term memory)
 
@@ -62,6 +90,8 @@ claude mcp add mempalace --command "python3 -m mempalace.mcp_server"
 ### Dependencies
 
 - [Claude Code](https://claude.ai/code) (CLI or desktop)
+- [Codex CLI](https://developers.openai.com/codex/overview)
+- [Gemini CLI](https://github.com/google-gemini/gemini-cli)
 - [MemPalace](https://github.com/rafiti052/mempalace) — optional but recommended for cross-session memory
 
 ## Project Structure
@@ -72,8 +102,12 @@ projectpal/
 ├── AGENTS.md                  ← Same as CLAUDE.md (standard agents filename)
 ├── sync-skill.sh              ← Deploy CLAUDE.md as a Claude Code skill
 ├── sync-codex-plugin.sh       ← Refresh skills/projectpal/SKILL.md for Codex
+├── sync-gemini-commands.sh    ← Refresh .gemini/commands/projectpal.toml for Gemini
 ├── .codex-plugin/
 │   └── plugin.json            ← Codex plugin manifest
+├── .gemini/
+│   └── commands/
+│       └── projectpal.toml    ← Gemini custom command wrapper
 ├── .agents/plugins/
 │   └── marketplace.json       ← Optional local Codex marketplace entry
 ├── skills/projectpal/
@@ -88,13 +122,20 @@ projectpal/
 │   └── tickets-generate.md    ← Ticket generation prompt
 ├── docs/
 │   ├── PRD-v3-north-star.md   ← Full vision (LangGraph, Docker, formal orchestration)
-│   └── PRD-v4-mvp.md          ← MVP spec — what this version implements
-└── .projectpal/               ← Local state (managed by the Pal, per project)
-    ├── state.yml              ← Current session state
-    └── parking-lot.md         ← Items captured out of phase
+│   ├── PRD-v4-mvp.md          ← MVP spec — what this version implements
+│   └── repo-context-lifecycle.md ← Repo resume and multi-worktree decision note
+└── .projectpal/               ← Local bridge state (managed by the Pal, per project)
+    ├── state.yml              ← Repo-local bridge state for startup/resume
+    └── parking-lot.md         ← Repo-scoped parked items with feat/phase tags
 ```
 
 Generated artifacts (PRDs, specs, tickets) are saved to `.projectpal/artifacts/` within the current project directory — not here.
+
+Repo continuity lives in MemPalace under `Projects/<repo-slug>`. Shared knowledge remains in broader MemPalace wings such as `Principles`, `Decisions`, and `Precedents`.
+
+Repo detection resolves the git repo root first and uses that directory name as `repo_slug`. If git detection fails, ProjectPal falls back to the current directory name, treats it as low-confidence startup context, and creates a fresh local bridge instead of reusing stale cross-repo state. Multiple worktrees of the same repo share repo-scoped memory while keeping separate `.projectpal/state.yml` bridge files.
+
+The repo-scoped schema and write/search order live in [docs/repo-context-lifecycle.md](docs/repo-context-lifecycle.md). In short: repo anchors and feature scopes live under `Projects/<repo-slug>`, the local bridge stays in `.projectpal/state.yml`, and Parking Lot items are mirrored with `repo:`, `feat:`, `phase:`, and `kind:parking-lot` tags so phase-entry surfacing stays repo-local.
 
 ## Milestones
 

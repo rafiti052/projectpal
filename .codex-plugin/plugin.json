@@ -1,6 +1,6 @@
 {
   "name": "projectpal",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A patient product companion that turns chaotic ideas into PRDs, specs, and 15-minute tickets.",
   "author": {
     "name": "Rafael",
@@ -21,7 +21,7 @@
   "interface": {
     "displayName": "ProjectPal",
     "shortDescription": "Turns chaotic ideas into PRDs, specs, and 15-minute tickets.",
-    "longDescription": "ProjectPal is a patient product companion for turning non-linear ideas into plans, specs, and small execution tickets without forcing structured intake.",
+    "longDescription": "ProjectPal is a patient product companion for turning non-linear ideas into plans, specs, and small execution tickets without forcing structured intake. In Codex, launch it with the ProjectPal skill or a documented trigger phrase such as \"Start ProjectPal\".",
     "developerName": "Rafael",
     "category": "Productivity",
     "capabilities": [
@@ -30,9 +30,11 @@
     ],
     "websiteURL": "https://github.com/rafiti052/projectpal",
     "defaultPrompt": [
+      "ProjectPal",
+      "projectpal",
       "Start ProjectPal",
-      "Turn this idea into tickets",
-      "Help me shape a project"
+      "Use the ProjectPal plugin",
+      "Turn this idea into tickets"
     ],
     "brandColor": "#2563EB"
   }

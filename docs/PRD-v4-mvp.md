@@ -224,14 +224,17 @@ Pal presents final PRD to user
 - Silent capture during any phase
 - Brief confirmation: _"Noted that for the implementation phase."_
 - Injection at the start of the relevant phase: _"Last week you mentioned X. Want to include it?"_
+- Repo-scoped tags should be carried with each item so the active repo can be filtered before phase surfacing
+- Mirrored memory should use the same `repo:`, `feat:`, `phase:`, and `kind:parking-lot` tags under `Projects/<repo-slug>`
 
 ### 8.3 Session Resumption
 
 **Implementation:** At the start of each session, the Pal:
 
-1. Reads `.projectpal/state.yml` for local state
-2. Consults MemPalace for long-term context
-3. Presents a 2–3 line summary
+1. Detects the active repo from git root first
+2. Reads `.projectpal/state.yml` for repo-local bridge state
+3. Consults repo-scoped memory in `Projects/<repo-slug>` before any broader fallback
+4. Presents a 2–3 line summary
 
 > _"In the last session, you were reviewing the PRD for the website redesign. The Critic pointed out that the success criteria were vague and the Judge partially agreed. Next step: revise and approve. Want to continue?"_
 

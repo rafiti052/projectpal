@@ -1,0 +1,12 @@
+description = "Start ProjectPal from the shared canonical instructions in CLAUDE.md."
+prompt = """
+Start ProjectPal for this repository.
+
+Use the canonical ProjectPal instructions below.
+
+@{CLAUDE.md}
+
+After reading those instructions, open in Phase 0 with warm conversational intake and ask only one question.
+
+If the user typed extra arguments after /projectpal, treat them as the latest user message.
+"""
