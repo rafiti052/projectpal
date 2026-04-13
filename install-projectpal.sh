@@ -23,12 +23,16 @@ normalize_choice() {
 }
 
 prompt_for_choice() {
-  printf '%s\n' "Choose an assistant to install ProjectPal for:"
-  printf '%s\n' "  1. Claude Code"
-  printf '%s\n' "  2. Codex"
-  printf '%s' "> "
+  printf '%s\n' "Choose an assistant to install ProjectPal for:" >&2
+  printf '%s\n' "  1. Claude Code" >&2
+  printf '%s\n' "  2. Codex" >&2
+  printf '%s' "> " >&2
   IFS= read -r answer || exit 1
   normalize_choice "$answer"
+}
+
+is_interactive_stdin() {
+  [ -t 0 ]
 }
 
 if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
@@ -38,7 +42,13 @@ fi
 
 choice=$(normalize_choice "${1:-}")
 if [ -z "$choice" ]; then
-  choice=$(prompt_for_choice)
+  if is_interactive_stdin; then
+    choice=$(prompt_for_choice)
+  else
+    usage >&2
+    printf '\n%s\n' "install-projectpal: assistant choice required when stdin is not interactive" >&2
+    exit 1
+  fi
 fi
 
 if [ -z "$choice" ]; then

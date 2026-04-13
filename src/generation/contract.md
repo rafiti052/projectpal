@@ -8,7 +8,7 @@ Every feature touching ProjectPal runtime behavior should update the neutral sou
 
 ## Planned generation order
 
-1. Edit neutral source files under `src/projectpal/`
+1. Edit neutral source files under `src/`
 2. Generate shared runtime outputs:
    - `CLAUDE.md`
    - `AGENTS.md`

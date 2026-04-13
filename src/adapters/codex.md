@@ -44,10 +44,10 @@ The Codex adapter should own only:
 - generated-file packaging notes
 
 These adapter-owned snippets now live in:
-- `src/projectpal/adapters/codex-skill-header.md`
-- `src/projectpal/adapters/codex-skill-footer.md`
+- `src/adapters/codex-skill-header.md`
+- `src/adapters/codex-skill-footer.md`
 
-The shared ProjectPal behavior should come from `src/projectpal/shared/layer0.md`.
+The shared ProjectPal behavior should come from `src/shared/layer0.md`.
 
 ## Minimum wrapper conclusion
 

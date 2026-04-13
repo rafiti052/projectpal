@@ -32,12 +32,12 @@ git -C "$new_repo" init >/dev/null 2>&1
 printf '%s\n' "# Existing Repo" > "$existing_repo/README.md"
 
 sync_output=$(sh "$ROOT_DIR/sync-codex-plugin.sh")
-assert_contains "$sync_output" "Generated CLAUDE.md from src/projectpal/shared/layer0.md"
-assert_contains "$sync_output" "Generated AGENTS.md from src/projectpal/shared/layer0.md"
-assert_contains "$sync_output" "Generated skills/projectpal/SKILL.md from src/projectpal"
+assert_contains "$sync_output" "Generated CLAUDE.md from src/shared/layer0.md"
+assert_contains "$sync_output" "Generated AGENTS.md from src/shared/layer0.md"
+assert_contains "$sync_output" "Generated skills/projectpal/SKILL.md from src"
 
-assert_file_contains "$ROOT_DIR/CLAUDE.md" "ProjectPal neutral source under src/projectpal/"
-assert_file_contains "$ROOT_DIR/AGENTS.md" "ProjectPal neutral source under src/projectpal/"
+assert_file_contains "$ROOT_DIR/CLAUDE.md" "ProjectPal neutral source under src/"
+assert_file_contains "$ROOT_DIR/AGENTS.md" "ProjectPal neutral source under src/"
 assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" 'In Codex, start ProjectPal by typing `ProjectPal`.'
 
 codex_install_output=$(sh "$ROOT_DIR/install-projectpal.sh" codex)

@@ -20,7 +20,7 @@ It works through conversation, not forms. It remembers context between sessions.
 
 ## Canonical Instructions
 
-`src/projectpal/` is the neutral ProjectPal source in this repo.
+`src/` is the neutral ProjectPal source in this repo.
 
 The launcher-specific files for Claude Code and Codex CLI are generated runtime surfaces. `CLAUDE.md` and `AGENTS.md` are outputs, not the authoring center.
 
@@ -43,7 +43,7 @@ Supported assistants right now:
 - Codex
 - Claude Code
 
-The installer always refreshes the generated runtime surfaces from `src/projectpal/` first, then installs the assistant-specific integration you choose.
+The installer always refreshes the generated runtime surfaces from `src/` first, then installs the assistant-specific integration you choose.
 
 ### Codex
 
@@ -112,18 +112,18 @@ For Codex, use the equivalent Codex MCP registration flow for your local environ
 
 ```
 projectpal/
-├── src/projectpal/            ← Neutral ProjectPal source for generated runtime surfaces
+├── src/                       ← Neutral ProjectPal source for generated runtime surfaces
 ├── install-projectpal.sh      ← Single install entrypoint that prompts for Claude or Codex
-├── CLAUDE.md                  ← Generated Claude runtime surface
-├── AGENTS.md                  ← Generated agents-compatible runtime surface
+├── CLAUDE.md                  ← Generated Claude runtime surface (local install output, not versioned)
+├── AGENTS.md                  ← Generated agents-compatible runtime surface (local install output, not versioned)
 ├── sync-claude-skill.sh       ← Install generated Claude runtime surface into Claude Code
-├── sync-codex-plugin.sh       ← Generate Claude and Codex runtime surfaces from src/projectpal
+├── sync-codex-plugin.sh       ← Generate Claude and Codex runtime surfaces from src/
 ├── .codex-plugin/
 │   └── plugin.json            ← Codex plugin manifest
 ├── .agents/plugins/
 │   └── marketplace.json       ← Optional local Codex marketplace entry
 ├── skills/projectpal/
-│   └── SKILL.md               ← Generated Codex skill entrypoint
+│   └── SKILL.md               ← Generated Codex skill entrypoint (local install output, not versioned)
 ├── .mcp.json                  ← MemPalace MCP connection
 ├── prompts/
 │   ├── critic-agent.md        ← Critic sub-agent persona

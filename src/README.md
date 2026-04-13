@@ -12,7 +12,7 @@ The goal is to stop treating generated runtime files as the source of truth and 
 ## Layout
 
 ```text
-src/projectpal/
+src/
   README.md
   shared/
     layer0.md

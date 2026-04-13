@@ -8,10 +8,10 @@ These are currently shared ProjectPal behavior blocks that should move into the 
 
 | Current file | Current block | Classification | Planned neutral home |
 |--------------|---------------|----------------|----------------------|
-| `CLAUDE.md` | Full Layer 0 runtime body | Shared | `src/projectpal/shared/layer0.md` |
-| `AGENTS.md` | Full Layer 0 runtime body | Shared generated mirror | `src/projectpal/shared/layer0.md` |
-| `skills/projectpal/SKILL.md` | Embedded ProjectPal runtime body copied from `CLAUDE.md` | Shared generated body | `src/projectpal/shared/layer0.md` |
-| `instructions/*.md` | Detailed deferred protocols and contracts | Shared deferred detail | referenced by `src/projectpal/shared/layer1-index.md` |
+| `CLAUDE.md` | Full Layer 0 runtime body | Shared | `src/shared/layer0.md` |
+| `AGENTS.md` | Full Layer 0 runtime body | Shared generated mirror | `src/shared/layer0.md` |
+| `skills/projectpal/SKILL.md` | Embedded ProjectPal runtime body copied from `CLAUDE.md` | Shared generated body | `src/shared/layer0.md` |
+| `instructions/*.md` | Detailed deferred protocols and contracts | Shared deferred detail | referenced by `src/shared/layer1-index.md` |
 
 ## Runtime-specific wrapper inventory
 
@@ -19,11 +19,11 @@ These blocks should remain outside the shared neutral source:
 
 | Current file | Current block | Classification | Planned adapter home |
 |--------------|---------------|----------------|----------------------|
-| `skills/projectpal/SKILL.md` | skill frontmatter | Codex wrapper | `src/projectpal/adapters/codex.md` |
-| `skills/projectpal/SKILL.md` | Codex adapter preamble | Codex wrapper | `src/projectpal/adapters/codex.md` |
-| `skills/projectpal/SKILL.md` | Codex packaging footer | Codex wrapper | `src/projectpal/adapters/codex.md` |
-| `.codex-plugin/plugin.json` | plugin metadata and prompt triggers | Codex wrapper metadata | `src/projectpal/adapters/codex.md` |
-| `CLAUDE.md` | ownership comment and file identity | Claude wrapper, minimal | `src/projectpal/adapters/claude.md` |
+| `skills/projectpal/SKILL.md` | skill frontmatter | Codex wrapper | `src/adapters/codex.md` |
+| `skills/projectpal/SKILL.md` | Codex adapter preamble | Codex wrapper | `src/adapters/codex.md` |
+| `skills/projectpal/SKILL.md` | Codex packaging footer | Codex wrapper | `src/adapters/codex.md` |
+| `.codex-plugin/plugin.json` | plugin metadata and prompt triggers | Codex wrapper metadata | `src/adapters/codex.md` |
+| `CLAUDE.md` | ownership comment and file identity | Claude wrapper, minimal | `src/adapters/claude.md` |
 
 ## Non-source operational files
 

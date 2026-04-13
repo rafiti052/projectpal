@@ -1,9 +1,9 @@
 #!/bin/sh
-# Generate CLAUDE.md, AGENTS.md, and skills/projectpal/SKILL.md from src/projectpal/.
+# Generate CLAUDE.md, AGENTS.md, and skills/projectpal/SKILL.md from src/.
 
 set -eu
 
-SOURCE_DIR="src/projectpal"
+SOURCE_DIR="src"
 SHARED_FILE="$SOURCE_DIR/shared/layer0.md"
 PREFIX_FILE="$SOURCE_DIR/adapters/runtime-output-prefix.md"
 SKILL_HEADER_FILE="$SOURCE_DIR/adapters/codex-skill-header.md"

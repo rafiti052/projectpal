@@ -18,9 +18,9 @@ Keep the Claude adapter as thin as possible:
 - any Claude-only launch note if one becomes necessary
 
 The current generated-file prefix is shared through:
-- `src/projectpal/adapters/runtime-output-prefix.md`
+- `src/adapters/runtime-output-prefix.md`
 
-Everything else should come from `src/projectpal/shared/layer0.md`.
+Everything else should come from `src/shared/layer0.md`.
 
 ## Minimum wrapper conclusion
 

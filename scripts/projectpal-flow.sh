@@ -256,7 +256,7 @@ command_probe_assistants() {
   confidence=inconclusive
   fallback_used=true
 
-  if [ -f "$target_dir/.claude/settings.local.json" ] || [ -d "$target_dir/src/projectpal" ] || [ -f "$target_dir/sync-claude-skill.sh" ]; then
+  if [ -f "$target_dir/.claude/settings.local.json" ] || [ -f "$target_dir/src/shared/layer0.md" ] || [ -f "$target_dir/sync-claude-skill.sh" ]; then
     claude_signal=true
   fi
   if [ -f "$target_dir/.codex-plugin/plugin.json" ] || [ -f "$target_dir/skills/projectpal/SKILL.md" ] || [ -f "$target_dir/sync-codex-plugin.sh" ]; then
