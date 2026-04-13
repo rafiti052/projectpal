@@ -2,21 +2,21 @@
 
 # MemPalace Integration
 
-MemPalace is connected via MCP. Two distinct mechanisms — keep them separate:
+MemPalace is connected via MCP. Two distinct mechanisms keep different jobs separate:
 
 - **Diary** (`mempalace_diary_write` / `mempalace_diary_read`): availability check and agent handoff only. Do not treat the diary as the source of truth for repo continuity.
 - **Repo-scoped drawers** (`mempalace_add_drawer` + `mempalace_search`): continuity and parked work for the active repo under `wing="Projects"` and `room="<repo-slug>"`.
 - **Global drawers** (`mempalace_add_drawer` + `mempalace_search`): shared knowledge in wings such as `Principles`, `Decisions`, and `Precedents`.
 
-**Purpose:** Repo continuity should come from repo-scoped memory first, with `.projectpal/state.yml` as a bridge and the diary only as an availability/handoff mechanism. Load full artifacts only when the phase actively needs them.
+**Purpose:** Local continuity should come from `.projectpal/state.yml` first, with repo-scoped memory as background continuity or bootstrap only when the local bridge is missing. The diary remains an availability and handoff mechanism only. Load full artifacts only when the phase actively needs them.
 
 ## Repo-scoped memory conventions
 
 - Repo anchor writes go to `wing="Projects"` and `room="<repo-slug>"`.
 - Feature-scoped writes stay in the same room and add tags in content, such as `repo:<repo-slug> feat:<feat-slug> phase:<phase-tag> kind:feature-scope`.
 - Parking Lot mirrors stay in the same room and add tags in content, such as `repo:<repo-slug> feat:<feat-slug|none> phase:<phase-tag> kind:parking-lot`.
-- Repo-scoped search order is fixed: repo room first, then matching `feat:` tags in that room, then `kind:parking-lot` for that repo, then broader global fallback only if repo-local search misses.
-- Repo-scoped writes happen before local bridge updates when MemPalace is available.
+- Repo-scoped search order is fixed: local bridge first, then the repo room, then matching `feat:` tags in that room, then `kind:parking-lot` for that repo, then broader global fallback only if repo-local search misses.
+- Repo-scoped writes happen quietly after local bridge updates succeed.
 
 ## Session end — always write diary before closing
 
@@ -37,7 +37,7 @@ No return value to store. Retrieval is always by recency — no ID needed.
 
 ## Session start — read diary before anything else
 
-The diary read at session start is performed as part of the MemPalace Availability Check above — it serves double duty as detection and resumption. Do not call `mempalace_diary_read` a second time here.
+The diary read at session start is performed as part of the MemPalace Availability Check above. It serves double duty as detection and handoff context. Do not call `mempalace_diary_read` a second time here.
 
 *(Skip if `mempalace_available = false` — use `.projectpal/state.yml` instead)*
 
@@ -47,7 +47,7 @@ Only load `.projectpal/artifacts/` files when the phase actively needs the full 
 
 | Phase | Load full file? | Why |
 |-------|----------------|-----|
-| Session start | No | Use repo-scoped memory summary |
+| Session start | No | Use local bridge first; fall back to repo-scoped memory only if needed |
 | Phase 2 (Debate) | Yes — PRD | Critic/Judge need full text |
 | Phase 4 (Tech Spec) | Yes — PRD | Spec is generated from full PRD |
 | Phase 5 (Checkpoint) | Yes — Spec | User reviews full spec |

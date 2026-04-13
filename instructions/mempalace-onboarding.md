@@ -27,8 +27,10 @@ Wait for user response before proceeding.
 ### Install Path (user chooses "set it up" — Case 1: never installed)
 
 1. Run `pip install mempalace` via Bash tool.
-2. If pip succeeds, run `claude mcp add mempalace --command "python3 -m mempalace.mcp_server"` via Bash tool.
-   - If it succeeds: go to step 3.
+2. If pip succeeds, register MemPalace with the assistant already chosen for this repo:
+   - For Codex: run `codex mcp add mempalace -- python3 -m mempalace.mcp_server` via Bash tool.
+   - For Claude Code: run `claude mcp add mempalace --command "python3 -m mempalace.mcp_server"` via Bash tool.
+   - If the preferred assistant is still unknown, ask once, then use the matching command.
    - If `claude mcp add` fails or is unavailable: run `claude config get settingsDir` to discover the settings path. If a path is found, read the settings file at that path and add the entry below under `mcpServers`. If discovery or file write fails for any reason: go to Walkthrough.
      ```json
      "mempalace": {
@@ -37,7 +39,7 @@ Wait for user response before proceeding.
        "args": ["-m", "mempalace.mcp_server"]
      }
      ```
-3. Confirm: *"Done — MemPalace is installed and registered. Restart Claude Code to activate it, then run `/projectpal` again."*
+3. Confirm: *"Done — MemPalace is installed and registered. Restart your AI assistant, then start ProjectPal again."*
 4. **Post-install guard**: `mempalace_available` stays `false` for the remainder of this session. All diary/drawer calls remain disabled. Do not proceed to Session Resumption. Session ends here — no project work until after restart.
 5. If pip fails: surface the exact error, then go to Walkthrough.
 
@@ -45,8 +47,8 @@ Wait for user response before proceeding.
 
 Present steps one at a time, waiting for confirmation after each:
 1. *"Run this in your terminal: `pip install mempalace`"*
-2. *"Then run: `claude mcp add mempalace --command 'python3 -m mempalace.mcp_server'`"*
-3. *"Restart Claude Code, then run `/projectpal` again."*
+2. *"Then register MemPalace with your AI assistant. For Codex: `codex mcp add mempalace -- python3 -m mempalace.mcp_server`. For Claude Code: `claude mcp add mempalace --command 'python3 -m mempalace.mcp_server'`"*
+3. *"Restart your AI assistant, then start ProjectPal again."*
 
 ---
 
@@ -54,11 +56,14 @@ Present steps one at a time, waiting for confirmation after each:
 
 Do not attempt reinstall.
 
-1. Run `claude mcp add mempalace --command "python3 -m mempalace.mcp_server"` via Bash tool.
-   - If it succeeds: *"Registered — restart Claude Code and run `/projectpal` again."*
+1. Register MemPalace with the assistant already chosen for this repo.
+   - For Codex: run `codex mcp add mempalace -- python3 -m mempalace.mcp_server` via Bash tool.
+   - For Claude Code: run `claude mcp add mempalace --command "python3 -m mempalace.mcp_server"` via Bash tool.
+   - If the preferred assistant is still unknown, ask once, then use the matching command.
+   - If it succeeds: *"MemPalace is connected again. Restart your AI assistant, then start ProjectPal again."*
    - If it fails: walkthrough, one step at a time:
-     1. *"Run: `claude mcp add mempalace --command 'python3 -m mempalace.mcp_server'`"*
-     2. *"Restart Claude Code, then run `/projectpal` again."*
+     1. *"Register MemPalace with your AI assistant. For Codex: `codex mcp add mempalace -- python3 -m mempalace.mcp_server`. For Claude Code: `claude mcp add mempalace --command 'python3 -m mempalace.mcp_server'`"*
+     2. *"Restart your AI assistant, then start ProjectPal again."*
 
 **Post-reconnect guard**: same as install — `mempalace_available` stays `false`, session ends here.
 

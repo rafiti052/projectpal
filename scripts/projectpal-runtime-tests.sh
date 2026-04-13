@@ -38,17 +38,20 @@ assert_contains "$sync_output" "Generated skills/projectpal/SKILL.md from src"
 
 assert_file_contains "$ROOT_DIR/CLAUDE.md" "ProjectPal neutral source under src/"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "ProjectPal neutral source under src/"
+assert_file_contains "$ROOT_DIR/AGENTS.md" "Complexity Assessment"
+assert_file_contains "$ROOT_DIR/AGENTS.md" "👷 ProjectPal"
 assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" 'In Codex, start ProjectPal by typing `ProjectPal`.'
+assert_file_contains "$ROOT_DIR/instructions/session-resumption-schema.md" 'Read `.projectpal/state.yml` for the current repo first.'
 
 codex_install_output=$(sh "$ROOT_DIR/install-projectpal.sh" codex)
-assert_contains "$codex_install_output" "ProjectPal is installed for Codex."
-assert_contains "$codex_install_output" "Next step: open Codex in the new or existing project repo and type ProjectPal."
+assert_contains "$codex_install_output" "ProjectPal is ready in Codex."
+assert_contains "$codex_install_output" "Next, open Codex in your repo and type ProjectPal."
 
 claude_home="$TMP_DIR/claude-home"
 mkdir -p "$claude_home"
 claude_install_output=$(HOME="$claude_home" sh "$ROOT_DIR/install-projectpal.sh" claude)
-assert_contains "$claude_install_output" "ProjectPal is installed for Claude Code."
-assert_contains "$claude_install_output" "Next step: open Claude Code and run /projectpal."
+assert_contains "$claude_install_output" "ProjectPal is ready in Claude Code."
+assert_contains "$claude_install_output" "Next, open Claude Code and run /projectpal."
 assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "name: projectpal"
 
 existing_flow_output=$(PROJECTPAL_ASSISTANT_HINT=codex PROJECTPAL_MEMPALACE_MODE=missing sh "$ROOT_DIR/scripts/projectpal-flow.sh" onboarding-flow "$existing_repo")

@@ -10,7 +10,7 @@ usage() {
 usage:
   sh install-projectpal.sh [claude|codex]
 
-If no assistant is provided, the installer prompts for one.
+If you leave the assistant out, ProjectPal will ask which one to install.
 EOF
 }
 
@@ -23,7 +23,7 @@ normalize_choice() {
 }
 
 prompt_for_choice() {
-  printf '%s\n' "Choose an assistant to install ProjectPal for:" >&2
+  printf '%s\n' "Which assistant should I install ProjectPal for?" >&2
   printf '%s\n' "  1. Claude Code" >&2
   printf '%s\n' "  2. Codex" >&2
   printf '%s' "> " >&2
@@ -46,13 +46,13 @@ if [ -z "$choice" ]; then
     choice=$(prompt_for_choice)
   else
     usage >&2
-    printf '\n%s\n' "install-projectpal: assistant choice required when stdin is not interactive" >&2
+    printf '\n%s\n' "install-projectpal: choose claude or codex when stdin is not interactive" >&2
     exit 1
   fi
 fi
 
 if [ -z "$choice" ]; then
-  printf '%s\n' "install-projectpal: invalid assistant choice" >&2
+  printf '%s\n' "install-projectpal: please choose claude or codex" >&2
   exit 1
 fi
 
@@ -61,11 +61,11 @@ sh "$SCRIPT_DIR/sync-codex-plugin.sh"
 case "$choice" in
   claude)
     sh "$SCRIPT_DIR/sync-claude-skill.sh"
-    printf '\n%s\n' "ProjectPal is installed for Claude Code."
-    printf '%s\n' "Next step: open Claude Code and run /projectpal."
+    printf '\n%s\n' "ProjectPal is ready in Claude Code."
+    printf '%s\n' "Next, open Claude Code and run /projectpal."
     ;;
   codex)
-    printf '\n%s\n' "ProjectPal is installed for Codex."
-    printf '%s\n' "Next step: open Codex in the new or existing project repo and type ProjectPal."
+    printf '\n%s\n' "ProjectPal is ready in Codex."
+    printf '%s\n' "Next, open Codex in your repo and type ProjectPal."
     ;;
 esac

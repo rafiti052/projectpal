@@ -1,4 +1,4 @@
-# ProjectPal `v0.2.4`
+# ProjectPal `v0.3.0`
 
 A patient AI companion that turns chaotic ideas into shipped projects.
 
@@ -6,17 +6,16 @@ A patient AI companion that turns chaotic ideas into shipped projects.
 
 ProjectPal helps you go from messy idea to actionable tickets without requiring you to have your thoughts organized first.
 
-It works through conversation, not forms. It remembers context between sessions. It captures out-of-phase ideas instead of losing them. And it uses a multi-agent debate system to stress-test plans before you commit.
+It works through conversation, not forms. It remembers context between sessions. It captures out-of-phase ideas instead of losing them. And it keeps more of the housekeeping quiet in the background so the user-facing flow stays calm.
 
 ## How it works
 
 1. **Talk to the Pal** — describe your idea however it comes out
-2. **Cynefin classification** — the Pal identifies the nature of the problem
-3. **PRD generation + debate** — a Critic agent and Judge agent pressure-test the plan
-4. **You decide** — approve, revise, or archive at every checkpoint
-5. **Tech spec → tickets** — broken into 15-minute focus sessions
-6. **Implementation → review** — tickets stay available while the Pal implements, verifies, and reviews progress
-7. **MemPalace** — everything is remembered for next time
+2. **Complexity Assessment** — the Pal names the safest route: Clear path, Needs a plan, Needs discovery, On fire, or Still unclear
+3. **Scope Framing → Solution** — the Pal turns the conversation into a requirements document and brings it back for review
+4. **Refinement or Spec when needed** — bounded work stays light; heavier work gets the extra pressure test and spec checkpoint
+5. **Implementation** — silent ticket setup leads into a real green light before building
+6. **Wrap Up** — changes are reviewed, state is saved locally first, and long-term memory sync stays in the background
 
 ## Canonical Instructions
 
@@ -93,14 +92,21 @@ If you prefer to set it up manually, install the package first:
 pip install mempalace
 ```
 
-Then register it with the assistant runtime you are using. For Claude Code:
+Then register it with the assistant runtime you are using:
+
+For Codex:
+
+```bash
+codex mcp add mempalace -- python3 -m mempalace.mcp_server
+```
+
+For Claude Code:
 
 ```bash
 claude mcp add mempalace --command "python3 -m mempalace.mcp_server"
-# Restart Claude Code to activate
 ```
 
-For Codex, use the equivalent Codex MCP registration flow for your local environment.
+Then restart your AI assistant and start ProjectPal again.
 
 ### Dependencies
 
@@ -142,7 +148,7 @@ projectpal/
 
 Generated artifacts (PRDs, specs, tickets) are saved to `.projectpal/artifacts/` within the current project directory — not here.
 
-Repo continuity lives in MemPalace under `Projects/<repo-slug>`. Shared knowledge remains in broader MemPalace wings such as `Principles`, `Decisions`, and `Precedents`.
+Repo continuity lives locally first in `.projectpal/state.yml`, with MemPalace available as background continuity and long-term memory under `Projects/<repo-slug>`. Shared knowledge remains in broader MemPalace wings such as `Principles`, `Decisions`, and `Precedents`.
 
 Repo detection resolves the git repo root first and uses that directory name as `repo_slug`. If git detection fails, ProjectPal falls back to the current directory name, treats it as low-confidence startup context, and creates a fresh local bridge instead of reusing stale cross-repo state. Multiple worktrees of the same repo share repo-scoped memory while keeping separate `.projectpal/state.yml` bridge files.
 
@@ -151,8 +157,8 @@ Repo detection resolves the git repo root first and uses that directory name as 
 | # | Deliverable | Status |
 |---|------------|--------|
 | M0 | CLAUDE.md + MemPalace connected | ✅ |
-| M1 | Cynefin classification works | ✅ |
-| M2 | Simple path | ✅ |
+| M1 | Complexity Assessment works | ✅ |
+| M2 | Clear-path route keeps the PRD and stays light | ✅ |
 | M3 | Complicated path: PRD + debate | ✅ |
 | M4 | Tech spec + tickets | ✅ |
 | M5 | Parking Lot + session resumption | ✅ |

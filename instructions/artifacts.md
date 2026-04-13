@@ -23,11 +23,25 @@ All generated documents use YAML frontmatter:
 project: <project-name>
 phase: <phase-number>
 type: prd | tech-spec | ticket | debate
-status: draft | debated | approved | archived
+status: <varies by artifact type>
 created: <ISO-8601>
 cynefin: simple | complicated | complex | chaotic
 ---
 ```
+
+Status vocabulary by artifact type:
+- PRD: `draft | debated | approved | archived`
+- Tech spec: `draft | approved | archived`
+- Debate: `complete`
+- Ticket bundle and tickets: `ready | queued | running | blocked | complete | deferred | archived`
+
+Checkpoint-facing artifacts should be presented through the ProjectPal shell, not dumped raw into chat.
+
+Artifact review pattern:
+- header shell
+- three-line summary
+- artifact link or links
+- one approval question
 
 **Debate artifact template** (save to `.projectpal/artifacts/debate/<project-name>-debate.md`):
 ```yaml
@@ -56,3 +70,8 @@ precedents: [<mempalace-ref>, ...]   # optional — omit if none
 spikes: [question: resolved | open]  # optional — omit if none
 ---
 ```
+
+**Ticket bundle contract**
+- The ticket bundle saved under `.projectpal/artifacts/tickets/` is the canonical Phase 6 artifact.
+- Individual ticket files stay alongside the bundle and follow the same repo-local artifact rules.
+- During Phase 7, update ticket status in place and preserve the Final Integration Report in the bundle.

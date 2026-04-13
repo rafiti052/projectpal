@@ -8,12 +8,12 @@ Six sub-agents are active in the pipeline. All receive their input inline — ne
 
 ---
 
-### 1. Cynefin Classifier
+### 1. Complexity Classifier
 Invoked at Phase 0 completion (see Phase 0 Protocol above).
 ```
 Agent(Cynefin Classifier):
   input:  prompts/cynefin-classify.md + Phase 0 transcript (inline)
-  output: classification, confidence, plain-terms summary, disorder flag
+  output: complexity zone, confidence, plain-terms summary, route sentence
 ```
 
 ---
@@ -22,7 +22,7 @@ Agent(Cynefin Classifier):
 Invoked at Phase 1 (see Phase 1 Discovery Protocol above).
 ```
 Agent(PRD Generator):
-  input:  prompts/prd-generate.md + transcript + Cynefin classification
+  input:  prompts/prd-generate.md + transcript + confirmed complexity assessment
           + Parking Lot items (phase:prd) + MemPalace results (inline)
   output: complete PRD document with YAML frontmatter
 ```
@@ -31,7 +31,7 @@ Pre-debate brevity audit: always run the brevity audit before Critic/Judge. If o
 ---
 
 ### 3. Critic
-Invoked at Phase 2. Skipped for Low hanging fruit (Simple) problems.
+Invoked at Phase 2. Skipped for Clear path problems.
 ```
 Agent(Critic):
   input:  prompts/critic-agent.md + full PRD text (inline)
@@ -69,7 +69,7 @@ Step 6: Pal saves debated PRD (status: debated) → presents at Phase 3 checkpoi
 ---
 
 ### 5. Tech Spec Generator
-Invoked at Phase 4 (see Phase 4 Tech Spec Protocol above).
+Invoked at Phase 4 when the route is Needs a plan (see Phase 4 Tech Spec Protocol above).
 ```
 Agent(Tech Spec Generator):
   input:  prompts/tech-spec-generate.md + full approved PRD text
@@ -80,7 +80,7 @@ Agent(Tech Spec Generator):
 ---
 
 ### 6. Ticket Generator
-Invoked at Phase 6 after tech spec is approved.
+Invoked at Phase 6 after the last planning checkpoint is approved.
 ```
 Agent(Ticket Generator):
   input:  prompts/tickets-generate.md + full approved tech spec text
@@ -90,7 +90,9 @@ Agent(Ticket Generator):
 
 **Phase 6 ticket protocol:**
 ```
-Step 1: Read approved tech spec from .projectpal/artifacts/tech-spec/<name>.md
+Step 1: Read the approved planning artifact set
+        - Needs a plan: read approved tech spec from .projectpal/artifacts/tech-spec/<name>.md
+        - Clear path: derive tickets from the approved PRD and the already-bounded route
 Step 2: Read Parking Lot items tagged phase:6 or phase:execution
 Step 3: Agent(Ticket Generator) receives: tickets-generate.md + spec + parking lot (inline)
 Step 4: Pal captures ticket set output
@@ -99,4 +101,4 @@ Step 5: Save each ticket as individual file: .projectpal/artifacts/tickets/<proj
 Step 6: Proceed to Phase 7 Implementation Protocol
 ```
 
-For Low hanging fruit (Simple) problems: skip all sub-agents except Ticket Generator. Go directly from Phase 0 → Phase 6 → Phase 7 → Phase 8.
+For Clear path problems: keep the PRD Generator, skip Critic, Judge, and Tech Spec Generator, then move through Phase 3 → Phase 6 → Phase 7 → Phase 8.

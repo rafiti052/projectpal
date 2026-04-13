@@ -1,7 +1,7 @@
 {
   "name": "projectpal",
-  "version": "0.2.4",
-  "description": "A patient product companion that turns chaotic ideas into PRDs, specs, and 15-minute tickets.",
+  "version": "0.3.0",
+  "description": "A patient product companion that turns messy ideas into a clear route, a solid solution, and 15-minute execution tickets.",
   "author": {
     "name": "Rafael",
     "url": "https://github.com/rafiti052"
@@ -20,8 +20,8 @@
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "ProjectPal",
-    "shortDescription": "Turns chaotic ideas into PRDs, specs, and 15-minute tickets.",
-    "longDescription": "ProjectPal is a patient product companion for turning non-linear ideas into plans, specs, and small execution tickets without forcing structured intake. In Codex, launch it with `ProjectPal`.",
+    "shortDescription": "Turns messy ideas into a clear route, a solid solution, and 15-minute tickets.",
+    "longDescription": "ProjectPal is a patient product companion for turning non-linear ideas into a clear route, a requirements document, a spec when needed, and small execution tickets without forcing structured intake. In Codex, launch it with `ProjectPal`.",
     "developerName": "Rafael",
     "category": "Productivity",
     "capabilities": [

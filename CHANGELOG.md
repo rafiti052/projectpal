@@ -8,6 +8,21 @@ All notable changes to ProjectPal are documented here.
 
 ---
 
+## [0.3.0] — 2026-04-13
+
+### Changed
+- ProjectPal now uses the quieter visible route `Discovery → Scope Framing → Refinement → Solution → Spec → Implementation → Wrap Up`, while keeping spec drafting and ticket setup silent in the background.
+- Clear-path work now keeps the PRD, skips specialist debate and visible spec review, and goes straight from `Solution` to the `Implementation` checkpoint.
+- Workflow-mode messages now use the `👷 ProjectPal` shell, with `Current / Next / Later` reserved for orientation and artifact reviews using the compact summary pattern.
+- Local state remains the primary continuity layer, while wrap-up artifacts now consistently record approved and completed status across the PRD, UI companion, ticket bundle, and ticket set.
+- MemPalace setup guidance is now assistant-aware across the live onboarding instructions, README, and reviewed copy surfaces.
+- README version bumped to `v0.3.0`.
+- Codex plugin manifest version bumped to `0.3.0`.
+
+### Fixed
+- Reviewed copy artifacts no longer expose silent internal stages such as `Spec Drafting` and `Implementation Setup` in the proposed visible roadmap.
+- The implementation wrap-up records now agree on completion state, including the ticket bundle, ticket bodies, and parked follow-up status for the deferred wording pass.
+
 ## [0.2.4] — 2026-04-13
 
 ### Added

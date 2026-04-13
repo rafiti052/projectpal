@@ -142,7 +142,7 @@ write_bridge_state() {
     printf '%s\n' "repo_root_hint: $repo_root_hint"
     printf '%s\n' "current_project: $current_project"
     printf '%s\n' "current_phase: $current_phase"
-    printf '%s\n' "last_session: $(today_utc)"
+    printf '%s\n' "last_session: $(utc_timestamp)"
     printf '%s\n' "resume_source: $resume_source"
     printf '%s\n' "synced_at: $(utc_timestamp)"
     printf '%s\n' "preferred_assistant: $preferred_assistant"
@@ -288,10 +288,10 @@ command_probe_assistants() {
 assistant_handoff_message() {
   case ${1:-codex} in
     claude)
-      printf '%s\n' "Open Claude and run /projectpal."
+      printf '%s\n' "Open Claude Code in this repo and run /projectpal."
       ;;
     gemini)
-      printf '%s\n' "Open Gemini in this repo and run the ProjectPal command."
+      printf '%s\n' "Open Gemini in this repo and start ProjectPal."
       ;;
     *)
       printf '%s\n' "Open Codex in this repo and type ProjectPal."
@@ -368,8 +368,8 @@ command_prepare_repo() {
     ok=false
     state_status=blocked
     blocker_name=projectpal-state-write-blocked
-    blocker_detail="ProjectPal could not create repo-local state under .projectpal."
-    blocker_next_step="Create .projectpal/state.yml in this repo, then rerun projectpal."
+    blocker_detail="I couldn't create ProjectPal's local workspace in .projectpal/ yet."
+    blocker_next_step="Create .projectpal/state.yml in this repo, then run ProjectPal again."
   else
     mkdir -p "$projectpal_dir" "$artifacts_dir"/prd "$artifacts_dir"/tech-spec "$artifacts_dir"/tickets "$artifacts_dir"/debate
     if [ ! -f "$state_path" ]; then
@@ -378,14 +378,14 @@ command_prepare_repo() {
         printf '%s\n' "repo_root_hint: $repo_root"
         printf '%s\n' "current_project: onboarding"
         printf '%s\n' "current_phase: 0"
-        printf '%s\n' "last_session: $(today_utc)"
+        printf '%s\n' "last_session: $(utc_timestamp)"
         printf '%s\n' "resume_source: fresh"
         printf '%s\n' "synced_at: $(utc_timestamp)"
         printf '%s\n' "artifacts_dir: .projectpal/artifacts"
         printf '%s\n' "next_steps:"
-        printf '%s\n' "  - \"Continue onboarding in this repo\""
+        printf '%s\n' "  - \"Finish setting up ProjectPal in this repo\""
         printf '%s\n' "bridge_summary: |"
-        printf '%s\n' "  Repo-local ProjectPal bridge initialized by onboarding."
+        printf '%s\n' "  ProjectPal saved enough local state to pick this repo back up later."
       } > "$state_path"
       state_status=created
     fi
@@ -396,8 +396,8 @@ command_prepare_repo() {
       ok=false
       gitignore_status=blocked
       blocker_name=gitignore-write-blocked
-      blocker_detail="ProjectPal could not update .gitignore to keep repo-local state out of version control."
-      blocker_next_step="Add .projectpal/ to .gitignore, then rerun projectpal."
+      blocker_detail="I couldn't update .gitignore, so ProjectPal's local files might get tracked."
+      blocker_next_step="Add .projectpal/ to .gitignore, then run ProjectPal again."
     else
       if [ -f "$gitignore_path" ]; then
         if grep -Fqx '.projectpal/' "$gitignore_path"; then
@@ -459,18 +459,18 @@ command_onboarding_flow() {
   blocker_next_step=$(printf '%s\n' "$prepare_output" | awk -F': ' '/^blocker_next_step:/ { print $2; exit }')
 
   handoff_message=$(assistant_handoff_message "$preferred_assistant")
-  bridge_summary="Onboarding is ready in this repo. Assistant preference is $preferred_assistant, MemPalace mode is $mempalace_mode, and the next step is to $handoff_message"
+  bridge_summary="ProjectPal is ready in this repo. I'll use $preferred_assistant here, memory mode is $mempalace_mode, and the next step is: $handoff_message"
   next_step=$handoff_message
   current_phase=onboarding
   last_blocker=none
 
   if [ "$repo_ready" = "false" ]; then
     handoff_message=$blocker_next_step
-    bridge_summary="Onboarding is blocked in this repo by $blocker_name. $blocker_detail"
+    bridge_summary="ProjectPal is almost ready in this repo, but one thing is blocking it: $blocker_detail"
     next_step=$blocker_next_step
     last_blocker=$blocker_name
   elif [ "$mempalace_available" = "false" ]; then
-    bridge_summary="Onboarding is ready in local-only mode for this repo. Assistant preference is $preferred_assistant, MemPalace fallback reason is $mempalace_reason, and the next step is to $handoff_message"
+    bridge_summary="ProjectPal is ready in this repo with local-only memory. I can keep going today, and the next step is: $handoff_message"
   fi
 
   if [ -f "$state_path" ]; then

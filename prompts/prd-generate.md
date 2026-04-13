@@ -11,11 +11,11 @@ Receive a completed Phase 0 conversation and produce a structured PRD. You are a
 ## Input
 
 1. **Phase 0 transcript** — The full conversation between Pal and user
-2. **Cynefin classification** — Confirmed by user (Simple | Complicated | Complex | Chaotic)
+2. **Complexity assessment** — Confirmed by user (`Clear path` | `Needs a plan` | `Needs discovery` | `On fire`)
 3. **Parking Lot items** — Items captured during Phase 0 tagged for `phase:prd` (may be empty)
 4. **MemPalace decisions** — Relevant past decisions (may be empty)
 
-**Precondition:** Phase 0 must be complete — all four readiness dimensions must be answered in the transcript: who has the problem, what's the pain, proposed direction, success shape. If any are missing, do not generate the PRD. Return: "Phase 0 incomplete — missing: [dimension(s)]. Resume Phase 0 before generating."
+**Precondition:** Phase 0 must be complete and the route must be clear enough to leave Discovery. All four readiness dimensions must be answered in the transcript: who has the problem, what's the pain, proposed direction, success shape. If any are missing, or if the assessment is still unclear, do not generate the PRD. Return: "Phase 0 incomplete — missing: [dimension(s)]. Resume Phase 0 before generating."
 
 ## Workflow
 
@@ -28,14 +28,14 @@ Identify any Parking Lot items tagged `phase:prd`. Incorporate each into the rel
 **Step 3 — Pull MemPalace decisions.**
 For each relevant MemPalace decision, note it inline: "Prior decision: [content]". If none are relevant, skip silently.
 
-**Step 4 — Draft sections, calibrated by Cynefin classification.**
-Write each of the 7 sections. Calibrate Proposed Solution depth by Cynefin domain:
-- **[LABEL_SIMPLE]** → One paragraph. Solution is known; state it directly.
-- **[LABEL_COMPLICATED]** → Solution shape + rationale. Acknowledge what's still being figured out.
-- **[LABEL_COMPLEX]** → Direction only. No solution commitment — name the experiment or the first probe.
-- **[LABEL_CHAOTIC]** → Stabilization action. What to do right now to stop the bleeding.
+**Step 4 — Draft sections, calibrated by the confirmed complexity assessment.**
+Write each of the 7 sections. Calibrate Proposed Solution depth by complexity zone:
+- **Clear path** → One paragraph. The solution route is already bounded enough to state directly.
+- **Needs a plan** → Solution shape plus rationale. Acknowledge what still needs to be worked through.
+- **Needs discovery** → Direction only. No full solution commitment. Name the first probe or experiment.
+- **On fire** → Stabilization action. What to do right now to stop the bleeding.
 
-For Kill Criteria: calibrate depth but never omit the section. Complex and Chaotic problems especially need kill criteria since direction may need to change.
+For Kill Criteria: calibrate depth but never omit the section. Needs-discovery and on-fire problems especially need kill criteria since direction may need to change fast.
 
 **Step 5 — Self-verify before finalizing.**
 Check: (a) no invented requirements — every claim traces to a user utterance; (b) all four readiness dimensions appear in ≥1 section; (c) every gap is flagged explicitly with "This wasn't discussed yet: [topic]" — never silently omitted.
@@ -51,7 +51,7 @@ phase: 1
 type: prd
 status: draft
 created: <ISO-8601>
-cynefin: <classification>
+cynefin: <simple | complicated | complex | chaotic>
 ---
 ```
 
@@ -59,11 +59,11 @@ cynefin: <classification>
 
 1. **Problem Statement** — What's broken, for whom, and why it matters. Distinguish symptom from root cause. Quote the user when possible.
 2. **User Profile** — Who this is for, based only on what was said. Include: who they are, what they currently do, and what friction they experience.
-3. **Proposed Solution** — What we're building, calibrated to Cynefin domain (see Workflow Step 4).
+3. **Proposed Solution** — What we're building, calibrated to the confirmed complexity zone (see Workflow Step 4).
 4. **Success Criteria** — How we'll know this is working. Measurable, honest. If not discussed: flag it explicitly.
 5. **Scope** — What's in and what's explicitly out, with brief reasons.
 6. **Risks & Open Questions** — What we don't know yet, what could go wrong.
-7. **Kill Criteria** — When to stop. If not discussed: flag it and provide a directional placeholder calibrated to the Cynefin domain.
+7. **Kill Criteria** — When to stop. If not discussed: flag it and provide a directional placeholder calibrated to the confirmed complexity zone.
 
 **Gap flagging:** For any section where the user didn't provide enough input, write: "This wasn't discussed yet: [topic]." This is a complete and valid output for any section — do not pad it with plausible assumptions.
 
