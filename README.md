@@ -20,9 +20,9 @@ It works through conversation, not forms. It remembers context between sessions.
 
 ## Canonical Instructions
 
-`CLAUDE.md` is the current canonical ProjectPal source artifact in this repo.
+`src/projectpal/` is the neutral ProjectPal source in this repo.
 
-The launcher-specific files for Claude Code, Codex CLI, and Gemini CLI are adapters generated or synced from that source. `AGENTS.md` stays as a repo-local mirror for toolchains that expect the standard agents filename.
+The launcher-specific files for Claude Code, Codex CLI, and Gemini CLI are generated or synced runtime surfaces. `CLAUDE.md` and `AGENTS.md` are outputs, not the authoring center.
 
 ## Setup
 
@@ -31,83 +31,95 @@ git clone git@github.com:rafiti052/projectpal.git
 cd projectpal
 ```
 
-### Claude Code
+## Install
+
+Use the single installer entrypoint and choose your assistant when prompted.
 
 ```bash
-./sync-skill.sh
-claude
+sh ./install-projectpal.sh
 ```
 
-Launcher: `/projectpal`
+Supported assistants right now:
+- Codex
+- Claude Code
 
-`./sync-skill.sh` installs the ProjectPal skill into `~/.claude/skills/projectpal/SKILL.md` and refreshes the repo-local `AGENTS.md` mirror.
+The installer always refreshes the generated runtime surfaces from `src/projectpal/` first, then installs the assistant-specific integration you choose.
 
-### Codex CLI
+### Codex
 
-```bash
-./sync-codex-plugin.sh
+Codex is the primary path for new GitHub users.
+
+1. Run the installer and choose `codex`.
+2. Open Codex in the new project repo or an existing repo.
+3. Type:
+
+```text
+ProjectPal
 ```
 
-Launchers:
-
-- `projectpal` skill
-- `Start ProjectPal`
-- `Use the ProjectPal plugin`
+That is the canonical Codex entrypoint.
 
 Codex reads the plugin manifest from `.codex-plugin/plugin.json`, which points at `skills/projectpal/SKILL.md` and the repo-local `.mcp.json`.
 
-ProjectPal does **not** claim that `/projectpal` is a native Codex slash command. OpenAI’s Codex docs currently position reusable workflows around skills, and custom prompts are deprecated in favor of skills.
+ProjectPal does **not** claim that `/projectpal` is a native Codex slash command.
 
-After updating the generator, refresh the generated skill file:
-
-```bash
-./sync-codex-plugin.sh
-```
-
-### Gemini CLI
+### Claude Code
 
 ```bash
-./sync-gemini-commands.sh
+sh ./install-projectpal.sh claude
 ```
 
-Launcher: `/projectpal`
+Then open Claude Code and run `/projectpal`.
 
-This syncs the repo-managed Gemini command wrapper to `.gemini/commands/projectpal.toml`. The command wrapper references the shared ProjectPal instructions from `CLAUDE.md` instead of forking the persona into a second handwritten file.
+### Refresh Generated Surfaces
 
-If your Gemini session is already open, reload commands before testing.
+If you are changing the neutral source or runtime wrappers directly:
+
+```bash
+sh ./sync-codex-plugin.sh
+```
+
+That regenerates:
+- `CLAUDE.md`
+- `AGENTS.md`
+- `skills/projectpal/SKILL.md`
 
 ### MemPalace (long-term memory)
 
 The Pal detects MemPalace automatically on first run. If it's not connected, it will explain what it is and offer to install and register it for you — no manual setup required.
 
-If you prefer to set it up manually:
+If you prefer to set it up manually, install the package first:
 ```bash
 pip install mempalace
+```
+
+Then register it with the assistant runtime you are using. For Claude Code:
+
+```bash
 claude mcp add mempalace --command "python3 -m mempalace.mcp_server"
 # Restart Claude Code to activate
 ```
+
+For Codex, use the equivalent Codex MCP registration flow for your local environment.
 
 ### Dependencies
 
 - [Claude Code](https://claude.ai/code) (CLI or desktop)
 - [Codex CLI](https://developers.openai.com/codex/overview)
-- [Gemini CLI](https://github.com/google-gemini/gemini-cli)
 - [MemPalace](https://github.com/rafiti052/mempalace) — optional but recommended for cross-session memory
 
 ## Project Structure
 
 ```
 projectpal/
-├── CLAUDE.md                  ← Pal persona + rules (loaded by Claude Code)
-├── AGENTS.md                  ← Same as CLAUDE.md (standard agents filename)
-├── sync-skill.sh              ← Deploy CLAUDE.md as a Claude Code skill
-├── sync-codex-plugin.sh       ← Refresh skills/projectpal/SKILL.md for Codex
-├── sync-gemini-commands.sh    ← Refresh .gemini/commands/projectpal.toml for Gemini
+├── src/projectpal/            ← Neutral ProjectPal source for generated runtime surfaces
+├── install-projectpal.sh      ← Single install entrypoint that prompts for Claude or Codex
+├── CLAUDE.md                  ← Generated Claude runtime surface
+├── AGENTS.md                  ← Generated agents-compatible runtime surface
+├── sync-skill.sh              ← Install generated Claude runtime surface into Claude Code
+├── sync-codex-plugin.sh       ← Generate Claude and Codex runtime surfaces from src/projectpal
 ├── .codex-plugin/
 │   └── plugin.json            ← Codex plugin manifest
-├── .gemini/
-│   └── commands/
-│       └── projectpal.toml    ← Gemini custom command wrapper
 ├── .agents/plugins/
 │   └── marketplace.json       ← Optional local Codex marketplace entry
 ├── skills/projectpal/
@@ -121,9 +133,8 @@ projectpal/
 │   ├── tech-spec-generate.md  ← Tech spec generation prompt
 │   └── tickets-generate.md    ← Ticket generation prompt
 ├── docs/
-│   ├── PRD-v3-north-star.md   ← Full vision (LangGraph, Docker, formal orchestration)
-│   ├── PRD-v4-mvp.md          ← MVP spec — what this version implements
-│   └── repo-context-lifecycle.md ← Repo resume and multi-worktree decision note
+│   ├── maintainer-codex-reinstall.md ← Maintainer-only clean reinstall guide
+│   └── north-star.md          ← Current product direction note
 └── .projectpal/               ← Local bridge state (managed by the Pal, per project)
     ├── state.yml              ← Repo-local bridge state for startup/resume
     └── parking-lot.md         ← Repo-scoped parked items with feat/phase tags
@@ -131,15 +142,9 @@ projectpal/
 
 Generated artifacts (PRDs, specs, tickets) are saved to `.projectpal/artifacts/` within the current project directory — not here.
 
-Review-time measurement artifacts also live there. For the current performance baseline work, the repeatable fixture entrypoint is `sh scripts/phase2-baseline-fixture.sh <run-id>`, which prepares `.projectpal/artifacts/review/<run-id>/` with the fixed PRD/prompt references and output placeholders.
-
-For artifact budget checks, use `sh scripts/markdown-word-budget.sh <markdown-path> [budget-limit]`. It counts markdown body words only and ignores YAML frontmatter when the file starts with a frontmatter block.
-
 Repo continuity lives in MemPalace under `Projects/<repo-slug>`. Shared knowledge remains in broader MemPalace wings such as `Principles`, `Decisions`, and `Precedents`.
 
 Repo detection resolves the git repo root first and uses that directory name as `repo_slug`. If git detection fails, ProjectPal falls back to the current directory name, treats it as low-confidence startup context, and creates a fresh local bridge instead of reusing stale cross-repo state. Multiple worktrees of the same repo share repo-scoped memory while keeping separate `.projectpal/state.yml` bridge files.
-
-The repo-scoped schema and write/search order live in [docs/repo-context-lifecycle.md](docs/repo-context-lifecycle.md). In short: repo anchors and feature scopes live under `Projects/<repo-slug>`, the local bridge stays in `.projectpal/state.yml`, and Parking Lot items are mirrored with `repo:`, `feat:`, `phase:`, and `kind:parking-lot` tags so phase-entry surfacing stays repo-local.
 
 ## Milestones
 
@@ -157,4 +162,4 @@ The repo-scoped schema and write/search order live in [docs/repo-context-lifecyc
 
 ## The North Star
 
-This MVP (v0.1) is a subset of [PRD v3](docs/PRD-v3-north-star.md), which describes the full vision with LangGraph orchestration, formal state machines, and Cynefin auto-routing. We build that when the core loop is validated.
+The current direction note lives in [docs/north-star.md](docs/north-star.md).

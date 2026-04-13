@@ -4,6 +4,23 @@ All notable changes to ProjectPal are documented here.
 
 ---
 
+## [Unreleased]
+
+### Added
+- `install-projectpal.sh` as the single installer entrypoint that prompts for Codex or Claude and refreshes generated runtime surfaces before install.
+- `docs/maintainer-codex-reinstall.md` for the maintainer-only clean Codex reinstall test.
+- `scripts/projectpal-runtime-tests.sh` for repeatable generation and install-freshness verification across Codex and Claude runtime outputs.
+
+### Changed
+- ProjectPal now uses `src/projectpal/` as the neutral source of truth for generated runtime surfaces.
+- `sync-codex-plugin.sh` now regenerates `CLAUDE.md`, `AGENTS.md`, and `skills/projectpal/SKILL.md` from the neutral source.
+- README now documents one installer entrypoint with Codex as the primary activation path and `ProjectPal` as the canonical Codex launch command.
+- Release notes for neutral-source changes should explicitly call out regenerated `CLAUDE.md`, `AGENTS.md`, and `skills/projectpal/SKILL.md` so Claude and Codex runtime surfaces stay visible in the changelog.
+
+### Fixed
+- Local onboarding verification now defaults to Codex when runtime detection is ambiguous, so the helper flow matches the primary installation path.
+- Runtime install verification now uses an isolated temporary `HOME` for the Claude branch, avoiding sandbox-specific false positives while still checking the generated install output.
+
 ## [0.2.3] — 2026-04-10
 
 ### Added

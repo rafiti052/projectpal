@@ -1,0 +1,393 @@
+# ProjectPal North Star
+
+**Status:** Canonical  
+**Scope:** Long-term product vision, operating model, and continuity rules  
+**Consolidates:** PRD v3, PRD v4 MVP, and the repo context lifecycle note
+
+---
+
+## 1. Product Thesis
+
+**ProjectPal is a patient product companion that helps developers turn messy ideas into shipped projects without requiring them to become organized before they can begin.**
+
+The product exists for one job: preserve momentum for developers who think non-linearly, lose context between sessions, and need the right next question more than they need another planning tool.
+
+The system does that through four linked behaviors:
+
+- conversation instead of intake forms
+- one-question-at-a-time guidance
+- durable continuity across sessions and repos
+- phased artifact generation that can end in implementation, not just planning
+
+The point is not to automate product management. The point is to build enough infrastructure around fragile project intent that it survives real life.
+
+---
+
+## 2. User And Problem
+
+### Core user
+
+The primary user is a developer or technical builder who thinks out loud, works in short focus windows, and does not reliably return with the same mental context they had before. They may jump phases, go deep on the wrong thing, or abandon a promising idea because reconstructing state costs too much.
+
+### Root problem
+
+Good technical ideas die for operational reasons, not because they were weak.
+
+### The three failures ProjectPal is built to fix
+
+1. **Most tools demand structure too early.** Developers often know what they want to say before they know how to frame it.
+2. **Context decays between sessions.** Returning to a repo often means rebuilding the whole mental model from scratch.
+3. **Out-of-phase work gets lost.** Hyperfocus on the wrong phase still produces useful material, but most systems treat it as noise.
+
+### Product consequence
+
+ProjectPal must behave like infrastructure for continuity, not like a form, dashboard, or evaluator.
+
+---
+
+## 3. North Star Outcome
+
+### Core outcome
+
+Projects that would normally stall in scattered notes, chats, or half-started branches reach a concrete implementation path and get shipped.
+
+### Long-term test
+
+Developers in the broader community can repeatedly take an idea from messy conversation to reviewed implementation without losing continuity between sessions.
+
+### Working success signals
+
+- real projects complete the full loop from conversation to implementation
+- users can resume after a multi-day gap without re-explaining everything
+- Parking Lot items are actually reincorporated later
+- debate changes plans in meaningful ways instead of rubber-stamping them
+- ticket sizing respects short focus sessions rather than producing oversized work
+
+### Failure signals
+
+- sessions restart from scratch because continuity failed
+- debate never changes outcomes
+- the system becomes heavier than the planning pain it was meant to remove
+- infrastructure work keeps outrunning user value
+
+---
+
+## 4. Product Principles
+
+These are non-negotiable.
+
+### Relationship
+
+- ProjectPal is a pal, not a PM, gatekeeper, or evaluator.
+- It accompanies chaos without punishing it.
+- It stays warm, plain-spoken, and direct.
+
+### Interaction
+
+- Conversation only. No forms.
+- One question per turn.
+- Short sessions count as real progress.
+- State is visible on demand, not pushed on the user as bureaucracy.
+
+### Flow protection
+
+- Out-of-phase ideas are captured, not rejected.
+- The Parking Lot is silent infrastructure, not a scolding mechanism.
+- No phase advances without explicit user approval where checkpoints apply.
+
+### Practicality
+
+- The current product should prefer the lightest implementation that preserves the core behavior.
+- Architecture can evolve later; continuity, tone, and checkpoint quality cannot be sacrificed now.
+
+---
+
+## 5. Decision Architecture
+
+ProjectPal routes work by problem shape, using Cynefin as a practical decision model for developer work.
+
+| Domain | Meaning | Default handling |
+| --- | --- | --- |
+| **Simple** | Known pattern, low ambiguity | Skip heavy planning and go straight to tickets and execution |
+| **Complicated** | Requires analysis and deliberate planning | Full pipeline: conversation, PRD, debate, spec, tickets, implementation |
+| **Complex** | Unknowns must be surfaced before planning | Decompose first, then run each sub-problem as Complicated |
+| **Chaotic** | Immediate stabilization needed | Stop the bleeding first, then reclassify |
+| **Disorder** | Not enough signal yet | Ask exploratory questions and bias toward Complicated |
+
+### Routing rule
+
+The system should always propose its classification in plain language and let the user confirm. Silent routing is not allowed.
+
+### Current implementation stance
+
+Today the classification is proposed conversationally and confirmed by the user. A future orchestrated version may automate more of this, but user confirmation stays the safety rail.
+
+---
+
+## 6. Phase Model
+
+ProjectPal operates as a phased pipeline, but the phase model must feel conversational from the user's side.
+
+| Phase | Outcome |
+| --- | --- |
+| **0. Conversation** | Understand the problem through free-form conversation |
+| **1. Discovery** | Generate a PRD draft |
+| **2. Debate** | Stress-test the PRD with Critic and Judge |
+| **3. Checkpoint 1** | User approves, revises, or archives the PRD |
+| **4. Tech Spec** | Generate the technical specification |
+| **5. Checkpoint 2** | User approves, revises, or archives the spec |
+| **6. Tickets** | Produce granular implementation tickets |
+| **7. Implementation** | Execute tickets with verification and ownership clarity |
+| **8. Review & Wrap-Up** | Review changes, route decisions, save memory, clean up |
+
+### Alternate paths
+
+- **Simple:** conversation to tickets to implementation
+- **Complex:** decomposition before entering the full planning path
+- **Chaotic:** stabilization before decomposition or planning
+
+### Readiness rule for leaving Phase 0
+
+ProjectPal should not leave open conversation until it can answer:
+
+1. who has the problem
+2. what the pain is
+3. what direction is being considered
+4. what success roughly looks like
+
+Those checks are internal only. The user should never see them as a form.
+
+---
+
+## 7. Core Behaviors
+
+### Parking Lot
+
+The Parking Lot exists to preserve out-of-phase value without derailing the current phase.
+
+- capture silently
+- acknowledge briefly
+- store with repo and phase tags
+- surface again when the relevant phase begins
+
+This is not optional. It is one of the main ways ProjectPal adapts to non-linear developer workflow instead of fighting it.
+
+### Debate
+
+The PRD must be challenged before the user sees it as a proposed truth.
+
+- **Critic** checks clarity, feasibility, and success criteria
+- **Judge** decides which critiques stand and produces the debated result
+
+The user sees the resulting artifact, not the internal argument, unless they ask.
+
+### Checkpoints
+
+Checkpoints are where the user regains full control. The artifact pauses there until the user approves, revises, or archives it.
+
+### Session resumption
+
+Every new session should start from the active repo context first, then summarize where things stand in 2-3 lines before asking whether to continue.
+
+---
+
+## 8. Current Product Architecture
+
+### What exists now
+
+The current product is a lean CLI-centered implementation designed to validate the core loop quickly with real developer workflows.
+
+- prompt-driven behavior instead of a custom orchestration runtime
+- sub-agents for debate and generation
+- MemPalace for long-term memory when available
+- `.projectpal/` inside the active repo for local bridge state and artifacts
+- launcher adapters for Claude, Codex, and Gemini around the same source instructions
+
+### Why this is the right current shape
+
+The earlier orchestration-heavy design solved future scaling problems before validating the present product risk. The current architecture keeps the product behavior while stripping out premature infrastructure.
+
+### Explicit current decisions
+
+- No formal state machine yet
+- No global continuity store
+- No separate orchestration service
+- No extra infra beyond what is needed to converse, remember, generate artifacts, and resume reliably
+
+### What remains future-facing
+
+ProjectPal can still evolve into a more formal orchestrated system later, but that is an optimization path, not the product definition.
+
+---
+
+## 9. Repo-Scoped Continuity
+
+Repo continuity is a first-class product rule, not an implementation detail.
+
+### Canonical rule
+
+ProjectPal resolves continuity from the active repo first, not from one shared global state blob.
+
+### Resolution rules
+
+1. Detect repo root with `git rev-parse --show-toplevel`.
+2. Use the repo-root directory name as `repo_slug`.
+3. If git root detection fails, fall back to the current working directory name and treat it as low confidence.
+4. Persist `repo_root_hint` in the local bridge whenever a git root is known.
+5. If the current repo root and stored `repo_root_hint` disagree, ignore the stale bridge and initialize for the current repo.
+6. A future global `projectpal` binary is only a launcher boundary. It must not become a second continuity system.
+
+### Continuity sources
+
+- **Repo-scoped memory:** `Projects/<repo-slug>` in MemPalace when available
+- **Local bridge:** `.projectpal/state.yml` inside the active repo
+- **Local Parking Lot:** `.projectpal/parking-lot.md`
+
+### Precedence
+
+1. active repo detection
+2. repo-scoped memory for that repo
+3. local bridge for that same repo
+4. broader fallback only when repo-local continuity is unavailable
+
+### Why this matters
+
+It prevents stale state from leaking across repos and lets multiple worktrees of the same repo share durable continuity without pretending they are the same local working copy.
+
+---
+
+## 10. Memory Model
+
+ProjectPal uses two memory layers.
+
+### Long-term memory
+
+MemPalace stores durable context when available.
+
+- repo continuity in `Projects/<repo-slug>`
+- broader reusable decisions in shared wings like `Decisions`, `Precedents`, and `Principles`
+
+### Local bridge memory
+
+`.projectpal/state.yml` is the repo-local bridge that keeps the current session resumable even when long-term memory is unavailable or before sync happens.
+
+### Required schemas
+
+#### RepoAnchor
+
+- `repo_slug`
+- `repo_root_hint`
+- `last_phase`
+- `last_resume_summary`
+- `last_next_step`
+- `last_seen_at`
+- `memory_refs[]`
+
+#### FeatureScope
+
+- `repo_slug`
+- `feat_slug`
+- `phase`
+- `status`
+- `summary`
+- `updated_at`
+
+#### ResumeBridge
+
+- `repo_slug`
+- `repo_root_hint`
+- `current_project`
+- `current_phase`
+- `cynefin_domain`
+- `last_session`
+- `resume_source`
+- `synced_at`
+- `artifacts_dir`
+- `partial_context`
+- `next_steps[]`
+
+### Search and write order
+
+Search order:
+
+1. repo room
+2. matching feature tags in that room
+3. repo Parking Lot mirrors
+4. local bridge
+5. global fallback
+
+Write order when MemPalace is available:
+
+1. repo-scoped memory
+2. local bridge
+3. local Parking Lot markdown when relevant
+
+---
+
+## 11. Packaging Boundary
+
+ProjectPal may later ship a public global Node CLI named `projectpal`, but that launcher must stay thin.
+
+### Packaging rule
+
+The launcher resolves repo context from the caller's current working directory, then delegates continuity to repo-local state plus optional MemPalace.
+
+### Implications
+
+- existing Claude, Codex, and Gemini entrypoints are adapters, not separate products
+- packaging work should add a launcher surface, not move continuity into a global directory
+- install-time caches are acceptable later; repo continuity outside the repo is not
+
+---
+
+## 12. Scope Boundaries
+
+### In scope now
+
+- the conversational core loop
+- Cynefin-informed routing
+- PRD generation and debate
+- spec generation
+- granular tickets
+- implementation flow
+- Parking Lot capture and resurfacing
+- repo-scoped continuity
+
+### Out of scope for now
+
+- multi-user collaboration
+- deep external integrations before the ticket loop is proven
+- heavyweight orchestration before the current loop is validated
+- productizing extra infrastructure that does not improve continuity or shipping behavior
+
+---
+
+## 13. Evolution Path
+
+The product should evolve in this order:
+
+1. prove the current loop helps real projects get shipped
+2. tighten continuity, quality, and implementation review
+3. add packaging around the same behavior
+4. only then consider formal orchestration if it unlocks clear product value
+
+The core product should remain stable across that evolution:
+
+- the Pal relationship
+- one-question conversation
+- Cynefin-based routing
+- debate before commitment
+- repo-first continuity
+- Parking Lot as protected flow control
+
+If those survive, the implementation can change without the product losing itself.
+
+---
+
+## 14. Canonical Decision
+
+**ProjectPal is defined by its user-facing behavior and continuity guarantees, not by a specific orchestration framework.**
+
+Today that means a lightweight, repo-aware, prompt-driven system that can take a developer from messy conversation to reviewed implementation while preserving memory across interruptions.
+
+Any future architecture is valid only if it strengthens that loop instead of replacing it with process.

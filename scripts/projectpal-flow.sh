@@ -9,6 +9,12 @@ DEFAULT_SUMMARY_LIMIT=150
 usage() {
   cat <<'EOF' >&2
 usage:
+  sh scripts/projectpal-flow.sh resolve-repo-context [cwd]
+  sh scripts/projectpal-flow.sh read-resume-bridge <state-path> [cwd]
+  sh scripts/projectpal-flow.sh probe-assistants [cwd]
+  sh scripts/projectpal-flow.sh probe-mempalace [cwd]
+  sh scripts/projectpal-flow.sh prepare-repo [cwd]
+  sh scripts/projectpal-flow.sh onboarding-flow [cwd]
   sh scripts/projectpal-flow.sh artifact-budget-check <markdown-path> [budget-limit] [exception-note-file] [compact-summary-file]
   sh scripts/projectpal-flow.sh split-evaluate <word-count> <budget-limit> <unresolved-scope:true|false> <exception-needed:true|false> <parent-project> [entry-phase]
   sh scripts/projectpal-flow.sh handoff-build <source-phase> <target-phase> <artifact-ref> <bridge-summary-file> [memory-summary-file] [dropped-context:true|false] [reentry-required:true|false]
@@ -54,6 +60,449 @@ read_multiline_yaml_block() {
       }
     }
   ' "$1"
+}
+
+canonical_dir() {
+  target_dir=$1
+  if [ -d "$target_dir" ]; then
+    (
+      CDPATH= cd -- "$target_dir" && pwd -P
+    )
+  else
+    printf '%s\n' "$target_dir"
+  fi
+}
+
+normalize_path_if_dir() {
+  target_path=$1
+  if [ -n "$target_path" ] && [ -d "$target_path" ]; then
+    canonical_dir "$target_path"
+  else
+    printf '%s\n' "$target_path"
+  fi
+}
+
+utc_timestamp() {
+  date -u +%Y-%m-%dT%H:%M:%SZ
+}
+
+today_utc() {
+  date -u +%Y-%m-%d
+}
+
+write_bridge_state() {
+  state_path=$1
+  repo_slug=$2
+  repo_root_hint=$3
+  current_project=$4
+  current_phase=$5
+  resume_source=$6
+  preferred_assistant=$7
+  last_blocker=$8
+  next_step=$9
+  bridge_summary=${10}
+
+  tmp_path=$(mktemp)
+  awk '
+    BEGIN {
+      skip_next_steps = 0
+      skip_bridge_summary = 0
+    }
+    /^repo_slug:/ { next }
+    /^repo_root_hint:/ { next }
+    /^current_project:/ { next }
+    /^current_phase:/ { next }
+    /^last_session:/ { next }
+    /^resume_source:/ { next }
+    /^synced_at:/ { next }
+    /^preferred_assistant:/ { next }
+    /^last_blocker:/ { next }
+    /^next_steps:/ {
+      skip_next_steps = 1
+      next
+    }
+    /^bridge_summary:[[:space:]]*\|/ {
+      skip_bridge_summary = 1
+      next
+    }
+    skip_next_steps {
+      if ($0 ~ /^  - /) next
+      skip_next_steps = 0
+    }
+    skip_bridge_summary {
+      if ($0 ~ /^  /) next
+      skip_bridge_summary = 0
+    }
+    { print }
+  ' "$state_path" > "$tmp_path"
+
+  {
+    cat "$tmp_path"
+    printf '%s\n' "repo_slug: $repo_slug"
+    printf '%s\n' "repo_root_hint: $repo_root_hint"
+    printf '%s\n' "current_project: $current_project"
+    printf '%s\n' "current_phase: $current_phase"
+    printf '%s\n' "last_session: $(today_utc)"
+    printf '%s\n' "resume_source: $resume_source"
+    printf '%s\n' "synced_at: $(utc_timestamp)"
+    printf '%s\n' "preferred_assistant: $preferred_assistant"
+    printf '%s\n' "last_blocker: $last_blocker"
+    printf '%s\n' "next_steps:"
+    printf '%s\n' "  - \"$next_step\""
+    printf '%s\n' "bridge_summary: |"
+    printf '%s\n' "  $bridge_summary"
+  } > "$state_path"
+
+  rm -f "$tmp_path"
+}
+
+yaml_value() {
+  key=$1
+  file_path=$2
+  awk -F': ' -v key="$key" '$1 == key { print $2; exit }' "$file_path"
+}
+
+resolve_repo_root() {
+  target_dir=$(canonical_dir "${1:-.}")
+  repo_root=$(git -C "$target_dir" rev-parse --show-toplevel 2>/dev/null || true)
+  if [ -n "$repo_root" ]; then
+    canonical_dir "$repo_root"
+  else
+    printf '%s\n' ""
+  fi
+}
+
+command_resolve_repo_context() {
+  if [ "$#" -gt 1 ]; then
+    usage
+  fi
+
+  target_dir=$(canonical_dir "${1:-.}")
+  repo_root=$(resolve_repo_root "$target_dir")
+  is_git_repo=false
+  repo_slug=$(basename "$target_dir")
+  confidence=low
+  worktree_key=
+
+  if [ -n "$repo_root" ]; then
+    is_git_repo=true
+    repo_slug=$(basename "$repo_root")
+    confidence=high
+    worktree_key=$repo_root
+  fi
+
+  printf '%s\n' "cwd: $target_dir"
+  printf '%s\n' "repo_root: ${repo_root:-$target_dir}"
+  printf '%s\n' "repo_slug: $repo_slug"
+  printf '%s\n' "is_git_repo: $is_git_repo"
+  printf '%s\n' "confidence: $confidence"
+  printf '%s\n' "worktree_key: ${worktree_key:-$target_dir}"
+}
+
+command_read_resume_bridge() {
+  if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+    usage
+  fi
+
+  state_path=$1
+  target_dir=${2:-.}
+
+  require_file "$state_path"
+
+  repo_context=$(command_resolve_repo_context "$target_dir")
+  current_repo_root=$(printf '%s\n' "$repo_context" | awk -F': ' '/^repo_root:/ { print $2; exit }')
+  current_repo_slug=$(printf '%s\n' "$repo_context" | awk -F': ' '/^repo_slug:/ { print $2; exit }')
+  current_confidence=$(printf '%s\n' "$repo_context" | awk -F': ' '/^confidence:/ { print $2; exit }')
+
+  stored_repo_slug=$(yaml_value repo_slug "$state_path")
+  stored_repo_root_hint=$(normalize_path_if_dir "$(yaml_value repo_root_hint "$state_path")")
+  resume_source=$(yaml_value resume_source "$state_path")
+  last_artifact_ref=$(yaml_value last_artifact_ref "$state_path")
+  bridge_summary=$(read_multiline_yaml_block "$state_path")
+
+  bridge_valid=true
+  mismatch_reason=
+  if [ -n "$stored_repo_root_hint" ] && [ -n "$current_repo_root" ] && [ "$stored_repo_root_hint" != "$current_repo_root" ]; then
+    bridge_valid=false
+    mismatch_reason=repo_root_hint_mismatch
+  elif [ -n "$stored_repo_slug" ] && [ "$stored_repo_slug" != "$current_repo_slug" ]; then
+    bridge_valid=false
+    mismatch_reason=repo_slug_mismatch
+  fi
+
+  printf '%s\n' "$repo_context"
+  printf '%s\n' "stored_repo_slug: $stored_repo_slug"
+  printf '%s\n' "stored_repo_root_hint: $stored_repo_root_hint"
+  printf '%s\n' "resume_source: $resume_source"
+  printf '%s\n' "last_artifact_ref: $last_artifact_ref"
+  printf '%s\n' "bridge_valid: $bridge_valid"
+  printf '%s\n' "mismatch_reason: ${mismatch_reason:-none}"
+  printf '%s\n' "bridge_confidence: $current_confidence"
+  printf '%s\n' "bridge_summary: |"
+  if [ -n "$bridge_summary" ]; then
+    printf '%s\n' "$bridge_summary" | sed 's/^/  /'
+  fi
+}
+
+command_probe_assistants() {
+  if [ "$#" -gt 1 ]; then
+    usage
+  fi
+
+  target_dir=$(canonical_dir "${1:-.}")
+  claude_signal=false
+  codex_signal=false
+  gemini_signal=false
+  preferred=codex
+  confidence=inconclusive
+  fallback_used=true
+
+  if [ -f "$target_dir/.claude/settings.local.json" ] || [ -d "$target_dir/src/projectpal" ] || [ -f "$target_dir/sync-skill.sh" ]; then
+    claude_signal=true
+  fi
+  if [ -f "$target_dir/.codex-plugin/plugin.json" ] || [ -f "$target_dir/skills/projectpal/SKILL.md" ] || [ -f "$target_dir/sync-codex-plugin.sh" ]; then
+    codex_signal=true
+  fi
+  if [ -f "$target_dir/.gemini/commands/projectpal.toml" ] || [ -f "$target_dir/sync-gemini-commands.sh" ]; then
+    gemini_signal=true
+  fi
+
+  if [ -n "${PROJECTPAL_ASSISTANT_HINT:-}" ]; then
+    preferred=$PROJECTPAL_ASSISTANT_HINT
+    confidence=high
+    fallback_used=false
+  elif [ "$claude_signal" = "true" ] && [ "$codex_signal" = "false" ] && [ "$gemini_signal" = "false" ]; then
+    preferred=claude
+    confidence=high
+    fallback_used=false
+  elif [ "$claude_signal" = "false" ] && [ "$codex_signal" = "true" ] && [ "$gemini_signal" = "false" ]; then
+    preferred=codex
+    confidence=high
+    fallback_used=false
+  elif [ "$claude_signal" = "false" ] && [ "$codex_signal" = "false" ] && [ "$gemini_signal" = "true" ]; then
+    preferred=gemini
+    confidence=high
+    fallback_used=false
+  fi
+
+  printf '%s\n' "preferred: $preferred"
+  printf '%s\n' "confidence: $confidence"
+  printf '%s\n' "fallback_used: $fallback_used"
+  printf '%s\n' "signals:"
+  printf '%s\n' "  - claude:$claude_signal"
+  printf '%s\n' "  - codex:$codex_signal"
+  printf '%s\n' "  - gemini:$gemini_signal"
+}
+
+assistant_handoff_message() {
+  case ${1:-codex} in
+    claude)
+      printf '%s\n' "Open Claude and run /projectpal."
+      ;;
+    gemini)
+      printf '%s\n' "Open Gemini in this repo and run the ProjectPal command."
+      ;;
+    *)
+      printf '%s\n' "Open Codex in this repo and type ProjectPal."
+      ;;
+  esac
+}
+
+command_probe_mempalace() {
+  if [ "$#" -gt 1 ]; then
+    usage
+  fi
+
+  target_dir=$(canonical_dir "${1:-.}")
+  available=false
+  reason=missing
+  fallback_mode=local-only
+  timeout_ms=1500
+
+  if [ -n "${PROJECTPAL_MEMPALACE_MODE:-}" ]; then
+    case "$PROJECTPAL_MEMPALACE_MODE" in
+      available)
+        available=true
+        reason=ok
+        fallback_mode=shared-memory
+        ;;
+      missing)
+        available=false
+        reason=missing
+        ;;
+      *)
+        available=false
+        reason=$PROJECTPAL_MEMPALACE_MODE
+        ;;
+    esac
+  elif [ -f "$target_dir/.mcp.json" ] && grep -q 'mempalace' "$target_dir/.mcp.json"; then
+    available=true
+    reason=ok
+    fallback_mode=shared-memory
+  elif [ -f "$target_dir/.gemini/settings.json" ] && grep -q 'mempalace' "$target_dir/.gemini/settings.json"; then
+    available=true
+    reason=ok
+    fallback_mode=shared-memory
+  fi
+
+  printf '%s\n' "available: $available"
+  printf '%s\n' "reason: $reason"
+  printf '%s\n' "timeout_ms: $timeout_ms"
+  printf '%s\n' "fallback_mode: $fallback_mode"
+}
+
+command_prepare_repo() {
+  if [ "$#" -gt 1 ]; then
+    usage
+  fi
+
+  target_dir=$(canonical_dir "${1:-.}")
+  repo_context=$(command_resolve_repo_context "$target_dir")
+  repo_root=$(printf '%s\n' "$repo_context" | awk -F': ' '/^repo_root:/ { print $2; exit }')
+  repo_slug=$(printf '%s\n' "$repo_context" | awk -F': ' '/^repo_slug:/ { print $2; exit }')
+  is_git_repo=$(printf '%s\n' "$repo_context" | awk -F': ' '/^is_git_repo:/ { print $2; exit }')
+  projectpal_dir=$repo_root/.projectpal
+  artifacts_dir=$projectpal_dir/artifacts
+  state_path=$projectpal_dir/state.yml
+  gitignore_path=$repo_root/.gitignore
+  blocker_mode=${PROJECTPAL_PREPARE_REPO_MODE:-}
+  ok=true
+  state_status=existing
+  gitignore_status=already-present
+  blocker_name=
+  blocker_detail=
+  blocker_next_step=
+
+  if [ "$blocker_mode" = "block-projectpal" ]; then
+    ok=false
+    state_status=blocked
+    blocker_name=projectpal-state-write-blocked
+    blocker_detail="ProjectPal could not create repo-local state under .projectpal."
+    blocker_next_step="Create .projectpal/state.yml in this repo, then rerun projectpal."
+  else
+    mkdir -p "$projectpal_dir" "$artifacts_dir"/prd "$artifacts_dir"/tech-spec "$artifacts_dir"/tickets "$artifacts_dir"/debate
+    if [ ! -f "$state_path" ]; then
+      {
+        printf '%s\n' "repo_slug: $repo_slug"
+        printf '%s\n' "repo_root_hint: $repo_root"
+        printf '%s\n' "current_project: onboarding"
+        printf '%s\n' "current_phase: 0"
+        printf '%s\n' "last_session: $(today_utc)"
+        printf '%s\n' "resume_source: fresh"
+        printf '%s\n' "synced_at: $(utc_timestamp)"
+        printf '%s\n' "artifacts_dir: .projectpal/artifacts"
+        printf '%s\n' "next_steps:"
+        printf '%s\n' "  - \"Continue onboarding in this repo\""
+        printf '%s\n' "bridge_summary: |"
+        printf '%s\n' "  Repo-local ProjectPal bridge initialized by onboarding."
+      } > "$state_path"
+      state_status=created
+    fi
+  fi
+
+  if [ "$ok" = "true" ]; then
+    if [ "$blocker_mode" = "block-gitignore" ]; then
+      ok=false
+      gitignore_status=blocked
+      blocker_name=gitignore-write-blocked
+      blocker_detail="ProjectPal could not update .gitignore to keep repo-local state out of version control."
+      blocker_next_step="Add .projectpal/ to .gitignore, then rerun projectpal."
+    else
+      if [ -f "$gitignore_path" ]; then
+        if grep -Fqx '.projectpal/' "$gitignore_path"; then
+          gitignore_status=already-present
+        else
+          printf '%s\n' ".projectpal/" >> "$gitignore_path"
+          gitignore_status=updated
+        fi
+      else
+        if [ "$is_git_repo" = "true" ]; then
+          printf '%s\n' ".projectpal/" > "$gitignore_path"
+          gitignore_status=created
+        else
+          gitignore_status=advice-only
+        fi
+      fi
+    fi
+  fi
+
+  printf '%s\n' "$repo_context"
+  printf '%s\n' "ok: $ok"
+  printf '%s\n' "projectpal_dir: $projectpal_dir"
+  printf '%s\n' "state_path: $state_path"
+  printf '%s\n' "state_status: $state_status"
+  printf '%s\n' "gitignore_path: $gitignore_path"
+  printf '%s\n' "gitignore_status: $gitignore_status"
+  if [ "$ok" = "false" ]; then
+    printf '%s\n' "blocker_name: $blocker_name"
+    printf '%s\n' "blocker_detail: $blocker_detail"
+    printf '%s\n' "blocker_next_step: $blocker_next_step"
+  fi
+}
+
+command_onboarding_flow() {
+  if [ "$#" -gt 1 ]; then
+    usage
+  fi
+
+  target_dir=$(canonical_dir "${1:-.}")
+  repo_context=$(command_resolve_repo_context "$target_dir")
+  repo_root=$(printf '%s\n' "$repo_context" | awk -F': ' '/^repo_root:/ { print $2; exit }')
+  repo_slug=$(printf '%s\n' "$repo_context" | awk -F': ' '/^repo_slug:/ { print $2; exit }')
+
+  assistant_probe=$(command_probe_assistants "$target_dir")
+  preferred_assistant=$(printf '%s\n' "$assistant_probe" | awk -F': ' '/^preferred:/ { print $2; exit }')
+  assistant_confidence=$(printf '%s\n' "$assistant_probe" | awk -F': ' '/^confidence:/ { print $2; exit }')
+  assistant_fallback=$(printf '%s\n' "$assistant_probe" | awk -F': ' '/^fallback_used:/ { print $2; exit }')
+
+  mempalace_probe=$(command_probe_mempalace "$target_dir")
+  mempalace_available=$(printf '%s\n' "$mempalace_probe" | awk -F': ' '/^available:/ { print $2; exit }')
+  mempalace_reason=$(printf '%s\n' "$mempalace_probe" | awk -F': ' '/^reason:/ { print $2; exit }')
+  mempalace_mode=$(printf '%s\n' "$mempalace_probe" | awk -F': ' '/^fallback_mode:/ { print $2; exit }')
+
+  prepare_output=$(command_prepare_repo "$target_dir")
+  repo_ready=$(printf '%s\n' "$prepare_output" | awk -F': ' '/^ok:/ { print $2; exit }')
+  state_path=$(printf '%s\n' "$prepare_output" | awk -F': ' '/^state_path:/ { print $2; exit }')
+  blocker_name=$(printf '%s\n' "$prepare_output" | awk -F': ' '/^blocker_name:/ { print $2; exit }')
+  blocker_detail=$(printf '%s\n' "$prepare_output" | awk -F': ' '/^blocker_detail:/ { print $2; exit }')
+  blocker_next_step=$(printf '%s\n' "$prepare_output" | awk -F': ' '/^blocker_next_step:/ { print $2; exit }')
+
+  handoff_message=$(assistant_handoff_message "$preferred_assistant")
+  bridge_summary="Onboarding is ready in this repo. Assistant preference is $preferred_assistant, MemPalace mode is $mempalace_mode, and the next step is to $handoff_message"
+  next_step=$handoff_message
+  current_phase=onboarding
+  last_blocker=none
+
+  if [ "$repo_ready" = "false" ]; then
+    handoff_message=$blocker_next_step
+    bridge_summary="Onboarding is blocked in this repo by $blocker_name. $blocker_detail"
+    next_step=$blocker_next_step
+    last_blocker=$blocker_name
+  elif [ "$mempalace_available" = "false" ]; then
+    bridge_summary="Onboarding is ready in local-only mode for this repo. Assistant preference is $preferred_assistant, MemPalace fallback reason is $mempalace_reason, and the next step is to $handoff_message"
+  fi
+
+  if [ -f "$state_path" ]; then
+    write_bridge_state "$state_path" "$repo_slug" "$repo_root" "onboarding" "$current_phase" "bridge" "$preferred_assistant" "$last_blocker" "$next_step" "$bridge_summary"
+  fi
+
+  printf '%s\n' "$repo_context"
+  printf '%s\n' "assistant_preferred: $preferred_assistant"
+  printf '%s\n' "assistant_confidence: $assistant_confidence"
+  printf '%s\n' "assistant_fallback_used: $assistant_fallback"
+  printf '%s\n' "mempalace_available: $mempalace_available"
+  printf '%s\n' "mempalace_reason: $mempalace_reason"
+  printf '%s\n' "mempalace_mode: $mempalace_mode"
+  printf '%s\n' "repo_ready: $repo_ready"
+  if [ "$repo_ready" = "false" ]; then
+    printf '%s\n' "blocker_name: $blocker_name"
+    printf '%s\n' "blocker_detail: $blocker_detail"
+    printf '%s\n' "final_next_step: $blocker_next_step"
+  else
+    printf '%s\n' "final_next_step: $handoff_message"
+  fi
+  printf '%s\n' "handoff_message: $handoff_message"
+  printf '%s\n' "state_path: $state_path"
 }
 
 command_artifact_budget_check() {
@@ -323,11 +772,19 @@ command_sync_resume_bridge() {
   require_file "$state_path"
   require_file "$bridge_summary_file"
 
+  stored_repo_root_hint=$(yaml_value repo_root_hint "$state_path")
+  current_repo_root=$(resolve_repo_root "$(dirname "$state_path")")
+  repo_root_hint=$stored_repo_root_hint
+  if [ -n "$current_repo_root" ]; then
+    repo_root_hint=$current_repo_root
+  fi
+
   tmp_path=$(mktemp)
   awk '
     BEGIN {
       skip = 0
     }
+    /^repo_root_hint:/ { next }
     /^last_artifact_ref:/ { next }
     /^bridge_summary:[[:space:]]*\|/ {
       skip = 1
@@ -346,6 +803,9 @@ command_sync_resume_bridge() {
 
   {
     cat "$tmp_path"
+    if [ -n "$repo_root_hint" ]; then
+      printf '%s\n' "repo_root_hint: $repo_root_hint"
+    fi
     printf '%s\n' "last_artifact_ref: $approved_artifact_ref"
     printf '%s\n' "bridge_summary: |"
     sed 's/^/  /' "$bridge_summary_file"
@@ -500,6 +960,12 @@ command=$1
 shift
 
 case "$command" in
+  resolve-repo-context) command_resolve_repo_context "$@" ;;
+  read-resume-bridge) command_read_resume_bridge "$@" ;;
+  probe-assistants) command_probe_assistants "$@" ;;
+  probe-mempalace) command_probe_mempalace "$@" ;;
+  prepare-repo) command_prepare_repo "$@" ;;
+  onboarding-flow) command_onboarding_flow "$@" ;;
   artifact-budget-check) command_artifact_budget_check "$@" ;;
   split-evaluate) command_split_evaluate "$@" ;;
   handoff-build) command_handoff_build "$@" ;;

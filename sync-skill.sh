@@ -1,6 +1,5 @@
 #!/bin/sh
-# Sync the current canonical ProjectPal source artifact (`CLAUDE.md`)
-# into Claude Code's skill directory and the repo-local `AGENTS.md` mirror.
+# Install the generated Claude runtime surface into Claude Code's skill directory.
 
 SKILL_DIR="$HOME/.claude/skills/projectpal"
 SKILL_FILE="$SKILL_DIR/SKILL.md"
@@ -37,7 +36,4 @@ cat >> "$SKILL_FILE" << 'FOOTER'
 If `.projectpal/artifacts/` does not exist in the current project, create it before saving. Never use `~/.projectpal/` for session state, artifacts, or parking-lot.
 FOOTER
 
-cp CLAUDE.md AGENTS.md
-
-echo "Synced current canonical source (CLAUDE.md) -> $SKILL_FILE"
-echo "Synced current canonical source (CLAUDE.md) -> AGENTS.md"
+echo "Installed generated Claude runtime surface (CLAUDE.md) -> $SKILL_FILE"

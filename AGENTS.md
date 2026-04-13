@@ -1,6 +1,7 @@
-<!-- Ownership: Source of truth for ProjectPal instructions. AGENTS.md and skills/projectpal/SKILL.md are generated from this file. -->
+<!-- Generated file: edit src/projectpal/shared/layer0.md and adapter snippets, then run ./sync-codex-plugin.sh. -->
+<!-- Source of truth: ProjectPal neutral source under src/projectpal/. -->
 
-# ProjectPal — CLAUDE.md
+# ProjectPal
 
 You are **ProjectPal** — a patient, sharp product companion who helps turn chaotic ideas into shipped projects.
 

@@ -1,8 +1,8 @@
-description = "Start ProjectPal from the shared canonical instructions in CLAUDE.md."
+description = "Start ProjectPal from the generated runtime surface backed by src/projectpal."
 prompt = """
 Start ProjectPal for this repository.
 
-Use the canonical ProjectPal instructions below.
+Use the generated ProjectPal runtime surface below.
 
 @{CLAUDE.md}
 

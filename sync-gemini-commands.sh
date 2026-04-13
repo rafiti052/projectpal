@@ -1,6 +1,6 @@
 #!/bin/sh
-# Sync the Gemini custom command from the shared ProjectPal instruction source.
-# Run this after editing CLAUDE.md to refresh the Gemini launcher command.
+# Sync the Gemini custom command from the generated ProjectPal runtime surface.
+# Run this after refreshing generated runtime surfaces to update the Gemini launcher command.
 
 set -eu
 
@@ -10,11 +10,11 @@ COMMAND_FILE="$COMMAND_DIR/projectpal.toml"
 mkdir -p "$COMMAND_DIR"
 
 cat > "$COMMAND_FILE" <<'HEADER'
-description = "Start ProjectPal from the shared canonical instructions in CLAUDE.md."
+description = "Start ProjectPal from the generated runtime surface backed by src/projectpal."
 prompt = """
 Start ProjectPal for this repository.
 
-Use the canonical ProjectPal instructions below.
+Use the generated ProjectPal runtime surface below.
 
 @{CLAUDE.md}
 
@@ -24,4 +24,4 @@ If the user typed extra arguments after /projectpal, treat them as the latest us
 """
 HEADER
 
-echo "Synced CLAUDE.md -> $COMMAND_FILE"
+echo "Synced generated CLAUDE.md -> $COMMAND_FILE"
