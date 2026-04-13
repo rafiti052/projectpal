@@ -4,6 +4,25 @@ All notable changes to ProjectPal are documented here.
 
 ---
 
+## [0.2.3] — 2026-04-10
+
+### Added
+- Repo-local Phase 7 helper scripts for artifact budget checks, phase handoff packaging, resume bridge sync, reduction reporting, and comparison artifact generation under `scripts/`.
+- Focused shell verification for the new flow via `scripts/projectpal-flow-tests.sh`.
+- Saved Phase 2 comparison helpers for baseline-vs-narrowed handoff inspection.
+
+### Changed
+- README now documents the local measurement and markdown budget helper entrypoints.
+- README version bumped to `v0.2.3`.
+- Codex plugin manifest version bumped to `0.2.3`.
+
+### Fixed
+- `build-phase-input` no longer fails on bullet-line rendering in `scripts/projectpal-flow.sh`.
+- Repo-scoped memory summary ranking now prefers matching `feat:` rows ahead of same-phase rows from other features.
+- Phase 2 measurement review now distinguishes wrapper-only counts from comparable transported debate surfaces.
+
+---
+
 ## [0.2.2] — 2026-04-10
 
 ### Changed

@@ -1,4 +1,4 @@
-# ProjectPal `v0.2.2`
+# ProjectPal `v0.2.3`
 
 A patient AI companion that turns chaotic ideas into shipped projects.
 
@@ -130,6 +130,10 @@ projectpal/
 ```
 
 Generated artifacts (PRDs, specs, tickets) are saved to `.projectpal/artifacts/` within the current project directory — not here.
+
+Review-time measurement artifacts also live there. For the current performance baseline work, the repeatable fixture entrypoint is `sh scripts/phase2-baseline-fixture.sh <run-id>`, which prepares `.projectpal/artifacts/review/<run-id>/` with the fixed PRD/prompt references and output placeholders.
+
+For artifact budget checks, use `sh scripts/markdown-word-budget.sh <markdown-path> [budget-limit]`. It counts markdown body words only and ignores YAML frontmatter when the file starts with a frontmatter block.
 
 Repo continuity lives in MemPalace under `Projects/<repo-slug>`. Shared knowledge remains in broader MemPalace wings such as `Principles`, `Decisions`, and `Precedents`.
 
