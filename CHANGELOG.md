@@ -4,6 +4,17 @@ All notable changes to ProjectPal are documented here.
 
 ---
 
+## [0.2.0] — 2026-04-10
+
+### Added
+- **Codex plugin support** — added `.codex-plugin/plugin.json`, generated `skills/projectpal/SKILL.md`, and an optional local Codex marketplace entry.
+- **Codex sync script** — added `sync-codex-plugin.sh` to refresh the Codex skill entrypoint from `CLAUDE.md` while preserving the Claude Code `sync-skill.sh` flow.
+
+### Changed
+- README now documents both Claude Code and Codex plugin setup paths.
+
+---
+
 ## [0.1.1] — 2026-04-10
 
 ### Added

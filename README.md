@@ -1,4 +1,4 @@
-# ProjectPal `v0.1.1`
+# ProjectPal `v0.2.0`
 
 A patient AI companion that turns chaotic ideas into shipped projects.
 
@@ -36,6 +36,17 @@ claude
 
 The Pal loads automatically from `CLAUDE.md`. For non-Claude-Code environments, use `AGENTS.md` (identical content, standard filename).
 
+### Codex plugin setup
+
+ProjectPal can also be installed as a Codex plugin without changing the Claude Code integration:
+
+```bash
+# Refresh the Codex skill entrypoint from CLAUDE.md
+./sync-codex-plugin.sh
+```
+
+Codex reads the plugin manifest from `.codex-plugin/plugin.json`, which points to `skills/projectpal/SKILL.md` and the repo-local `.mcp.json`.
+
 ### MemPalace (long-term memory)
 
 The Pal detects MemPalace automatically on first run. If it's not connected, it will explain what it is and offer to install and register it for you — no manual setup required.
@@ -59,6 +70,13 @@ projectpal/
 ├── CLAUDE.md                  ← Pal persona + rules (loaded by Claude Code)
 ├── AGENTS.md                  ← Same as CLAUDE.md (standard agents filename)
 ├── sync-skill.sh              ← Deploy CLAUDE.md as a Claude Code skill
+├── sync-codex-plugin.sh       ← Refresh skills/projectpal/SKILL.md for Codex
+├── .codex-plugin/
+│   └── plugin.json            ← Codex plugin manifest
+├── .agents/plugins/
+│   └── marketplace.json       ← Optional local Codex marketplace entry
+├── skills/projectpal/
+│   └── SKILL.md               ← Generated Codex skill entrypoint
 ├── .mcp.json                  ← MemPalace MCP connection
 ├── prompts/
 │   ├── critic-agent.md        ← Critic sub-agent persona

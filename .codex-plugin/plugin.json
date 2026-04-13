@@ -1,0 +1,39 @@
+{
+  "name": "projectpal",
+  "version": "0.2.0",
+  "description": "A patient product companion that turns chaotic ideas into PRDs, specs, and 15-minute tickets.",
+  "author": {
+    "name": "Rafael",
+    "url": "https://github.com/rafiti052"
+  },
+  "homepage": "https://github.com/rafiti052/projectpal",
+  "repository": "https://github.com/rafiti052/projectpal",
+  "license": "MIT",
+  "keywords": [
+    "product",
+    "planning",
+    "prd",
+    "tickets",
+    "adhd"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "ProjectPal",
+    "shortDescription": "Turns chaotic ideas into PRDs, specs, and 15-minute tickets.",
+    "longDescription": "ProjectPal is a patient product companion for turning non-linear ideas into plans, specs, and small execution tickets without forcing structured intake.",
+    "developerName": "Rafael",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/rafiti052/projectpal",
+    "defaultPrompt": [
+      "Start ProjectPal",
+      "Turn this idea into tickets",
+      "Help me shape a project"
+    ],
+    "brandColor": "#2563EB"
+  }
+}
