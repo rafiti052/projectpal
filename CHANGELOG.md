@@ -6,6 +6,10 @@ All notable changes to ProjectPal are documented here.
 
 ## [Unreleased]
 
+---
+
+## [0.2.4] — 2026-04-13
+
 ### Added
 - `install-projectpal.sh` as the single installer entrypoint that prompts for Codex or Claude and refreshes generated runtime surfaces before install.
 - `docs/maintainer-codex-reinstall.md` for the maintainer-only clean Codex reinstall test.
@@ -14,12 +18,16 @@ All notable changes to ProjectPal are documented here.
 ### Changed
 - ProjectPal now uses `src/projectpal/` as the neutral source of truth for generated runtime surfaces.
 - `sync-codex-plugin.sh` now regenerates `CLAUDE.md`, `AGENTS.md`, and `skills/projectpal/SKILL.md` from the neutral source.
+- `sync-skill.sh` has been renamed to `sync-claude-skill.sh` so the Claude-specific install path is explicit.
 - README now documents one installer entrypoint with Codex as the primary activation path and `ProjectPal` as the canonical Codex launch command.
 - Release notes for neutral-source changes should explicitly call out regenerated `CLAUDE.md`, `AGENTS.md`, and `skills/projectpal/SKILL.md` so Claude and Codex runtime surfaces stay visible in the changelog.
+- README version bumped to `v0.2.4`.
+- Codex plugin manifest version bumped to `0.2.4`.
 
 ### Fixed
 - Local onboarding verification now defaults to Codex when runtime detection is ambiguous, so the helper flow matches the primary installation path.
 - Runtime install verification now uses an isolated temporary `HOME` for the Claude branch, avoiding sandbox-specific false positives while still checking the generated install output.
+- Stale Gemini install/runtime hooks were removed from the root install surface and assistant probe output.
 
 ## [0.2.3] — 2026-04-10
 
@@ -70,7 +78,7 @@ All notable changes to ProjectPal are documented here.
 
 ### Added
 - **Codex plugin support** — added `.codex-plugin/plugin.json`, generated `skills/projectpal/SKILL.md`, and an optional local Codex marketplace entry.
-- **Codex sync script** — added `sync-codex-plugin.sh` to refresh the Codex skill entrypoint from `CLAUDE.md` while preserving the Claude Code `sync-skill.sh` flow.
+- **Codex sync script** — added `sync-codex-plugin.sh` to refresh the Codex skill entrypoint from `CLAUDE.md` while preserving the Claude Code `sync-claude-skill.sh` flow.
 
 ### Changed
 - README now documents both Claude Code and Codex plugin setup paths.
@@ -113,5 +121,5 @@ All notable changes to ProjectPal are documented here.
 - Parking Lot — silent capture of out-of-phase ideas
 - Session resumption via MemPalace diary + local `state.yml`
 - Phase 6 decision routing (A|B|C) and project wrap-up
-- `sync-skill.sh` — deploys Pal as a Claude Code slash command (`/projectpal`)
+- `sync-claude-skill.sh` — deploys Pal as a Claude Code slash command (`/projectpal`)
 - Persona label system: Low hanging fruit / Needs a plan / Uncharted territory / On fire / Can't read it yet

@@ -1,4 +1,4 @@
-# ProjectPal `v0.2.3`
+# ProjectPal `v0.2.4`
 
 A patient AI companion that turns chaotic ideas into shipped projects.
 
@@ -22,7 +22,7 @@ It works through conversation, not forms. It remembers context between sessions.
 
 `src/projectpal/` is the neutral ProjectPal source in this repo.
 
-The launcher-specific files for Claude Code, Codex CLI, and Gemini CLI are generated or synced runtime surfaces. `CLAUDE.md` and `AGENTS.md` are outputs, not the authoring center.
+The launcher-specific files for Claude Code and Codex CLI are generated runtime surfaces. `CLAUDE.md` and `AGENTS.md` are outputs, not the authoring center.
 
 ## Setup
 
@@ -116,7 +116,7 @@ projectpal/
 ├── install-projectpal.sh      ← Single install entrypoint that prompts for Claude or Codex
 ├── CLAUDE.md                  ← Generated Claude runtime surface
 ├── AGENTS.md                  ← Generated agents-compatible runtime surface
-├── sync-skill.sh              ← Install generated Claude runtime surface into Claude Code
+├── sync-claude-skill.sh       ← Install generated Claude runtime surface into Claude Code
 ├── sync-codex-plugin.sh       ← Generate Claude and Codex runtime surfaces from src/projectpal
 ├── .codex-plugin/
 │   └── plugin.json            ← Codex plugin manifest

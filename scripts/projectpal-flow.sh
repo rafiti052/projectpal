@@ -252,35 +252,27 @@ command_probe_assistants() {
   target_dir=$(canonical_dir "${1:-.}")
   claude_signal=false
   codex_signal=false
-  gemini_signal=false
   preferred=codex
   confidence=inconclusive
   fallback_used=true
 
-  if [ -f "$target_dir/.claude/settings.local.json" ] || [ -d "$target_dir/src/projectpal" ] || [ -f "$target_dir/sync-skill.sh" ]; then
+  if [ -f "$target_dir/.claude/settings.local.json" ] || [ -d "$target_dir/src/projectpal" ] || [ -f "$target_dir/sync-claude-skill.sh" ]; then
     claude_signal=true
   fi
   if [ -f "$target_dir/.codex-plugin/plugin.json" ] || [ -f "$target_dir/skills/projectpal/SKILL.md" ] || [ -f "$target_dir/sync-codex-plugin.sh" ]; then
     codex_signal=true
-  fi
-  if [ -f "$target_dir/.gemini/commands/projectpal.toml" ] || [ -f "$target_dir/sync-gemini-commands.sh" ]; then
-    gemini_signal=true
   fi
 
   if [ -n "${PROJECTPAL_ASSISTANT_HINT:-}" ]; then
     preferred=$PROJECTPAL_ASSISTANT_HINT
     confidence=high
     fallback_used=false
-  elif [ "$claude_signal" = "true" ] && [ "$codex_signal" = "false" ] && [ "$gemini_signal" = "false" ]; then
+  elif [ "$claude_signal" = "true" ] && [ "$codex_signal" = "false" ]; then
     preferred=claude
     confidence=high
     fallback_used=false
-  elif [ "$claude_signal" = "false" ] && [ "$codex_signal" = "true" ] && [ "$gemini_signal" = "false" ]; then
+  elif [ "$claude_signal" = "false" ] && [ "$codex_signal" = "true" ]; then
     preferred=codex
-    confidence=high
-    fallback_used=false
-  elif [ "$claude_signal" = "false" ] && [ "$codex_signal" = "false" ] && [ "$gemini_signal" = "true" ]; then
-    preferred=gemini
     confidence=high
     fallback_used=false
   fi
@@ -291,7 +283,6 @@ command_probe_assistants() {
   printf '%s\n' "signals:"
   printf '%s\n' "  - claude:$claude_signal"
   printf '%s\n' "  - codex:$codex_signal"
-  printf '%s\n' "  - gemini:$gemini_signal"
 }
 
 assistant_handoff_message() {

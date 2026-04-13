@@ -148,7 +148,6 @@ assert_contains "$assistant_probe_output" "confidence: inconclusive"
 assert_contains "$assistant_probe_output" "fallback_used: true"
 assert_contains "$assistant_probe_output" "claude:true"
 assert_contains "$assistant_probe_output" "codex:true"
-assert_contains "$assistant_probe_output" "gemini:true"
 
 assistant_hint_output=$(PROJECTPAL_ASSISTANT_HINT=codex run_flow probe-assistants "$ROOT_DIR")
 assert_contains "$assistant_hint_output" "preferred: codex"

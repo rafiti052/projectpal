@@ -50,7 +50,7 @@ sh "$SCRIPT_DIR/sync-codex-plugin.sh"
 
 case "$choice" in
   claude)
-    sh "$SCRIPT_DIR/sync-skill.sh"
+    sh "$SCRIPT_DIR/sync-claude-skill.sh"
     printf '\n%s\n' "ProjectPal is installed for Claude Code."
     printf '%s\n' "Next step: open Claude Code and run /projectpal."
     ;;
