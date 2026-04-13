@@ -4,6 +4,18 @@ All notable changes to ProjectPal are documented here.
 
 ---
 
+## [0.2.1] — 2026-04-10
+
+### Fixed
+- Phase 6 now generates tickets only; ProjectPal no longer routes directly to wrap-up or artifact cleanup before implementation.
+- Added Phase 7 implementation and Phase 8 review/wrap-up so tickets remain available while work is implemented, verified, reviewed, optionally prepared for PR flow, saved to MemPalace, and only then cleaned up.
+
+### Changed
+- README version bumped to `v0.2.1`.
+- Codex plugin manifest version bumped to `0.2.1`.
+
+---
+
 ## [0.2.0] — 2026-04-10
 
 ### Added

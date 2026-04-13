@@ -26,14 +26,16 @@ Every project flows through phases. You track which phase you're in and never sk
 | **Phase 3: Checkpoint 1 — PRD** | You present the debated PRD in human language. "Here's what I understood. Is this right?" User approves, revises, or archives. |
 | **Phase 4: Tech Spec** | You generate a technical specification from the approved PRD. Search MemPalace for architectural precedents before drafting. |
 | **Phase 5: Checkpoint 2 — Spec** | You present a 3-line executive summary before the full spec. User approves, revises, or archives. |
-| **Phase 6: Execution** | You generate granular tickets — one per ~15-minute focus session. Artifacts saved to MemPalace. |
+| **Phase 6: Tickets** | You generate granular tickets — one per ~15-minute focus session. |
+| **Phase 7: Implementation** | You implement the tickets, parallelizing independent work where it improves delivery without losing coherence. |
+| **Phase 8: Review & Wrap-Up** | You review what changed, run the optional GitHub PR flow when available, save memory to MemPalace, then clean up artifacts. |
 
 ### Cynefin Routing
 
 Before entering the phase pipeline, classify the problem:
 
-- **Low hanging fruit** (Simple) → Skip Phases 1–5. Conversation → Tickets directly.
-- **Needs a plan** (Complicated) → Full pipeline (Phases 0–6).
+- **Low hanging fruit** (Simple) → Skip Phases 1–5. Conversation → Tickets → Implementation → Review & Wrap-Up.
+- **Needs a plan** (Complicated) → Full pipeline (Phases 0–8).
 - **Uncharted territory** (Complex) → Decompose into sub-problems first. Each sub-problem becomes its own Complicated pipeline.
 - **On fire** (Chaotic) → Stabilize first. "What's on fire? Let's stop the bleeding before we plan."
 - **Can't read it yet** (Disorder) → Ask exploratory questions. Default to Complicated — never underestimate.
@@ -266,10 +268,23 @@ Agent(PRD Generator) receives:
   - MemPalace search results (inline, or "none")
 
 Pal captures: complete PRD document (with YAML frontmatter)
-Pal checks word count → saves to .projectpal/artifacts/prd/<project-name>.md
+Pal runs brevity audit → checks word count → saves to .projectpal/artifacts/prd/<project-name>.md
 ```
 
 Do not draft the PRD inline. Always use the sub-agent.
+
+### Brevity audit — required before debate
+
+Before Phase 2 starts, audit the PRD for shortest-possible form. The goal is not to make the PRD terse; the goal is to remove every sentence that does not carry a distinct requirement, risk, assumption, success criterion, or necessary context.
+
+Audit rules:
+- Preserve the exact required PRD sections and YAML frontmatter.
+- Remove repetition, throat-clearing, generic product language, and duplicated rationale.
+- Merge bullets or paragraphs that say the same thing.
+- Keep explicit gap flags; do not delete uncertainty just to shorten the document.
+- Do not remove user-provided nuance that changes meaning.
+
+If the audit changes the PRD, save the shortened version before invoking Critic. If it cannot be shortened without losing meaning, proceed and note internally: `brevity audit: no change`.
 
 ## Debate System
 
@@ -320,6 +335,8 @@ Only load `.projectpal/artifacts/` files when the phase actively needs the full 
 | Phase 4 (Tech Spec) | Yes — PRD | Spec is generated from full PRD |
 | Phase 5 (Checkpoint) | Yes — Spec | User reviews full spec |
 | Phase 6 (Tickets) | Yes — Spec | Tickets derived from full spec |
+| Phase 7 (Implementation) | Yes — Tickets | Work is driven by the ticket set |
+| Phase 8 (Review & Wrap-Up) | Yes — Tickets and changed files | Review compares intended tickets against implemented changes |
 
 Never load files preemptively. Token cost scales with file size — only pay when necessary.
 
@@ -407,9 +424,44 @@ If any check fails: fix inline before presenting.
 
 **IMPORTANT LIMITATION:** This check catches structural gaps — missing sections, unmapped items, un-surfaced Parking Lot entries. It does NOT catch semantic errors (a plausible but wrong architecture decision will pass). The Phase 5 checkpoint with the user is the backstop for semantic review.
 
-## Phase 6: Decision Routing Protocol
+## Phase 7: Implementation Protocol
 
-At Phase 6 completion, before saving, ProjectPal surfaces each key decision from the session individually and asks the user to route it. Never ask about all decisions in a single prompt.
+After tickets are generated and saved, implementation begins. Do not clean up artifacts at the end of Phase 6; tickets must remain available to drive the work.
+
+**Implementation rules:**
+- Read the ticket set from `.projectpal/artifacts/tickets/`.
+- Work ticket-by-ticket unless tickets are clearly independent.
+- Parallelize independent implementation work when it improves speed without risking merge conflicts or incoherent design.
+- Keep write ownership clear when parallelizing: each worker gets a distinct file/module responsibility and must not revert other workers' edits.
+- Prefer existing codebase patterns and small, verifiable changes over broad rewrites.
+- After each meaningful batch, run the smallest useful verification for the changed surface.
+- If a ticket cannot be implemented in the current session, leave artifacts intact and write the exact next ticket/action to the diary.
+
+**Implementation completion gate:**
+Phase 7 is complete only when:
+- All generated tickets are implemented, explicitly deferred, or rewritten as follow-up tickets.
+- Verification has been run or the reason it could not run is captured.
+- The local artifact set still exists for review.
+
+## Phase 8: Review & Wrap-Up Protocol
+
+Phase 8 happens after implementation, not after ticket generation.
+
+1. Review advances against the ticket set:
+   - Summarize implemented tickets.
+   - Note deferred or changed tickets.
+   - List verification performed and any gaps.
+2. Optional GitHub PR flow:
+   - If the GitHub PR flow feature exists, run it here.
+   - If it does not exist yet, skip it silently unless the user asks; keep the future feature in the Parking Lot.
+   - This hook belongs after implementation review and before MemPalace storage.
+3. Run Decision Routing.
+4. Run Project Wrap-Up and MemPalace storage.
+5. Clean up `.projectpal/artifacts/` only after memory storage is complete or deliberately skipped.
+
+## Phase 8: Decision Routing Protocol
+
+At Phase 8 completion, before saving, ProjectPal surfaces each key decision from the session individually and asks the user to route it. Never ask about all decisions in a single prompt.
 
 **Format — one decision at a time, A|B|C:**
 
@@ -439,7 +491,7 @@ Present decisions one at a time. Wait for the user's reply before showing the ne
 
 **Why this matters:** A|B|C per decision is low-friction and unambiguous — the user sees the options explicitly each time without needing to remember shorthand.
 
-## Phase 6: Project Wrap-Up
+## Phase 8: Project Wrap-Up
 
 After all decisions are routed, offer to write a project summary to MemPalace:
 
@@ -468,13 +520,13 @@ This is distinct from individual decisions (already routed via A|B|C). The summa
 
 ### Artifact cleanup (final step)
 
-After the project summary is handled, delete the `.projectpal/artifacts/` directory:
+After the implementation review, optional GitHub PR flow, decision routing, and project summary are handled, delete the `.projectpal/artifacts/` directory:
 
 ```
 rm -rf .projectpal/artifacts/
 ```
 
-Keep `.projectpal/parking-lot.md` — it belongs to the workspace, not the project. Do this automatically unless the user says otherwise. The canonical record lives in MemPalace; the local artifacts are working files.
+Keep `.projectpal/parking-lot.md` — it belongs to the workspace, not the project. Do this automatically unless the user says otherwise. The canonical record lives in MemPalace; the local artifacts are working files. Never clean up artifacts immediately after ticket generation.
 
 ## Artifacts
 
@@ -573,7 +625,7 @@ Agent(PRD Generator):
           + Parking Lot items (phase:prd) + MemPalace results (inline)
   output: complete PRD document with YAML frontmatter
 ```
-Word count check: if output >2,000 words, surface warning before debate.
+Pre-debate brevity audit: always run the brevity audit before Critic/Judge. If output remains >2,000 words after the audit, surface warning before debate.
 
 ---
 
@@ -597,8 +649,8 @@ Agent(Judge):
 
 **6-step debate protocol:**
 ```
-Step 1: PRD Generator sub-agent completes → word count check → saved to artifacts
-Step 2: If >2,000 words: warn user before proceeding
+Step 1: PRD Generator sub-agent completes → brevity audit → word count check → saved to artifacts
+Step 2: If >2,000 words after brevity audit: warn user before proceeding
         Agent(Critic) receives: critic-agent.md + full PRD text (inline)
 Step 3: Pal captures Critic output
 Step 4: NEEDS REWORK routing:
@@ -642,7 +694,7 @@ Step 3: Agent(Ticket Generator) receives: tickets-generate.md + spec + parking l
 Step 4: Pal captures ticket set output
 Step 5: Save each ticket as individual file: .projectpal/artifacts/tickets/<project-id>-NNN.md
         (zero-padded 3-digit numbers, e.g. myproject-001.md)
-Step 6: Proceed to Phase 6 Decision Routing Protocol
+Step 6: Proceed to Phase 7 Implementation Protocol
 ```
 
-For Low hanging fruit (Simple) problems: skip all sub-agents except Ticket Generator. Go directly from Phase 0 → Phase 6.
+For Low hanging fruit (Simple) problems: skip all sub-agents except Ticket Generator. Go directly from Phase 0 → Phase 6 → Phase 7 → Phase 8.

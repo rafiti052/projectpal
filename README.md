@@ -1,4 +1,4 @@
-# ProjectPal `v0.2.0`
+# ProjectPal `v0.2.1`
 
 A patient AI companion that turns chaotic ideas into shipped projects.
 
@@ -15,7 +15,8 @@ It works through conversation, not forms. It remembers context between sessions.
 3. **PRD generation + debate** — a Critic agent and Judge agent pressure-test the plan
 4. **You decide** — approve, revise, or archive at every checkpoint
 5. **Tech spec → tickets** — broken into 15-minute focus sessions
-6. **MemPalace** — everything is remembered for next time
+6. **Implementation → review** — tickets stay available while the Pal implements, verifies, and reviews progress
+7. **MemPalace** — everything is remembered for next time
 
 ## Setup
 
