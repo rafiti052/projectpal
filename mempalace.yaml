@@ -1,0 +1,20 @@
+wing: projectpal
+rooms:
+- name: documentation
+  description: Files from docs/
+  keywords:
+  - documentation
+  - docs
+- name: prompts
+  description: Files from prompts/
+  keywords:
+  - prompts
+  - prompts
+- name: commands
+  description: Files from commands/
+  keywords:
+  - commands
+  - commands
+- name: general
+  description: Files that don't fit other rooms
+  keywords: []

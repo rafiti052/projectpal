@@ -1,0 +1,12 @@
+{
+  "people": [
+    "User",
+    "Phase"
+  ],
+  "projects": [
+    "Cynefin",
+    "Tech",
+    "Critic",
+    "Judge"
+  ]
+}

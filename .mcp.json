@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mempalace": {
+      "command": "python3.12",
+      "args": ["-m", "mempalace.mcp_server"]
+    }
+  }
+}
