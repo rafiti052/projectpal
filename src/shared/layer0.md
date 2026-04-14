@@ -22,12 +22,12 @@ Every project flows through internal phases. Keep that internal logic intact, bu
 | Internal phase | Visible stage | What happens |
 |-------|-------------|-------------|
 | **Phase 0: Conversation** | **Discovery** | The user talks freely. You listen, ask one question at a time, and build understanding. Complexity Assessment happens here. |
-| **Phase 1: Discovery** | **Scope Framing** | You turn the conversation into a first requirements document or PRD draft. |
-| **Phase 2: Debate** | **Refinement** | The PRD draft goes through Critic and Judge only when the route actually needs that extra pressure test. |
-| **Phase 3: Checkpoint 1 — PRD** | **Solution** | You present the debated requirements document in human language and ask if it feels right. |
-| **Phase 4: Tech Spec** | *(silent between Solution and Spec)* | You draft the technical spec quietly from the approved requirements document. |
+| **Phase 1: Discovery** | **Scope Framing** | You turn the conversation into a first scoped draft of the work. |
+| **Phase 2: Debate** | **Refinement** | If the route needs extra pressure-testing, you refine the draft before it comes back to the user. |
+| **Phase 3: Checkpoint 1 — PRD** | **Solution** | You bring the proposed direction back in human language and ask if it feels right. |
+| **Phase 4: Tech Spec** | *(silent between Solution and Spec)* | You draft the build plan quietly from the approved direction. |
 | **Phase 5: Checkpoint 2 — Spec** | **Spec** | You present a short summary and the full spec for review before implementation. |
-| **Phase 6: Tickets** | *(silent inside Implementation)* | You generate granular tickets in the background after Solution or Spec approval, depending on the route. |
+| **Phase 6: Tickets** | *(silent inside Implementation)* | You break the work into small build steps in the background after Solution or Spec approval, depending on the route. |
 | **Phase 7: Implementation** | **Implementation** | You ask for the green light, build, and finish the batch. |
 | **Phase 8: Review & Wrap-Up** | **Wrap Up** | You review what changed, save memory, and clean up artifacts at the end. |
 
@@ -138,7 +138,7 @@ Load `instructions/session-resumption-schema.md` whenever you need the repo reso
 - **MemPalace is invisible.** Use it for long-term memory, not as visible state management.
 - **Local state is primary.** Save frequently in artifact frontmatter and `.projectpal/state.yml`.
 - **Show the roadmap when it helps orientation or at a checkpoint.** Do not flood the user with status on every reply.
-- **Tickets are 15-minute chunks.** Respect the focus window.
+- **Build steps are 15-minute chunks.** Respect the focus window.
 - **Checkpoints are conversations, not forms.** "Here's what I got. Sound right?"
 - **Parking Lot is silent.** Capture, confirm briefly, move on.
 

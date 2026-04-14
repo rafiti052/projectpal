@@ -170,7 +170,7 @@ assert_contains "$prepare_repo_output" "state_status: created"
 assert_contains "$prepare_repo_output" "gitignore_status: created"
 assert_contains "$(cat "$TMP_DIR/prepare/.projectpal/state.yml")" "current_project: onboarding"
 assert_contains "$(cat "$TMP_DIR/prepare/.gitignore")" ".projectpal/"
-assert_contains "$(cat "$TMP_DIR/prepare/.projectpal/state.yml")" "ProjectPal saved enough local state to pick this repo back up later."
+assert_contains "$(cat "$TMP_DIR/prepare/.projectpal/state.yml")" "This repo has local ProjectPal state, so you can pick it back up here later."
 
 prepare_repo_rerun_output=$(run_flow prepare-repo "$TMP_DIR/prepare")
 assert_contains "$prepare_repo_rerun_output" "ok: true"
@@ -200,18 +200,24 @@ assert_contains "$onboarding_state" "current_phase: onboarding"
 assert_contains "$onboarding_state" "preferred_assistant: codex"
 assert_contains "$onboarding_state" "last_blocker: none"
 assert_contains "$onboarding_state" "Open Codex in this repo and type ProjectPal."
-assert_contains "$onboarding_state" "ProjectPal is ready in this repo with local-only memory."
+assert_contains "$onboarding_state" "This repo is ready for ProjectPal. Local state is set up here, so you can keep going in this repo today and pick it back up here later. MemPalace would add longer-term memory across sessions and repos. Next step: Open Codex in this repo and type ProjectPal."
 
 onboarding_local_only_output=$(PROJECTPAL_MEMPALACE_MODE=missing run_flow onboarding-flow "$TMP_DIR/onboarding")
 assert_contains "$onboarding_local_only_output" "mempalace_available: false"
 assert_contains "$onboarding_local_only_output" "mempalace_mode: local-only"
 assert_contains "$onboarding_local_only_output" "final_next_step: Open Codex in this repo and type ProjectPal."
 
+onboarding_memory_output=$(PROJECTPAL_MEMPALACE_MODE=available run_flow onboarding-flow "$TMP_DIR/onboarding")
+assert_contains "$onboarding_memory_output" "mempalace_available: true"
+assert_contains "$onboarding_memory_output" "mempalace_mode: shared-memory"
+assert_contains "$(cat "$TMP_DIR/onboarding/.projectpal/state.yml")" "This repo is ready for ProjectPal. Local state is set up, MemPalace is connected for longer-term memory. Next step: Open Codex in this repo and type ProjectPal."
+
 onboarding_blocked_output=$(PROJECTPAL_PREPARE_REPO_MODE=block-gitignore run_flow onboarding-flow "$TMP_DIR/onboarding")
 assert_contains "$onboarding_blocked_output" "repo_ready: false"
 assert_contains "$onboarding_blocked_output" "blocker_name: gitignore-write-blocked"
 assert_contains "$onboarding_blocked_output" "final_next_step: Add .projectpal/ to .gitignore, then run ProjectPal again."
 assert_contains "$(cat "$TMP_DIR/onboarding/.projectpal/state.yml")" "last_blocker: gitignore-write-blocked"
+assert_contains "$(cat "$TMP_DIR/onboarding/.projectpal/state.yml")" "This repo is almost ready for ProjectPal. One blocker still needs attention: I couldn't update .gitignore, so ProjectPal's local files might get tracked. Next step: Add .projectpal/ to .gitignore, then run ProjectPal again."
 
 split_output=$(run_flow split-evaluate 1200 1000 false true example 1)
 assert_contains "$split_output" "split_required: true"

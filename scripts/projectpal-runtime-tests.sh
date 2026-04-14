@@ -24,6 +24,15 @@ assert_file_contains() {
   fi
 }
 
+assert_file_not_contains() {
+  file_path=$1
+  needle=$2
+  if grep -F -- "$needle" "$file_path" >/dev/null 2>&1; then
+    printf '%s\n' "assertion failed: expected $file_path not to contain: $needle" >&2
+    exit 1
+  fi
+}
+
 existing_repo="$TMP_DIR/existing-repo"
 new_repo="$TMP_DIR/new-repo"
 mkdir -p "$existing_repo" "$new_repo"
@@ -40,8 +49,15 @@ assert_file_contains "$ROOT_DIR/CLAUDE.md" "ProjectPal neutral source under src/
 assert_file_contains "$ROOT_DIR/AGENTS.md" "ProjectPal neutral source under src/"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "Complexity Assessment"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "👷 ProjectPal"
+assert_file_contains "$ROOT_DIR/AGENTS.md" "You turn the conversation into a first scoped draft of the work."
+assert_file_contains "$ROOT_DIR/AGENTS.md" "You break the work into small build steps in the background after Solution or Spec approval, depending on the route."
+assert_file_contains "$ROOT_DIR/AGENTS.md" "**Build steps are 15-minute chunks.** Respect the focus window."
 assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" 'In Codex, start ProjectPal by typing `ProjectPal`.'
 assert_file_contains "$ROOT_DIR/instructions/session-resumption-schema.md" 'Read `.projectpal/state.yml` for the current repo first.'
+assert_file_contains "$ROOT_DIR/instructions/mempalace-onboarding.md" "MemPalace is what lets me carry context across sessions and across repos."
+assert_file_contains "$ROOT_DIR/instructions/mempalace-onboarding.md" 'This repo can still resume from `.projectpal/state.yml`, and MemPalace is what adds longer-term memory across sessions and across repos.'
+assert_file_not_contains "$ROOT_DIR/instructions/mempalace-onboarding.md" "my long-term memory layer"
+assert_file_not_contains "$ROOT_DIR/instructions/mempalace-onboarding.md" "they won't carry over"
 
 codex_install_output=$(sh "$ROOT_DIR/install-projectpal.sh" codex)
 assert_contains "$codex_install_output" "ProjectPal is ready in Codex."

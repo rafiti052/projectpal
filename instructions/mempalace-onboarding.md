@@ -6,19 +6,19 @@
 
 **Step A — Explain.**
 
-If a raw error appeared in the UI before this message, open with: *"That error above is just MemPalace not being connected — here's what that means..."*
+If a raw error appeared in the UI before this message, open with: *"That error above just means MemPalace isn't connected right now. Here's what that means..."*
 
 Then present the canonical explanation, with case-specific opening:
 
 - If the error suggests the tool is not in the tool set at all:
-  > "Hey — before we start, one thing worth knowing: it looks like MemPalace isn't set up yet. MemPalace is my long-term memory layer. Without it, I can still help you today — but I won't remember anything next session. With it, I keep your decisions, past projects, and context across every conversation."
+  > "Before we start, one thing worth knowing: MemPalace is what lets me carry context across sessions and across repos. If it isn't set up yet, that's okay. I can still keep going in this repo with local notes, and this repo can pick back up from its local state. MemPalace is what adds the longer-term memory beyond that."
 
 - If the tool is present but the call errored (server issue or misconfiguration):
-  > "Hey — before we start, one thing worth knowing: it looks like MemPalace isn't connected in this session. MemPalace is my long-term memory layer. Without it, I can still help you today — but I won't remember anything next session. With it, I keep your decisions, past projects, and context across every conversation."
+  > "Before we start, one thing worth knowing: MemPalace isn't connected in this session right now. That's okay. I can still keep going in this repo with local notes, and this repo can pick back up from its local state. MemPalace is what adds longer-term memory across sessions and across repos."
 
 **Step B — Offer.**
 
-> "Want me to set it up now, or continue without it for this session?"
+> "Want me to set it up now, or keep going with local notes in this repo?"
 
 Wait for user response before proceeding.
 
@@ -71,7 +71,7 @@ Do not attempt reinstall.
 
 ### Local-Only Path (user chooses "continue without")
 
-- Respond: *"Got it — I'll keep notes locally this session, but they won't carry over."*
+- Respond: *"Okay. I'll keep going with local notes for this repo. This repo can still resume from `.projectpal/state.yml`, and MemPalace is what adds longer-term memory across sessions and across repos."*
 - Set `mempalace_available = false` for this session.
 - Proceed to Session Resumption using `.projectpal/state.yml` only.
 - All diary and drawer calls are disabled for this session (silently skipped).

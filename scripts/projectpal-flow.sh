@@ -385,7 +385,7 @@ command_prepare_repo() {
         printf '%s\n' "next_steps:"
         printf '%s\n' "  - \"Finish setting up ProjectPal in this repo\""
         printf '%s\n' "bridge_summary: |"
-        printf '%s\n' "  ProjectPal saved enough local state to pick this repo back up later."
+        printf '%s\n' "  This repo has local ProjectPal state, so you can pick it back up here later."
       } > "$state_path"
       state_status=created
     fi
@@ -459,18 +459,18 @@ command_onboarding_flow() {
   blocker_next_step=$(printf '%s\n' "$prepare_output" | awk -F': ' '/^blocker_next_step:/ { print $2; exit }')
 
   handoff_message=$(assistant_handoff_message "$preferred_assistant")
-  bridge_summary="ProjectPal is ready in this repo. I'll use $preferred_assistant here, memory mode is $mempalace_mode, and the next step is: $handoff_message"
+  bridge_summary="This repo is ready for ProjectPal. Local state is set up, MemPalace is connected for longer-term memory. Next step: $handoff_message"
   next_step=$handoff_message
   current_phase=onboarding
   last_blocker=none
 
   if [ "$repo_ready" = "false" ]; then
     handoff_message=$blocker_next_step
-    bridge_summary="ProjectPal is almost ready in this repo, but one thing is blocking it: $blocker_detail"
+    bridge_summary="This repo is almost ready for ProjectPal. One blocker still needs attention: $blocker_detail Next step: $blocker_next_step"
     next_step=$blocker_next_step
     last_blocker=$blocker_name
   elif [ "$mempalace_available" = "false" ]; then
-    bridge_summary="ProjectPal is ready in this repo with local-only memory. I can keep going today, and the next step is: $handoff_message"
+    bridge_summary="This repo is ready for ProjectPal. Local state is set up here, so you can keep going in this repo today and pick it back up here later. MemPalace would add longer-term memory across sessions and repos. Next step: $handoff_message"
   fi
 
   if [ -f "$state_path" ]; then

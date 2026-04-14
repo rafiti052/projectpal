@@ -8,6 +8,23 @@ All notable changes to ProjectPal are documented here.
 
 ---
 
+## [0.3.1] — 2026-04-14
+
+### Changed
+- MemPalace onboarding now explains local-only continuity in repo-first terms, including that `.projectpal/state.yml` still lets the same repo pick back up later.
+- Onboarding bridge summaries now save calm repo handoff context instead of setup jargon such as memory mode or assistant metadata.
+- User-facing stage descriptions now keep the friendly visible names aligned with the quieter voice system, using softer descriptions like scoped draft, build plan, and build steps.
+- Generated runtime surfaces were refreshed from `src/shared/layer0.md` after the user-facing naming cleanup.
+- README version bumped to `v0.3.1`.
+- Codex plugin manifest version bumped to `0.3.1`.
+
+### Fixed
+- Local-only onboarding no longer implies that same-repo continuity is lost when MemPalace is unavailable.
+- MemPalace intro copy now uses calmer, more grounded language instead of the older setup-heavy phrasing.
+- Runtime and flow shell tests now assert the updated continuity and stage-copy wording so stale expectations are caught by default.
+
+---
+
 ## [0.3.0] — 2026-04-13
 
 ### Changed
