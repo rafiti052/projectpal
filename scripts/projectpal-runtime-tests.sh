@@ -50,8 +50,8 @@ assert_file_contains "$ROOT_DIR/AGENTS.md" "ProjectPal neutral source under src/
 assert_file_contains "$ROOT_DIR/AGENTS.md" "Complexity Assessment"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "👷 ProjectPal"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "You turn the conversation into a first scoped draft of the work."
-assert_file_contains "$ROOT_DIR/AGENTS.md" "You break the work into small build steps in the background after Solution or Spec approval, depending on the route."
-assert_file_contains "$ROOT_DIR/AGENTS.md" "**Build steps are 15-minute chunks.** Respect the focus window."
+assert_file_contains "$ROOT_DIR/AGENTS.md" "You break the work into tickets after Solution or Technical Details approval. Runs on every route — never skipped."
+assert_file_contains "$ROOT_DIR/AGENTS.md" "**Tickets are 15-minute chunks.** Respect the focus window."
 assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" 'In Codex, start ProjectPal by typing `ProjectPal`.'
 assert_file_contains "$ROOT_DIR/instructions/session-resumption-schema.md" 'Read `.projectpal/state.yml` for the current repo first.'
 assert_file_contains "$ROOT_DIR/instructions/mempalace-onboarding.md" "MemPalace is what lets me carry context across sessions and across repos."
@@ -59,15 +59,13 @@ assert_file_contains "$ROOT_DIR/instructions/mempalace-onboarding.md" 'This repo
 assert_file_not_contains "$ROOT_DIR/instructions/mempalace-onboarding.md" "my long-term memory layer"
 assert_file_not_contains "$ROOT_DIR/instructions/mempalace-onboarding.md" "they won't carry over"
 
-codex_install_output=$(sh "$ROOT_DIR/install-projectpal.sh" codex)
-assert_contains "$codex_install_output" "ProjectPal is ready in Codex."
-assert_contains "$codex_install_output" "Next, open Codex in your repo and type ProjectPal."
+install_output=$(sh "$ROOT_DIR/install-projectpal.sh")
+assert_contains "$install_output" "ProjectPal is ready in both assistants."
 
 claude_home="$TMP_DIR/claude-home"
 mkdir -p "$claude_home"
-claude_install_output=$(HOME="$claude_home" sh "$ROOT_DIR/install-projectpal.sh" claude)
-assert_contains "$claude_install_output" "ProjectPal is ready in Claude Code."
-assert_contains "$claude_install_output" "Next, open Claude Code and run /projectpal."
+claude_install_output=$(HOME="$claude_home" sh "$ROOT_DIR/install-projectpal.sh")
+assert_contains "$claude_install_output" "ProjectPal is ready in both assistants."
 assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "name: projectpal"
 
 existing_flow_output=$(PROJECTPAL_ASSISTANT_HINT=codex PROJECTPAL_MEMPALACE_MODE=missing sh "$ROOT_DIR/scripts/projectpal-flow.sh" onboarding-flow "$existing_repo")

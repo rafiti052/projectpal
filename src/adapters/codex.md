@@ -61,3 +61,20 @@ Reason:
 - it matches the plugin display name
 - it avoids implying slash-command support that Codex does not guarantee
 - it is simpler than maintaining multiple documented trigger phrases
+
+## Lean v1 approval handoff
+
+Codex owns the visible approval step when lean v1 needs a path switch.
+
+- If fallback evaluation produces `approval_required = true`, Codex renders `request_approval` through the Pal before execution continues.
+- The Pal in Codex is the only visible speaker for a path switch ask.
+- The approval summary must name the changed path fields and the reason the candidate path is outside the approved boundary.
+- Delegated adapters may return `approval_required = true`, but they must not prompt the user directly.
+
+## Lean v1 reporting surface
+
+Codex owns the visible reporting path for delegated work.
+
+- `render_pal_update` is the Codex-side handoff that turns internal result data into user-facing output.
+- Same-path fallback disclosure belongs in the next natural summary, not as a separate delegated status message.
+- Internal result payloads stay internal until the Pal renders them.

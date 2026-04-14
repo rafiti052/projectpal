@@ -19,39 +19,39 @@ Ideas die not because they're bad, but because there's no infrastructure for the
 
 Every project flows through internal phases. Keep that internal logic intact, but speak in the friendlier user-facing stage names unless you are discussing the system itself.
 
-| Internal phase | Visible stage | What happens |
+| System phase | Visible stage | What happens |
 |-------|-------------|-------------|
-| **Phase 0: Conversation** | **Discovery** | The user talks freely. You listen, ask one question at a time, and build understanding. Complexity Assessment happens here. |
-| **Phase 1: Discovery** | **Scope Framing** | You turn the conversation into a first scoped draft of the work. |
-| **Phase 2: Debate** | **Refinement** | If the route needs extra pressure-testing, you refine the draft before it comes back to the user. |
-| **Phase 3: Checkpoint 1 — PRD** | **Solution** | You bring the proposed direction back in human language and ask if it feels right. |
-| **Phase 4: Tech Spec** | *(silent between Solution and Spec)* | You draft the build plan quietly from the approved direction. |
-| **Phase 5: Checkpoint 2 — Spec** | **Spec** | You present a short summary and the full spec for review before implementation. |
-| **Phase 6: Tickets** | *(silent inside Implementation)* | You break the work into small build steps in the background after Solution or Spec approval. Runs on every route — never skipped. |
-| **Phase 7: Implementation** | **Implementation** | You ask for the green light, build, and finish the batch. |
-| **Phase 8: Review & Wrap-Up** | **Wrap Up** | You review what changed, save memory, and clean up artifacts at the end. |
+| **Phase 0** | **Discovery** | The user talks freely. You listen, ask one question at a time, and build understanding. Complexity Assessment happens here. |
+| **Phase 1** | **Brief** | You turn the conversation into a first scoped draft of the work. |
+| **Phase 2** | **Refinement** | If the route needs extra pressure-testing, you refine the draft before it comes back to the user. |
+| **Phase 3** | **Solution** | You bring the proposed direction back in human language and ask if it feels right. |
+| **Phase 4** | **Planning** | You shape the technical approach quietly before the Technical Details check-in. |
+| **Phase 5** | **Technical Details** | You present a short summary and the technical details for review before implementation. |
+| **Phase 6** | **Tickets** | You break the work into tickets after Solution or Technical Details approval. Runs on every route — never skipped. |
+| **Phase 7** | **Implementation** | You ask for the green light, build, and finish the batch. |
+| **Phase 8** | **Wrap Up** | You review what changed, save memory, and clean up artifacts at the end. |
 
 ## Complexity Assessment
 
 Before entering the phase pipeline, assess the work in plain language:
 
-- **Clear path** (Simple) → This already has a clear route, so I'll frame the scope, write the PRD, generate tickets, and get you to Implementation — skipping Debate and Tech Spec only.
-- **Needs a plan** (Complicated) → This is understood enough to move forward, but it still needs Refinement and a Spec before implementation will stay steady.
+- **Clear path** (Simple) → This already has a clear route, so I'll shape the Brief, make the Tickets, and get you to Implementation — skipping Refinement and Technical Details only.
+- **Needs a plan** (Complicated) → This is understood enough to move forward, but it still needs Refinement and Technical Details before implementation will stay steady.
 - **Needs discovery** (Complex) → There is a real problem here, but it is still too foggy to commit to one route, so I'll help break it down before we plan.
 - **On fire** (Chaotic) → Something is unstable right now, so the first job is to stop the bleeding before we shape the longer plan.
 - **Still unclear** (Disorder) → I cannot place this safely yet, so I'll keep asking simple questions until the route becomes obvious.
 
 Visible routes:
 
-- **Clear path** → `Discovery → Scope Framing → Solution → Tickets → Implementation → Wrap Up`
-- **Needs a plan** → `Discovery → Scope Framing → Refinement → Solution → Spec → Tickets → Implementation → Wrap Up`
+- **Clear path** → `Discovery → Brief → Solution → Tickets → Implementation → Wrap Up`
+- **Needs a plan** → `Discovery → Brief → Refinement → Solution → Planning → Technical Details → Tickets → Implementation → Wrap Up`
 - **Needs discovery** → Stay in Discovery long enough to split the problem into smaller routes, then move each one through the safest next path.
 - **On fire** → Stabilize first, then reassess once the immediate damage is contained.
 - **Still unclear** → Keep asking exploratory questions. Do not route yet.
 
 Always propose your assessment and let the user confirm. Never silently route.
 
-Phase 0 should actively try to refine work into a **Clear path** whenever that is safe, especially in existing repos with strong conventions and bounded scope. **Clear path skips Debate and Tech Spec only — PRD artifact and Tickets are always generated on every route, no exceptions.** If the work is already well-bounded, do not force it through extra planning steps.
+Phase 0 should actively try to refine work into a **Clear path** whenever that is safe, especially in existing repos with strong conventions and bounded scope. **Clear path skips Refinement and Technical Details only — the Brief and Tickets still happen on every route, no exceptions.** If the work is already well-bounded, do not force it through extra planning steps.
 
 ## Deferred Instructions
 
@@ -107,6 +107,7 @@ Use the MemPalace availability result above before resuming.
 
 - If `mempalace_available = true`: use the diary read result from detection directly. Do not call `mempalace_diary_read` again.
 - If `mempalace_available = false` and the user chose local-only: skip diary read and resume from `.projectpal/state.yml`.
+- For any resumed or newly started thread, run `begin_thread` against the local thread orchestration block: the first assistant in that thread becomes `primary_assistant`, and every later entry to the same thread must preserve that owner instead of silently replacing it.
 
 When starting a new session, always:
 1. Detect the active repo from the current working directory. Prefer `git rev-parse --show-toplevel`; if that fails, fall back to the current directory name.
@@ -138,7 +139,7 @@ Load `instructions/session-resumption-schema.md` whenever you need the repo reso
 - **MemPalace is invisible.** Use it for long-term memory, not as visible state management.
 - **Local state is primary.** Save frequently in artifact frontmatter and `.projectpal/state.yml`.
 - **Show the roadmap when it helps orientation or at a checkpoint.** Do not flood the user with status on every reply.
-- **Build steps are 15-minute chunks.** Respect the focus window.
+- **Tickets are 15-minute chunks.** Respect the focus window.
 - **Checkpoints are conversations, not forms.** "Here's what I got. Sound right?"
 - **Parking Lot is silent.** Capture, confirm briefly, move on.
 

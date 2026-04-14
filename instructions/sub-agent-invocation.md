@@ -6,6 +6,38 @@ Use the **Agent** tool (not Task) to invoke all sub-agents. Agent is always avai
 
 Six sub-agents are active in the pipeline. All receive their input inline — never by file reference alone.
 
+## Lean v1 execution path contract
+
+Before invoking delegated work in lean v1, compare the candidate `ExecutionPathRecord` to the thread's approved path.
+
+- The approval boundary is defined by `connector`, `provider`, `runtime_path`, `auth_scope`, and `quality_tier`.
+- If any of those fields change, the path is outside the approved boundary and `approval_required = true` before delegated execution continues.
+- A model change is automatic only when it is an equivalent substitution inside the same boundary and the same `quality_tier`.
+- If the connector cannot prove the candidate path stays inside that boundary, treat it as approval-required instead of inferring safety.
+
+## Lean v1 fallback evaluation
+
+When delegated work fails, evaluate fallback in one explicit step before any retry or substitution happens.
+
+`evaluate_fallback` returns:
+- `fallback_type` = `retry_same_path | equivalent_substitution | path_switch_request | none`
+- `attempt_number`
+- `changed_fields[]`
+- `approval_required`
+
+Rules:
+- Allow at most one automatic `retry_same_path` per delegated task.
+- Allow `equivalent_substitution` only when `changed_fields[]` stays outside `connector`, `provider`, `runtime_path`, `auth_scope`, and `quality_tier`, and the substitute remains in the same `quality_tier`.
+- If the connector cannot prove a safe equivalent substitution, prefer `retry_same_path` while the one automatic retry remains available.
+- After the automatic retry is spent, any remaining recovery outside a proven same-path substitution becomes `path_switch_request` with `approval_required = true`.
+
+## Lean v1 parallel delegation guard
+
+- Explicit parallel delegated work is blocked in lean v1.
+- Do not invoke multiple delegated agents in parallel for one active ProjectPal thread.
+- Return `blocked` plus a Pal-owned explanation instead of partially scheduling delegated parallel work.
+- This guard does not forbid independent non-delegated ProjectPal work elsewhere in the session.
+
 ---
 
 ### 1. Complexity Classifier

@@ -10,6 +10,16 @@ MemPalace is connected via MCP. Two distinct mechanisms keep different jobs sepa
 
 **Purpose:** Local continuity should come from `.projectpal/state.yml` first, with repo-scoped memory as background continuity or bootstrap only when the local bridge is missing. The diary remains an availability and handoff mechanism only. Load full artifacts only when the phase actively needs them.
 
+## Orchestration persistence guard
+
+For lean v1 orchestration data, ProjectPal persists only connector-safe metadata and thread-local references.
+
+- `allowed_metadata_fields[]` = `auth_state`, `availability_state`, `last_failure_reason`, `quota_state`
+- `connector_identity` and timestamps may be kept as structural context.
+- Connector-owned auth stays outside ProjectPal storage.
+- Never store raw credentials, token material, token fingerprints, account identity, billing identifiers, or raw quota numbers in `.projectpal/`, artifacts, diary entries, or repo-scoped drawers.
+- If the connector cannot prove a value, store `unknown` rather than guessing.
+
 ## Repo-scoped memory conventions
 
 - Repo anchor writes go to `wing="Projects"` and `room="<repo-slug>"`.

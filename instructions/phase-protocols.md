@@ -231,6 +231,7 @@ After tickets are generated and saved, implementation begins. Do not clean up ar
 **Implementation rules:**
 - Read the ticket set from `.projectpal/artifacts/tickets/`.
 - Read the bundle by wave order first. Do not start a later wave until the current wave's exit criteria are satisfied or the remaining blocked work is explicitly deferred.
+- Treat `begin_thread` as the ownership gate for thread-local orchestration: the first assistant in a thread sets `primary_assistant`, and every later entry to that same thread preserves the existing owner instead of silently reassigning it.
 - Within a wave, parallelize only the tickets whose `depends_on` chain is satisfied and whose `allowed_writes` do not overlap on an exclusive write surface.
 - Keep write ownership clear when parallelizing: each worker gets a distinct file or module responsibility and must not revert other workers' edits.
 - Treat `builder` as the default execution owner. Use `reviewer` or `verifier` only when the wave or ticket explicitly asks for an optional role slot.
@@ -240,6 +241,32 @@ After tickets are generated and saved, implementation begins. Do not clean up ar
 - After each meaningful batch, run the smallest useful verification for the changed surface.
 - Before any likely interruption point or long-running batch, sync `.projectpal/state.yml` so resume starts from the latest finished wave or ticket group.
 - If a ticket cannot be implemented in the current session, leave artifacts intact and write the exact next ticket or action to the diary.
+
+### Lean v1 fallback policy
+
+- Automatic recovery is limited to one `retry_same_path` attempt per delegated task.
+- `equivalent_substitution` is automatic only when the substitute stays inside the approved path boundary and the same `quality_tier`.
+- Any recovery that changes `connector`, `provider`, `runtime_path`, `auth_scope`, or `quality_tier` is outside automatic recovery and must not continue silently.
+- If the connector cannot prove a safe equivalent substitution, do not infer one. Use the single same-path retry if it has not been spent; otherwise stop and route the case into approval handling.
+
+### Lean v1 approval gate
+
+- If fallback evaluation returns `path_switch_request` or any `approval_required = true` result, pause delegated execution before the path changes.
+- `request_approval` is always owned by the Pal in Codex.
+- The approval ask must name the changed path fields and make it clear that the path switch was not part of the already approved boundary.
+- Delegated adapters may report `approval_required = true`, but they must not emit user-facing approval prompts directly.
+
+### Lean v1 reporting flow
+
+- `render_pal_update` in Codex is the only path that turns delegated internal result data into visible user-facing text.
+- Same-path fallback disclosure is attached to the next natural summary instead of emitted as a standalone delegated status message.
+- Non-primary assistants must not emit user-facing progress, decisions, or completion text.
+
+### Lean v1 parallel delegation guard
+
+- Explicit parallel delegated work is blocked in lean v1.
+- When a user asks for parallel delegated work, return one Pal-owned explanation that lean v1 only supports one delegated path at a time.
+- This guard applies to delegated parallelism only; it does not forbid independent non-delegated ProjectPal work in the same session.
 
 **Batch close rules:**
 - A wave is only closed when its runnable tickets are `complete` or explicitly `deferred`, its blocked tickets explain why they are blocked, and its exit criteria are satisfied.

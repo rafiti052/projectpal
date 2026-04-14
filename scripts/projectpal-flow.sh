@@ -24,6 +24,8 @@ usage:
   sh scripts/projectpal-flow.sh sync-resume-bridge <state-path> <approved-artifact-ref> <bridge-summary-file> [resume-source]
   sh scripts/projectpal-flow.sh reduction-report <baseline-summary-path> <new-flow-summary-path> [output-path]
   sh scripts/projectpal-flow.sh phase7-batch-close-check <ticket-bundle-path>
+  sh scripts/projectpal-flow.sh thread-orchestration-isolation-check <fixture-path>
+  sh scripts/projectpal-flow.sh agent-orchestration-proof-flow-check <fixture-path>
   sh scripts/projectpal-flow.sh generate-implementation-aid <output-path> <source-file>...
 EOF
   exit 1
@@ -897,6 +899,105 @@ command_phase7_batch_close_check() {
   printf '%s\n' "close_ready: $close_ready"
 }
 
+command_thread_orchestration_isolation_check() {
+  if [ "$#" -ne 1 ]; then
+    usage
+  fi
+
+  fixture_path=$1
+  require_file "$fixture_path"
+
+  resume_primary=$(yaml_value resume_preserves_primary_assistant "$fixture_path")
+  resume_approval=$(yaml_value resume_preserves_approval_state "$fixture_path")
+  resume_path=$(yaml_value resume_preserves_approved_execution_path_id "$fixture_path")
+  new_thread_non_inheritance=$(yaml_value new_thread_non_inheritance "$fixture_path")
+  new_thread_primary=$(yaml_value new_thread_primary_assistant "$fixture_path")
+  new_thread_approval=$(yaml_value new_thread_approval_state "$fixture_path")
+  new_thread_path=$(yaml_value new_thread_approved_execution_path_id "$fixture_path")
+  assistant_switch_non_inheritance=$(yaml_value assistant_switch_non_inheritance "$fixture_path")
+  assistant_switch_primary=$(yaml_value assistant_switch_primary_assistant "$fixture_path")
+  assistant_switch_approval=$(yaml_value assistant_switch_approval_state "$fixture_path")
+  assistant_switch_path=$(yaml_value assistant_switch_approved_execution_path_id "$fixture_path")
+
+  resume_same_thread_preserved=false
+  if [ -n "$resume_primary" ] && [ -n "$resume_approval" ] && [ -n "$resume_path" ]; then
+    resume_same_thread_preserved=true
+  fi
+
+  printf '%s\n' "fixture_ref: $fixture_path"
+  printf '%s\n' "resume_same_thread_preserved: $resume_same_thread_preserved"
+  printf '%s\n' "resume_same_thread_primary_assistant: $resume_primary"
+  printf '%s\n' "resume_same_thread_approval_state: $resume_approval"
+  printf '%s\n' "resume_same_thread_approved_execution_path_id: $resume_path"
+  printf '%s\n' "new_thread_non_inheritance: $new_thread_non_inheritance"
+  printf '%s\n' "new_thread_primary_assistant: $new_thread_primary"
+  printf '%s\n' "new_thread_approval_state: $new_thread_approval"
+  printf '%s\n' "new_thread_approved_execution_path_id: $new_thread_path"
+  printf '%s\n' "assistant_switch_non_inheritance: $assistant_switch_non_inheritance"
+  printf '%s\n' "assistant_switch_primary_assistant: $assistant_switch_primary"
+  printf '%s\n' "assistant_switch_approval_state: $assistant_switch_approval"
+  printf '%s\n' "assistant_switch_approved_execution_path_id: $assistant_switch_path"
+  printf '%s\n' "fields_checked:"
+  fields_output=$(
+    awk '
+      /^## Non-inheritance fields/ { in_fields = 1; next }
+      in_fields && /^- / {
+        sub(/^- /, "", $0)
+        print "  - " $0
+        next
+      }
+      in_fields { exit }
+    ' "$fixture_path"
+  )
+  if [ -n "$fields_output" ]; then
+    printf '%s\n' "$fields_output"
+  else
+    printf '%s\n' "  []"
+  fi
+}
+
+command_agent_orchestration_proof_flow_check() {
+  if [ "$#" -ne 1 ]; then
+    usage
+  fi
+
+  fixture_path=$1
+  require_file "$fixture_path"
+
+  primary_assistant=$(yaml_value primary_assistant "$fixture_path")
+  delegated_assistant=$(yaml_value delegated_assistant "$fixture_path")
+  execution_path_connector=$(yaml_value execution_path_connector "$fixture_path")
+  execution_path_provider=$(yaml_value execution_path_provider "$fixture_path")
+  execution_path_runtime_path=$(yaml_value execution_path_runtime_path "$fixture_path")
+  execution_path_quality_tier=$(yaml_value execution_path_quality_tier "$fixture_path")
+  same_path_fallback_type=$(yaml_value same_path_fallback_type "$fixture_path")
+  same_path_fallback_disclosed_in_next_summary=$(yaml_value same_path_fallback_disclosed_in_next_summary "$fixture_path")
+  same_path_fallback_visible_owner=$(yaml_value same_path_fallback_visible_owner "$fixture_path")
+  path_switch_fallback_type=$(yaml_value path_switch_fallback_type "$fixture_path")
+  path_switch_approval_required=$(yaml_value path_switch_approval_required "$fixture_path")
+  path_switch_changed_fields=$(yaml_value path_switch_changed_fields "$fixture_path")
+  path_switch_visible_owner=$(yaml_value path_switch_visible_owner "$fixture_path")
+  parallel_delegated_work_blocked=$(yaml_value parallel_delegated_work_blocked "$fixture_path")
+  parallel_delegation_visible_owner=$(yaml_value parallel_delegation_visible_owner "$fixture_path")
+
+  printf '%s\n' "fixture_ref: $fixture_path"
+  printf '%s\n' "primary_assistant: $primary_assistant"
+  printf '%s\n' "delegated_assistant: $delegated_assistant"
+  printf '%s\n' "execution_path_connector: $execution_path_connector"
+  printf '%s\n' "execution_path_provider: $execution_path_provider"
+  printf '%s\n' "execution_path_runtime_path: $execution_path_runtime_path"
+  printf '%s\n' "execution_path_quality_tier: $execution_path_quality_tier"
+  printf '%s\n' "same_path_fallback_type: $same_path_fallback_type"
+  printf '%s\n' "same_path_fallback_disclosed_in_next_summary: $same_path_fallback_disclosed_in_next_summary"
+  printf '%s\n' "same_path_fallback_visible_owner: $same_path_fallback_visible_owner"
+  printf '%s\n' "path_switch_fallback_type: $path_switch_fallback_type"
+  printf '%s\n' "path_switch_approval_required: $path_switch_approval_required"
+  printf '%s\n' "path_switch_changed_fields: $path_switch_changed_fields"
+  printf '%s\n' "path_switch_visible_owner: $path_switch_visible_owner"
+  printf '%s\n' "parallel_delegated_work_blocked: $parallel_delegated_work_blocked"
+  printf '%s\n' "parallel_delegation_visible_owner: $parallel_delegation_visible_owner"
+}
+
 command_generate_implementation_aid() {
   if [ "$#" -lt 2 ]; then
     usage
@@ -966,6 +1067,8 @@ case "$command" in
   sync-resume-bridge) command_sync_resume_bridge "$@" ;;
   reduction-report) command_reduction_report "$@" ;;
   phase7-batch-close-check) command_phase7_batch_close_check "$@" ;;
+  thread-orchestration-isolation-check) command_thread_orchestration_isolation_check "$@" ;;
+  agent-orchestration-proof-flow-check) command_agent_orchestration_proof_flow_check "$@" ;;
   generate-implementation-aid) command_generate_implementation_aid "$@" ;;
   *) usage ;;
 esac

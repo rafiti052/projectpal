@@ -20,6 +20,8 @@ run_flow() {
 }
 
 FIXTURE_PATH="$ROOT_DIR/scripts/parallel-batch-fixture.md"
+ISOLATION_FIXTURE_PATH="$ROOT_DIR/scripts/thread-orchestration-isolation-fixture.md"
+PROOF_FLOW_FIXTURE_PATH="$ROOT_DIR/scripts/agent-orchestration-proof-flow-fixture.md"
 
 cat > "$TMP_DIR/sample.md" <<'EOF'
 ---
@@ -244,6 +246,40 @@ assert_contains "$fixture_close_output" "has_wave_summaries: true"
 assert_contains "$fixture_close_output" "has_active_owners: true"
 assert_contains "$fixture_close_output" "has_blocked_items: true"
 assert_contains "$fixture_close_output" "close_ready: true"
+
+isolation_output=$(run_flow thread-orchestration-isolation-check "$ISOLATION_FIXTURE_PATH")
+assert_contains "$isolation_output" "resume_same_thread_preserved: true"
+assert_contains "$isolation_output" "resume_same_thread_primary_assistant: codex"
+assert_contains "$isolation_output" "resume_same_thread_approval_state: approved"
+assert_contains "$isolation_output" "resume_same_thread_approved_execution_path_id: path-codex-claude-premium"
+assert_contains "$isolation_output" "new_thread_non_inheritance: true"
+assert_contains "$isolation_output" "new_thread_primary_assistant: claude"
+assert_contains "$isolation_output" "new_thread_approval_state: not_needed"
+assert_contains "$isolation_output" "new_thread_approved_execution_path_id: null"
+assert_contains "$isolation_output" "assistant_switch_non_inheritance: true"
+assert_contains "$isolation_output" "assistant_switch_primary_assistant: gemini"
+assert_contains "$isolation_output" "assistant_switch_approval_state: not_needed"
+assert_contains "$isolation_output" "assistant_switch_approved_execution_path_id: null"
+assert_contains "$isolation_output" "  - primary_assistant"
+assert_contains "$isolation_output" "  - approval_state"
+assert_contains "$isolation_output" "  - approved_execution_path_id"
+
+proof_flow_output=$(run_flow agent-orchestration-proof-flow-check "$PROOF_FLOW_FIXTURE_PATH")
+assert_contains "$proof_flow_output" "primary_assistant: codex"
+assert_contains "$proof_flow_output" "delegated_assistant: Claude"
+assert_contains "$proof_flow_output" "execution_path_connector: claude-code"
+assert_contains "$proof_flow_output" "execution_path_provider: anthropic-via-claude-code"
+assert_contains "$proof_flow_output" "execution_path_runtime_path: codex_to_claude_code_delegate"
+assert_contains "$proof_flow_output" "execution_path_quality_tier: premium"
+assert_contains "$proof_flow_output" "same_path_fallback_type: retry_same_path"
+assert_contains "$proof_flow_output" "same_path_fallback_disclosed_in_next_summary: true"
+assert_contains "$proof_flow_output" "same_path_fallback_visible_owner: pal"
+assert_contains "$proof_flow_output" "path_switch_fallback_type: path_switch_request"
+assert_contains "$proof_flow_output" "path_switch_approval_required: true"
+assert_contains "$proof_flow_output" "path_switch_changed_fields: quality_tier"
+assert_contains "$proof_flow_output" "path_switch_visible_owner: codex-pal"
+assert_contains "$proof_flow_output" "parallel_delegated_work_blocked: true"
+assert_contains "$proof_flow_output" "parallel_delegation_visible_owner: pal"
 
 run_flow sync-resume-bridge "$TMP_DIR/state.yml" .projectpal/artifacts/tech-spec/example-spec.md "$TMP_DIR/bridge-summary.md" repo-bridge > /dev/null
 synced_state=$(cat "$TMP_DIR/state.yml")

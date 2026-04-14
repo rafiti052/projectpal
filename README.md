@@ -12,9 +12,9 @@ It works through conversation, not forms. It remembers context between sessions.
 
 1. **Talk to the Pal** — describe your idea however it comes out
 2. **Complexity Assessment** — the Pal names the safest route: Clear path, Needs a plan, Needs discovery, On fire, or Still unclear
-3. **Scope Framing → Solution** — the Pal turns the conversation into a requirements document and brings it back for review
-4. **Refinement or Spec when needed** — bounded work stays light; heavier work gets the extra pressure test and spec checkpoint
-5. **Implementation** — silent ticket setup leads into a real green light before building
+3. **Brief → Solution** — the Pal turns the conversation into a first clear draft and brings it back for review
+4. **Refinement or Technical Details when needed** — bounded work stays light; heavier work gets the extra pressure test and technical planning pass
+5. **Tickets → Implementation** — the work is broken into tickets before the real green light to build
 6. **Wrap Up** — changes are reviewed, state is saved locally first, and long-term memory sync stays in the background
 
 ## Canonical Instructions
@@ -146,7 +146,7 @@ projectpal/
     └── parking-lot.md         ← Repo-scoped parked items with feat/phase tags
 ```
 
-Generated artifacts (PRDs, specs, tickets) are saved to `.projectpal/artifacts/` within the current project directory — not here.
+Generated artifacts (briefs, technical details, tickets) are saved to `.projectpal/artifacts/` within the current project directory — not here.
 
 Repo continuity lives locally first in `.projectpal/state.yml`, with MemPalace available as background continuity and long-term memory under `Projects/<repo-slug>`. Shared knowledge remains in broader MemPalace wings such as `Principles`, `Decisions`, and `Precedents`.
 
@@ -158,12 +158,12 @@ Repo detection resolves the git repo root first and uses that directory name as 
 |---|------------|--------|
 | M0 | CLAUDE.md + MemPalace connected | ✅ |
 | M1 | Complexity Assessment works | ✅ |
-| M2 | Clear-path route keeps the PRD and stays light | ✅ |
-| M3 | Complicated path: PRD + debate | ✅ |
+| M2 | Clear-path route keeps the Brief and stays light | ✅ |
+| M3 | Needs-a-plan route: Brief + Refinement | ✅ |
 | M4 | Tech spec + tickets | ✅ |
 | M5 | Parking Lot + session resumption | ✅ |
 | M6 | MemPalace onboarding — graceful detection, install guidance, local-only fallback | ✅ |
-| M7 | Full sub-agent pipeline — all 6 agents wired (Cynefin, PRD, Critic, Judge, Spec, Tickets) | ✅ |
+| M7 | Full sub-agent pipeline — all 6 agents wired (Route Guide, Brief Writer, Architect, Manager, Tech Lead, Ticket Planner) | ✅ |
 | **The Test** | **The website gets rewritten** | **pending** |
 
 ## The North Star
