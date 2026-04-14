@@ -51,8 +51,16 @@ assert_file_contains "$ROOT_DIR/AGENTS.md" "Complexity Assessment"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "👷 ProjectPal"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "You turn the conversation into a first scoped draft of the work."
 assert_file_contains "$ROOT_DIR/AGENTS.md" "You break the work into tickets after Solution or Technical Details approval. Runs on every route — never skipped."
+assert_file_contains "$ROOT_DIR/AGENTS.md" "**At every Check-in, show what is documented so far, show the current plan, and ask for guidance before moving on.**"
+assert_file_contains "$ROOT_DIR/AGENTS.md" "**Check-ins are conversations, not forms.** \"Here's what I got. Sound right?\""
 assert_file_contains "$ROOT_DIR/AGENTS.md" "**Tickets are 15-minute chunks.** Respect the focus window."
+assert_file_not_contains "$ROOT_DIR/AGENTS.md" "Discovery → Scope Framing"
+assert_file_not_contains "$ROOT_DIR/AGENTS.md" "**At every checkpoint, show what is documented so far, show the current plan, and ask for guidance before moving on.**"
+assert_file_not_contains "$ROOT_DIR/AGENTS.md" "Checkpoints are conversations, not forms."
 assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" 'In Codex, start ProjectPal by typing `ProjectPal`.'
+assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "**Check-ins are conversations, not forms.** \"Here's what I got. Sound right?\""
+assert_file_not_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "Discovery → Scope Framing"
+assert_file_not_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "**At every checkpoint, show what is documented so far, show the current plan, and ask for guidance before moving on.**"
 assert_file_contains "$ROOT_DIR/instructions/session-resumption-schema.md" 'Read `.projectpal/state.yml` for the current repo first.'
 assert_file_contains "$ROOT_DIR/instructions/mempalace-onboarding.md" "MemPalace is what lets me carry context across sessions and across repos."
 assert_file_contains "$ROOT_DIR/instructions/mempalace-onboarding.md" 'This repo can still resume from `.projectpal/state.yml`, and MemPalace is what adds longer-term memory across sessions and across repos.'
@@ -67,6 +75,14 @@ mkdir -p "$claude_home"
 claude_install_output=$(HOME="$claude_home" sh "$ROOT_DIR/install-projectpal.sh")
 assert_contains "$claude_install_output" "ProjectPal is ready in both assistants."
 assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "name: projectpal"
+assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "**At every Check-in, show what is documented so far, show the current plan, and ask for guidance before moving on.**"
+assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "**Check-ins are conversations, not forms.** \"Here's what I got. Sound right?\""
+assert_file_not_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "Discovery → Scope Framing"
+assert_file_not_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "**At every checkpoint, show what is documented so far, show the current plan, and ask for guidance before moving on.**"
+assert_file_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "**At every Check-in, show what is documented so far, show the current plan, and ask for guidance before moving on.**"
+assert_file_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "**Check-ins are conversations, not forms.** \"Here's what I got. Sound right?\""
+assert_file_not_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "Discovery → Scope Framing"
+assert_file_not_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "**At every checkpoint, show what is documented so far, show the current plan, and ask for guidance before moving on.**"
 
 existing_flow_output=$(PROJECTPAL_ASSISTANT_HINT=codex PROJECTPAL_MEMPALACE_MODE=missing sh "$ROOT_DIR/scripts/projectpal-flow.sh" onboarding-flow "$existing_repo")
 assert_contains "$existing_flow_output" "assistant_preferred: codex"

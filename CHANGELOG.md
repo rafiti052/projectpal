@@ -8,6 +8,21 @@ All notable changes to ProjectPal are documented here.
 
 ---
 
+## [0.3.5] — 2026-04-14
+
+### Changed
+- User-facing workflow guidance now consistently uses the visible stage names `Brief`, `Refinement`, `Planning`, and `Technical Details` wherever the runtime or maintainer instructions talk about the flow.
+- Artifact and sub-agent instructions now keep internal labels such as `PRD`, `tech-spec`, `Critic`, and `Judge` backstage unless the user explicitly asks for them.
+- README version bumped to `v0.3.5`.
+- Codex plugin manifest version bumped to `0.3.5`.
+
+### Fixed
+- Artifact review guidance now maps the internal `prd` and `tech-spec` files to the user-facing `Brief` and `Technical Details` checkpoints consistently.
+- Planning and memory-loading instructions no longer mix legacy internal labels into user-facing phase descriptions.
+- Runtime verification now checks the generated surfaces and installed Claude/Codex skills so label changes ship through `sync-codex-plugin.sh` and `install-projectpal.sh`.
+
+---
+
 ## [0.3.1] — 2026-04-14
 
 ### Changed

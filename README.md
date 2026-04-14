@@ -1,4 +1,4 @@
-# ProjectPal `v0.3.3`
+# ProjectPal `v0.3.5`
 
 A patient AI companion that turns chaotic ideas into shipped projects.
 
@@ -13,7 +13,7 @@ It works through conversation, not forms. It remembers context between sessions.
 1. **Talk to the Pal** — describe your idea however it comes out
 2. **Complexity Assessment** — the Pal names the safest route: Clear path, Needs a plan, Needs discovery, On fire, or Still unclear
 3. **Brief → Solution** — the Pal turns the conversation into a first clear draft and brings it back for review
-4. **Refinement or Technical Details when needed** — bounded work stays light; heavier work gets the extra pressure test and technical planning pass
+4. **Refinement → Planning → Technical Details when needed** — bounded work stays light; heavier work gets the extra pressure test and technical planning pass
 5. **Tickets → Implementation** — the work is broken into tickets before the real green light to build
 6. **Wrap Up** — changes are reviewed, state is saved locally first, and long-term memory sync stays in the background
 
@@ -22,6 +22,7 @@ It works through conversation, not forms. It remembers context between sessions.
 `src/` is the neutral ProjectPal source in this repo.
 
 The launcher-specific files for Claude Code and Codex CLI are generated runtime surfaces. `CLAUDE.md` and `AGENTS.md` are outputs, not the authoring center.
+`docs/projectpal-ui-labels.en.json` is the label reference. If wording needs to ship through install or sync, change the source in `src/` and regenerate instead of patching the generated outputs directly.
 
 ## Setup
 
@@ -132,11 +133,11 @@ projectpal/
 │   └── SKILL.md               ← Generated Codex skill entrypoint (local install output, not versioned)
 ├── .mcp.json                  ← MemPalace MCP connection
 ├── prompts/
-│   ├── critic-agent.md        ← Critic sub-agent persona
-│   ├── judge-agent.md         ← Judge sub-agent persona
+│   ├── critic-agent.md        ← Internal Architect reviewer prompt
+│   ├── judge-agent.md         ← Internal Manager reviewer prompt
 │   ├── cynefin-classify.md    ← Domain classification prompt
-│   ├── prd-generate.md        ← PRD generation prompt
-│   ├── tech-spec-generate.md  ← Tech spec generation prompt
+│   ├── prd-generate.md        ← Internal Brief drafting prompt
+│   ├── tech-spec-generate.md  ← Internal Technical Details drafting prompt
 │   └── tickets-generate.md    ← Ticket generation prompt
 ├── docs/
 │   ├── maintainer-codex-reinstall.md ← Maintainer-only clean reinstall guide
@@ -160,10 +161,10 @@ Repo detection resolves the git repo root first and uses that directory name as 
 | M1 | Complexity Assessment works | ✅ |
 | M2 | Clear-path route keeps the Brief and stays light | ✅ |
 | M3 | Needs-a-plan route: Brief + Refinement | ✅ |
-| M4 | Tech spec + tickets | ✅ |
+| M4 | Technical Details + tickets | ✅ |
 | M5 | Parking Lot + session resumption | ✅ |
 | M6 | MemPalace onboarding — graceful detection, install guidance, local-only fallback | ✅ |
-| M7 | Full sub-agent pipeline — all 6 agents wired (Route Guide, Brief Writer, Architect, Manager, Tech Lead, Ticket Planner) | ✅ |
+| M7 | Full sub-agent pipeline — all 6 internal roles wired, with shipped labels aligned to Problem Solver, Architect, Manager, and Tech Lead | ✅ |
 | **The Test** | **The website gets rewritten** | **pending** |
 
 ## The North Star

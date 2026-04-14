@@ -9,7 +9,7 @@ This index exists so the neutral source can refer to those responsibilities with
 ## Deferred instruction map
 
 - `instructions/phase-protocols.md`
-  Phase 0, Phase 1, debate, and Phase 4/7/8 detailed protocols.
+  Phase 0, Phase 1, Refinement, and Phase 4/7/8 detailed protocols.
 
 - `instructions/mempalace-onboarding.md`
   MemPalace setup, reconnect, and local-only onboarding flows.
@@ -21,10 +21,10 @@ This index exists so the neutral source can refer to those responsibilities with
   Repo-scoped memory behavior, diary use, and artifact loading rules.
 
 - `instructions/sub-agent-invocation.md`
-  Sub-agent contracts and debate / ticket generation orchestration.
+  Sub-agent contracts and Refinement / ticket generation orchestration.
 
 - `instructions/artifacts.md`
-  Artifact layout, frontmatter contracts, and debate / tech-spec templates.
+  Artifact layout, frontmatter contracts, and Refinement / tech-spec templates.
 
 ## Constraint
 

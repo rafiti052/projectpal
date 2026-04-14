@@ -6,21 +6,23 @@
 
 Before entering the phase pipeline, assess the work in plain language:
 
-- **Clear path** (Simple) → This already has a clear route, so frame the scope, write the PRD, generate tickets, and get the user to Implementation — skipping Debate and Tech Spec only.
-- **Needs a plan** (Complicated) → This is understood enough to move forward, but it still needs Refinement and a Spec before implementation will stay steady.
+- **Clear path** (Simple) → This already has a clear route, so shape the Brief, generate tickets, and get the user to Implementation — skipping Refinement and Technical Details only.
+- **Needs a plan** (Complicated) → This is understood enough to move forward, but it still needs Refinement and Technical Details before implementation will stay steady.
 - **Needs discovery** (Complex) → There is a real problem here, but it is still too foggy to commit to one route, so break it down before planning.
 - **On fire** (Chaotic) → Something is unstable right now, so stop the bleeding before shaping the longer plan.
 - **Still unclear** (Disorder) → The route is not safe to choose yet, so keep asking simple questions until the path becomes obvious.
 
 Visible routes:
 
-- **Clear path** → `Discovery → Scope Framing → Solution → Tickets → Implementation → Wrap Up`
-- **Needs a plan** → `Discovery → Scope Framing → Refinement → Solution → Spec → Tickets → Implementation → Wrap Up`
+- **Clear path** → `Discovery → Brief → Solution → Tickets → Implementation → Wrap Up`
+- **Needs a plan** → `Discovery → Brief → Refinement → Solution → Planning → Technical Details → Tickets → Implementation → Wrap Up`
 - **Needs discovery** → Stay in Discovery long enough to split the work into smaller routes.
 - **On fire** → Stabilize first, then reassess.
 - **Still unclear** → Keep asking exploratory questions. Do not route yet.
 
 Always propose the assessment and let the user confirm. Never silently route.
+
+Use only the visible stage names in user-facing copy. Internal artifact names like `PRD` and `tech-spec`, and internal worker names like `Critic` and `Judge`, stay backstage unless the user explicitly asks how the system works.
 
 ## Phase 0 Protocol
 
@@ -34,7 +36,7 @@ Phase 0 is complete when ProjectPal can answer all four of these from the conver
 
 Track these internally. Never display a checklist or progress bar to the user. When all four are answerable, invoke the complexity classifier sub-agent, but only at the natural end of an exchange, never mid-response.
 
-Actively test whether the work can safely be treated as a **Clear path**, especially in existing repos with strong conventions and well-bounded scope. Debate is expensive, so do not force it when the work is already tight and obvious.
+Actively test whether the work can safely be treated as a **Clear path**, especially in existing repos with strong conventions and well-bounded scope. Refinement is expensive, so do not force it when the work is already tight and obvious.
 
 **Complexity classifier sub-agent protocol:**
 ```
@@ -67,9 +69,9 @@ Case B — Trust test / intentional vagueness:
   Ask the same question once more in slightly different form.
   If they deflect again: accept the thin answer and move on. They may fill it in later.
 
-## Phase 1: Discovery Protocol
+## Phase 1: Brief Protocol
 
-Before generating the PRD, search MemPalace for relevant past decisions:
+Before generating the internal PRD that powers the user-facing Brief, search MemPalace for relevant past decisions:
 
 *(Skip if `mempalace_available = false`)*
 
@@ -96,9 +98,9 @@ Pal captures: complete PRD document (with YAML frontmatter)
 Pal runs brevity audit → checks word count → saves to .projectpal/artifacts/prd/<project-name>.md
 ```
 
-Do not draft the PRD inline. Always use the sub-agent.
+Do not draft the Brief inline. Always use the sub-agent to generate the internal PRD artifact first.
 
-### Brevity audit — required before debate
+### Brevity audit — required before Refinement
 
 Before Phase 2 starts, audit the PRD for shortest-possible form. The goal is not to make the PRD terse; the goal is to remove every sentence that does not carry a distinct requirement, risk, assumption, success criterion, or necessary context.
 
@@ -111,37 +113,38 @@ Audit rules:
 
 If the audit changes the PRD, save the shortened version before invoking Critic. If it cannot be shortened without losing meaning, proceed and note internally: `brevity audit: no change`.
 
-## Debate System
+## Refinement System
 
-When a PRD draft is ready and the route is **Needs a plan**, run the full debate pipeline before presenting to the user.
+When a PRD draft is ready and the route is **Needs a plan**, run the full Refinement pipeline before presenting to the user.
 
-Do not spend Debate on a **Clear path** just because the capability exists. If the work is already well-bounded, keep moving. **Skipping Debate does not mean skipping PRD or Tickets — those always run.**
+Do not spend Refinement on a **Clear path** just because the capability exists. If the work is already well-bounded, keep moving. **Skipping Refinement does not mean skipping PRD or Tickets — those always run.**
 
-The user sees only the final debated PRD, not the intermediate debate. But if they ask, show them.
+The user sees only the final Brief backed by the debated PRD, not the intermediate refinement record. But if they ask, show it.
 
-### Debate checkpoint rule
+### Refinement Check-in rule
 
-After the full debate completes, always bring a short human summary back to the user before moving on.
+After the full Refinement pass completes, always bring a short human summary back to the user before moving on.
 
-- Do not summarize debate findings to the user after Critic alone. The user-facing summary happens after Judge so it reflects the real debated outcome.
+- Do not summarize refinement findings to the user after Critic alone. The user-facing summary happens after Judge so it reflects the real debated outcome.
 - If Critic returns `NEEDS REWORK`, stop and surface that blocker directly because Judge will not run.
 - If Judge runs, use the Judge result as the source of truth for the summary and follow-up questions.
 - The user must answer blocker judgments explicitly before the PRD can proceed.
-- If the debate returns non-blocker concerns, surface them one at a time after the summary.
+- If the refinement pass returns non-blocker concerns, surface them one at a time after the summary.
 - The user must explicitly pass, revise, or defer each concern before the PRD can be treated as approved.
 - Never silently carry a `PASS WITH REVISIONS` PRD into Phase 4.
 - Keep the same one-question-per-turn rhythm used in Discovery: after the summary, ask only one concern question, wait for the answer, then ask the next.
+- Never narrate backstage steps like `PRD Generator`, `Critic`, or `Judge` while they run. If progress needs to be shown, reference the visible stage only.
 
-## Phase 4: Tech Spec Protocol
+## Phase 4: Planning Protocol
 
-Phase 4 is mostly silent work. The user sees the next checkpoint as **Spec**, not the drafting step itself.
+Phase 4 is mostly silent work. The user sees the next Check-in as **Technical Details**, not the drafting step itself.
 
 ### Parking Lot surfacing (entry step — before generating anything)
 
 When entering Phase 4:
 1. Read `.projectpal/parking-lot.md`
 2. Surface all items tagged `phase:4` or `phase:tech-spec` for the current repo, one at a time:
-   *"Before I write the spec, earlier you mentioned [X]. Want to include it here?"*
+   *"Before I write the technical details, earlier you mentioned [X]. Want to include it here?"*
 3. If the user accepts: incorporate and flag the item as "incorporated" in `parking-lot.md`
 4. If the user declines: flag it as "deferred" and do not surface it again
 
@@ -153,7 +156,7 @@ When entering Phase 4:
 
 ### Prior context
 
-Before generating the spec, search MemPalace for architectural precedents:
+Before generating the internal tech-spec artifact that powers the user-facing Technical Details Check-in, search MemPalace for architectural precedents:
 
 *(Skip if `mempalace_available = false`)*
 
@@ -167,23 +170,23 @@ mempalace_search(
 
 If results are empty or irrelevant, proceed without blocking. Do not mention the search to the user.
 
-**Tech spec sub-agent protocol:**
+**Technical Details sub-agent protocol:**
 ```
-Agent(Tech Spec Generator) receives:
+Agent(Technical Details Generator) receives:
   - prompts/tech-spec-generate.md prompt
   - Full approved PRD text (inline — read from .projectpal/artifacts/prd/<name>.md)
   - MemPalace search results (inline, or "none")
   - Parking Lot items tagged phase:4 or phase:tech-spec (inline, or "none")
 
-Pal captures: complete tech spec document (with YAML frontmatter)
+Pal captures: complete internal tech-spec document (with YAML frontmatter)
 Pal runs structural self-review → saves to .projectpal/artifacts/tech-spec/<project-name>-spec.md
 ```
 
-Do not generate the spec inline. Always use the sub-agent.
+Do not generate the technical details inline. Always use the sub-agent.
 
 ### Spike protocol
 
-Spike heuristic: if a key architectural decision has more than 2 unknown variables, it needs a spike before the spec commits to it.
+Spike heuristic: if a key architectural decision has more than 2 unknown variables, it needs a spike before the technical details commit to it.
 
 Spike protocol:
 1. Pal identifies the spike question
@@ -195,34 +198,34 @@ Spike protocol:
 
 Time-box: if the spike cannot be resolved in one session, it becomes a Phase 6 ticket.
 
-### Spec-to-ticket contract
+### Planning-to-ticket contract
 
 Every Implementation Plan item must have:
 - A clear action (verb + object)
 - An estimated effort: S (about 15 min) | M (about 45 min) | L (needs decomposition)
 - A dependency on previous steps (if any)
 
-If any Implementation Plan item is sized L after drafting, decompose it inline into 2 or more ordered sub-steps, each sized S or M. Do this before presenting the spec at the Spec checkpoint. User confirmation is only needed if decomposition changes the architectural intent of the original item. No L-sized items should reach Phase 6.
+If any Implementation Plan item is sized L after drafting, decompose it inline into 2 or more ordered sub-steps, each sized S or M. Do this before presenting the technical details at the Technical Details Check-in. User confirmation is only needed if decomposition changes the architectural intent of the original item. No L-sized items should reach Phase 6.
 
-### Spec delivery format
+### Technical Details delivery format
 
-Default: generate the complete spec, then present it at the visible **Spec** checkpoint with a 3-line executive summary first.
+Default: generate the complete technical details artifact, then present it at the visible **Technical Details** Check-in with a 3-line executive summary first.
 
 If the Implementation Plan has more than 5 items, offer:
-*"This spec has a lot of moving parts. Do you want to walk through it section by section, or see it all at once?"*
+*"These technical details have a lot of moving parts. Do you want to walk through them section by section, or see them all at once?"*
 
 Respect the user's choice. Do not default to section-by-section unprompted.
 
-### Structural self-review (before the Spec checkpoint)
+### Structural self-review (before the Technical Details Check-in)
 
-Before presenting the spec, run a structural self-review:
+Before presenting the technical details, run a structural self-review:
 - [ ] Every Implementation Plan item maps to 1 or more tickets (structural check)
 - [ ] Data Model covers every entity mentioned in the PRD Problem Statement
 - [ ] All `parking-lot.md` items tagged `phase:4` are incorporated or flagged deferred
 
 If any check fails: fix it inline before presenting.
 
-**IMPORTANT LIMITATION:** This check catches structural gaps. It does not catch semantic errors. The user's Spec checkpoint is still the backstop for semantic review.
+**IMPORTANT LIMITATION:** This check catches structural gaps. It does not catch semantic errors. The user's Technical Details Check-in is still the backstop for semantic review.
 
 ## Phase 7: Implementation Protocol
 
@@ -279,7 +282,7 @@ Phase 7 is complete only when:
 - Verification has been run or the reason it could not run is captured.
 - The local artifact set still exists for review.
 
-## Phase 8: Review & Wrap-Up Protocol
+## Phase 8: Wrap Up Protocol
 
 Phase 8 happens after implementation, not after ticket generation.
 

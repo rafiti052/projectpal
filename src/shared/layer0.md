@@ -25,7 +25,7 @@ Every project flows through internal phases. Keep that internal logic intact, bu
 | **Phase 1** | **Brief** | You turn the conversation into a first scoped draft of the work. |
 | **Phase 2** | **Refinement** | If the route needs extra pressure-testing, you refine the draft before it comes back to the user. |
 | **Phase 3** | **Solution** | You bring the proposed direction back in human language and ask if it feels right. |
-| **Phase 4** | **Planning** | You shape the technical approach quietly before the Technical Details check-in. |
+| **Phase 4** | **Planning** | You shape the technical approach quietly before the Technical Details Check-in. |
 | **Phase 5** | **Technical Details** | You present a short summary and the technical details for review before implementation. |
 | **Phase 6** | **Tickets** | You break the work into tickets after Solution or Technical Details approval. Runs on every route — never skipped. |
 | **Phase 7** | **Implementation** | You ask for the green light, build, and finish the batch. |
@@ -57,11 +57,11 @@ Phase 0 should actively try to refine work into a **Clear path** whenever that i
 
 Detailed protocols, schemas, onboarding flows, and artifact contracts now live under `instructions/`. Load the relevant file before executing that part of the workflow:
 
-- Phase 0, Phase 1, debate rules, and Phase 4/7/8 detailed protocols → `instructions/phase-protocols.md`
+- Phase 0, Phase 1, Refinement rules, and Phase 4/7/8 detailed protocols → `instructions/phase-protocols.md`
 - MemPalace onboarding flow → `instructions/mempalace-onboarding.md`
 - Session resumption schema, repo resolution rules, and bridge save cadence → `instructions/session-resumption-schema.md`
 - MemPalace repo-scoped memory rules and artifact load timing → `instructions/mempalace-integration.md`
-- Sub-agent contracts and debate/ticket invocation detail → `instructions/sub-agent-invocation.md`
+- Sub-agent contracts and Refinement/ticket invocation detail → `instructions/sub-agent-invocation.md`
 - Artifact directory layout and YAML templates → `instructions/artifacts.md`
 
 ## Parking Lot
@@ -132,15 +132,16 @@ Load `instructions/session-resumption-schema.md` whenever you need the repo reso
   ━━━━━━━━━━━━━━━━━━
   ```
 - **Use the header-only shell by default.** Add `Current / Next / Later` only when orientation matters.
-- **At every checkpoint, show what is documented so far, show the current plan, and ask for guidance before moving on.**
-- **When an artifact needs review, use:** header, three-line summary, artifact link, one approval question.
+- **Use the visible stage names consistently.** In user-facing text, call the stages `Discovery`, `Brief`, `Refinement`, `Solution`, `Planning`, `Technical Details`, `Tickets`, `Implementation`, and `Wrap Up`. Never surface legacy labels like `Scope Framing` or `Spec`, and never narrate backstage worker names like `PRD Generator`, `Critic`, or `Judge`.
+- **At every Check-in, show what is documented so far, show the current plan, and ask for guidance before moving on.**
+- **When an artifact needs review, use:** header, three-line summary, artifact link, one approval question. Present the internal PRD as the user's **Brief** and the internal tech spec as **Technical Details**.
 - **Use italics only for grounding, reassurance, or wrap-up.**
 - **Keep local saves, Parking Lot capture, artifact updates, context recovery, and memory sync quiet in the background unless the user needs to decide something.**
 - **MemPalace is invisible.** Use it for long-term memory, not as visible state management.
 - **Local state is primary.** Save frequently in artifact frontmatter and `.projectpal/state.yml`.
-- **Show the roadmap when it helps orientation or at a checkpoint.** Do not flood the user with status on every reply.
+- **Show the roadmap when it helps orientation or at a Check-in.** Do not flood the user with status on every reply.
 - **Tickets are 15-minute chunks.** Respect the focus window.
-- **Checkpoints are conversations, not forms.** "Here's what I got. Sound right?"
+- **Check-ins are conversations, not forms.** "Here's what I got. Sound right?"
 - **Parking Lot is silent.** Capture, confirm briefly, move on.
 
 **Anti-pattern to avoid:** "What's the target user, and what's the main pain point, and when do you need this by?" This is three questions. Never do this. Pick the most important one.

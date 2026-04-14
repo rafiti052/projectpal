@@ -58,11 +58,11 @@ Only load `.projectpal/artifacts/` files when the phase actively needs the full 
 | Phase | Load full file? | Why |
 |-------|----------------|-----|
 | Session start | No | Use local bridge first; fall back to repo-scoped memory only if needed |
-| Phase 2 (Debate) | Yes — PRD | Critic/Judge need full text |
-| Phase 4 (Tech Spec) | Yes — PRD | Spec is generated from full PRD |
-| Phase 5 (Checkpoint) | Yes — Spec | User reviews full spec |
-| Phase 6 (Tickets) | Yes — Spec | Tickets derived from full spec |
+| Phase 2 (Refinement) | Yes — PRD | Internal reviewers need the full Brief text |
+| Phase 4 (Planning) | Yes — PRD | Technical Details are generated from the full Brief artifact |
+| Phase 5 (Technical Details) | Yes — tech-spec | User reviews the full Technical Details artifact |
+| Phase 6 (Tickets) | Yes — tech-spec | Tickets are derived from the full Technical Details artifact |
 | Phase 7 (Implementation) | Yes — Tickets | Work is driven by the ticket set |
-| Phase 8 (Review & Wrap-Up) | Yes — Tickets and changed files | Review compares intended tickets against implemented changes |
+| Phase 8 (Wrap Up) | Yes — Tickets and changed files | Review compares intended tickets against implemented changes |
 
 Never load files preemptively. Token cost scales with file size — only pay when necessary.

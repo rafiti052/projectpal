@@ -60,13 +60,13 @@ Developers in the broader community can repeatedly take an idea from messy conve
 - real projects complete the full loop from conversation to implementation
 - users can resume after a multi-day gap without re-explaining everything
 - Parking Lot items are actually reincorporated later
-- debate changes plans in meaningful ways instead of rubber-stamping them
+- Refinement changes plans in meaningful ways instead of rubber-stamping them
 - ticket sizing respects short focus sessions rather than producing oversized work
 
 ### Failure signals
 
 - sessions restart from scratch because continuity failed
-- debate never changes outcomes
+- Refinement never changes outcomes
 - the system becomes heavier than the planning pain it was meant to remove
 - infrastructure work keeps outrunning user value
 
@@ -93,12 +93,12 @@ These are non-negotiable.
 
 - Out-of-phase ideas are captured, not rejected.
 - The Parking Lot is silent infrastructure, not a scolding mechanism.
-- No phase advances without explicit user approval where checkpoints apply.
+- No phase advances without explicit user approval where Check-ins apply.
 
 ### Practicality
 
 - The current product should prefer the lightest implementation that preserves the core behavior.
-- Architecture can evolve later; continuity, tone, and checkpoint quality cannot be sacrificed now.
+- Architecture can evolve later; continuity, tone, and Check-in quality cannot be sacrificed now.
 
 ---
 
@@ -109,7 +109,7 @@ ProjectPal routes work by problem shape, using Cynefin as a practical decision m
 | Domain | Meaning | Default handling |
 | --- | --- | --- |
 | **Simple** | Known pattern, low ambiguity | Skip heavy planning and go straight to tickets and execution |
-| **Complicated** | Requires analysis and deliberate planning | Full pipeline: conversation, PRD, debate, spec, tickets, implementation |
+| **Complicated** | Requires analysis and deliberate planning | Full pipeline: Discovery, Brief, Refinement, Solution, Planning, Technical Details, Tickets, Implementation |
 | **Complex** | Unknowns must be surfaced before planning | Decompose first, then run each sub-problem as Complicated |
 | **Chaotic** | Immediate stabilization needed | Stop the bleeding first, then reclassify |
 | **Disorder** | Not enough signal yet | Ask exploratory questions and bias toward Complicated |
@@ -130,20 +130,20 @@ ProjectPal operates as a phased pipeline, but the phase model must feel conversa
 
 | Phase | Outcome |
 | --- | --- |
-| **0. Conversation** | Understand the problem through free-form conversation |
-| **1. Discovery** | Generate a PRD draft |
-| **2. Debate** | Stress-test the PRD with Critic and Judge |
-| **3. Checkpoint 1** | User approves, revises, or archives the PRD |
-| **4. Tech Spec** | Generate the technical specification |
-| **5. Checkpoint 2** | User approves, revises, or archives the spec |
+| **0. Discovery** | Understand the problem through free-form conversation |
+| **1. Brief** | Generate the first scoped draft of the work |
+| **2. Refinement** | Pressure-test the Brief before it comes back to the user |
+| **3. Solution** | User approves, revises, or archives the proposed direction |
+| **4. Planning** | Shape the technical approach quietly before the next Check-in |
+| **5. Technical Details** | User approves, revises, or archives the technical plan |
 | **6. Tickets** | Produce granular implementation tickets |
 | **7. Implementation** | Execute tickets with verification and ownership clarity |
-| **8. Review & Wrap-Up** | Review changes, route decisions, save memory, clean up |
+| **8. Wrap Up** | Review changes, route decisions, save memory, clean up |
 
 ### Alternate paths
 
-- **Simple:** conversation to tickets to implementation
-- **Complex:** decomposition before entering the full planning path
+- **Simple:** Discovery to Brief to Solution to Tickets to Implementation to Wrap Up
+- **Complex:** decomposition inside Discovery before entering the full planning path
 - **Chaotic:** stabilization before decomposition or planning
 
 ### Readiness rule for leaving Phase 0
@@ -172,18 +172,18 @@ The Parking Lot exists to preserve out-of-phase value without derailing the curr
 
 This is not optional. It is one of the main ways ProjectPal adapts to non-linear developer workflow instead of fighting it.
 
-### Debate
+### Refinement
 
-The PRD must be challenged before the user sees it as a proposed truth.
+The Brief must be challenged before the user sees it as a proposed truth.
 
-- **Critic** checks clarity, feasibility, and success criteria
-- **Judge** decides which critiques stand and produces the debated result
+- **Architect** checks clarity, feasibility, and success criteria
+- **Manager** decides which critiques stand and produces the refined result
 
-The user sees the resulting artifact, not the internal argument, unless they ask.
+The user sees the resulting Brief, not the internal back-and-forth, unless they ask.
 
-### Checkpoints
+### Check-ins
 
-Checkpoints are where the user regains full control. The artifact pauses there until the user approves, revises, or archives it.
+Check-ins are where the user regains full control. The artifact pauses there until the user approves, revises, or archives it.
 
 ### Session resumption
 
@@ -198,7 +198,7 @@ Every new session should start from the active repo context first, then summariz
 The current product is a lean CLI-centered implementation designed to validate the core loop quickly with real developer workflows.
 
 - prompt-driven behavior instead of a custom orchestration runtime
-- sub-agents for debate and generation
+- sub-agents for Brief drafting, Refinement, Technical Details, and ticket generation
 - MemPalace for long-term memory when available
 - `.projectpal/` inside the active repo for local bridge state and artifacts
 - launcher adapters for Claude, Codex, and Gemini around the same source instructions
@@ -346,8 +346,8 @@ The launcher resolves repo context from the caller's current working directory, 
 
 - the conversational core loop
 - Cynefin-informed routing
-- PRD generation and debate
-- spec generation
+- Brief drafting and Refinement
+- Technical Details generation
 - granular tickets
 - implementation flow
 - Parking Lot capture and resurfacing
@@ -376,7 +376,7 @@ The core product should remain stable across that evolution:
 - the Pal relationship
 - one-question conversation
 - Cynefin-based routing
-- debate before commitment
+- Refinement before commitment
 - repo-first continuity
 - Parking Lot as protected flow control
 

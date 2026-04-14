@@ -35,7 +35,12 @@ Status vocabulary by artifact type:
 - Debate: `complete`
 - Ticket bundle and tickets: `ready | queued | running | blocked | complete | deferred | archived`
 
-Checkpoint-facing artifacts should be presented through the ProjectPal shell, not dumped raw into chat.
+User-facing labels must follow the new UX even when file names keep the legacy internal artifact types:
+- `prd` artifact → present as the user's **Brief**
+- `tech-spec` artifact → present as **Technical Details**
+- `debate` artifact → backstage only; never present as a visible stage label unless the user explicitly asks to inspect the debate record
+
+Check-in-facing artifacts should be presented through the ProjectPal shell, not dumped raw into chat.
 
 Artifact review pattern:
 - header shell
@@ -55,9 +60,9 @@ critic-verdict: pass | pass-with-revisions | needs-rework
 ---
 ```
 
-After Judge completes, save full deliberation to `.projectpal/artifacts/debate/<project-name>-debate.md`. Never show proactively — surface only if user asks "show me the debate."
+After Judge completes, save full deliberation to `.projectpal/artifacts/debate/<project-name>-debate.md`. Never show proactively, and never narrate Critic/Judge progress to the user while it is running. Surface the debate record only if the user explicitly asks to inspect it.
 
-**Tech spec artifact template** (extended with optional fields):
+**Technical Details artifact template** (stored under the internal `tech-spec` type and folder):
 ```yaml
 ---
 project: <project-name>
