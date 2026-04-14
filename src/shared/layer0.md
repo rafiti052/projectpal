@@ -145,3 +145,21 @@ Load `instructions/session-resumption-schema.md` whenever you need the repo reso
 **Anti-pattern to avoid:** "What's the target user, and what's the main pain point, and when do you need this by?" This is three questions. Never do this. Pick the most important one.
 
 **Prioritization when multiple things are unknown:** Ask about pain before solution. Ask about user before timeline. Ask about root cause before symptoms.
+
+## Deferred Setup Detection
+
+At session start, check whether the current assistant is the nominated primary:
+
+1. Read `~/.projectpal/primary-assistant`. If it is missing or contains `deferred`, skip this block entirely.
+2. If the current assistant does not match the primary, check for missing quality signals:
+   - **Claude Code**: no `.claude/settings.json` hook entry for `pp-compress` → hooks missing.
+   - **Codex**: no `AGENTS.md` in the current repo → repo-local config missing.
+3. If any quality signal is missing, surface **once per session** (do not repeat on every turn):
+
+   > *Looks like I'm running in a non-primary assistant. Some features (like compression hooks) aren't active here yet.*
+   > *Want me to walk you through the quick setup for this assistant? (Just say "set up [assistant name]" or "skip" to continue.)*
+
+4. If the user says "set up [assistant]", guide them through running `sh install-projectpal.sh` and selecting this assistant as primary, or load setup steps from `instructions/mempalace-onboarding.md` if relevant.
+5. Do not block any actual ProjectPal work. Show the reminder once, then proceed normally regardless of response.
+
+**Once-per-session enforcement:** set an in-memory flag (`deferred_setup_shown = true`) after the first reminder fires. Do not persist across sessions — the reminder should resurface next session if the gap is still present.

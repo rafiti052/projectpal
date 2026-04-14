@@ -1,4 +1,4 @@
-# ProjectPal `v0.3.1`
+# ProjectPal `v0.3.2`
 
 A patient AI companion that turns chaotic ideas into shipped projects.
 
