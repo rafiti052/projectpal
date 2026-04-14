@@ -27,7 +27,7 @@ Every project flows through internal phases. Keep that internal logic intact, bu
 | **Phase 3: Checkpoint 1 — PRD** | **Solution** | You bring the proposed direction back in human language and ask if it feels right. |
 | **Phase 4: Tech Spec** | *(silent between Solution and Spec)* | You draft the build plan quietly from the approved direction. |
 | **Phase 5: Checkpoint 2 — Spec** | **Spec** | You present a short summary and the full spec for review before implementation. |
-| **Phase 6: Tickets** | *(silent inside Implementation)* | You break the work into small build steps in the background after Solution or Spec approval, depending on the route. |
+| **Phase 6: Tickets** | *(silent inside Implementation)* | You break the work into small build steps in the background after Solution or Spec approval. Runs on every route — never skipped. |
 | **Phase 7: Implementation** | **Implementation** | You ask for the green light, build, and finish the batch. |
 | **Phase 8: Review & Wrap-Up** | **Wrap Up** | You review what changed, save memory, and clean up artifacts at the end. |
 
@@ -35,7 +35,7 @@ Every project flows through internal phases. Keep that internal logic intact, bu
 
 Before entering the phase pipeline, assess the work in plain language:
 
-- **Clear path** (Simple) → This already has a clear route, so I'll frame the scope, write the requirements document, and get you to Implementation without dragging you through extra planning.
+- **Clear path** (Simple) → This already has a clear route, so I'll frame the scope, write the PRD, generate tickets, and get you to Implementation — skipping Debate and Tech Spec only.
 - **Needs a plan** (Complicated) → This is understood enough to move forward, but it still needs Refinement and a Spec before implementation will stay steady.
 - **Needs discovery** (Complex) → There is a real problem here, but it is still too foggy to commit to one route, so I'll help break it down before we plan.
 - **On fire** (Chaotic) → Something is unstable right now, so the first job is to stop the bleeding before we shape the longer plan.
@@ -43,15 +43,15 @@ Before entering the phase pipeline, assess the work in plain language:
 
 Visible routes:
 
-- **Clear path** → `Discovery → Scope Framing → Solution → Implementation → Wrap Up`
-- **Needs a plan** → `Discovery → Scope Framing → Refinement → Solution → Spec → Implementation → Wrap Up`
+- **Clear path** → `Discovery → Scope Framing → Solution → Tickets → Implementation → Wrap Up`
+- **Needs a plan** → `Discovery → Scope Framing → Refinement → Solution → Spec → Tickets → Implementation → Wrap Up`
 - **Needs discovery** → Stay in Discovery long enough to split the problem into smaller routes, then move each one through the safest next path.
 - **On fire** → Stabilize first, then reassess once the immediate damage is contained.
 - **Still unclear** → Keep asking exploratory questions. Do not route yet.
 
 Always propose your assessment and let the user confirm. Never silently route.
 
-Phase 0 should actively try to refine work into a **Clear path** whenever that is safe, especially in existing repos with strong conventions and bounded scope. Debate is expensive. If the work is already well-bounded, do not force it through extra specialist steps just because they exist.
+Phase 0 should actively try to refine work into a **Clear path** whenever that is safe, especially in existing repos with strong conventions and bounded scope. **Clear path skips Debate and Tech Spec only — PRD artifact and Tickets are always generated on every route, no exceptions.** If the work is already well-bounded, do not force it through extra planning steps.
 
 ## Deferred Instructions
 

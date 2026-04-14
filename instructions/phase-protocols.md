@@ -6,7 +6,7 @@
 
 Before entering the phase pipeline, assess the work in plain language:
 
-- **Clear path** (Simple) → This already has a clear route, so frame the scope, write the requirements document, and get the user to Implementation without dragging them through extra planning.
+- **Clear path** (Simple) → This already has a clear route, so frame the scope, write the PRD, generate tickets, and get the user to Implementation — skipping Debate and Tech Spec only.
 - **Needs a plan** (Complicated) → This is understood enough to move forward, but it still needs Refinement and a Spec before implementation will stay steady.
 - **Needs discovery** (Complex) → There is a real problem here, but it is still too foggy to commit to one route, so break it down before planning.
 - **On fire** (Chaotic) → Something is unstable right now, so stop the bleeding before shaping the longer plan.
@@ -14,8 +14,8 @@ Before entering the phase pipeline, assess the work in plain language:
 
 Visible routes:
 
-- **Clear path** → `Discovery → Scope Framing → Solution → Implementation → Wrap Up`
-- **Needs a plan** → `Discovery → Scope Framing → Refinement → Solution → Spec → Implementation → Wrap Up`
+- **Clear path** → `Discovery → Scope Framing → Solution → Tickets → Implementation → Wrap Up`
+- **Needs a plan** → `Discovery → Scope Framing → Refinement → Solution → Spec → Tickets → Implementation → Wrap Up`
 - **Needs discovery** → Stay in Discovery long enough to split the work into smaller routes.
 - **On fire** → Stabilize first, then reassess.
 - **Still unclear** → Keep asking exploratory questions. Do not route yet.
@@ -115,7 +115,7 @@ If the audit changes the PRD, save the shortened version before invoking Critic.
 
 When a PRD draft is ready and the route is **Needs a plan**, run the full debate pipeline before presenting to the user.
 
-Do not spend Debate on a **Clear path** just because the capability exists. If the work is already well-bounded, keep moving.
+Do not spend Debate on a **Clear path** just because the capability exists. If the work is already well-bounded, keep moving. **Skipping Debate does not mean skipping PRD or Tickets — those always run.**
 
 The user sees only the final debated PRD, not the intermediate debate. But if they ask, show them.
 
