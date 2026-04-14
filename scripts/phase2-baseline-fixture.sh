@@ -8,9 +8,9 @@ MANIFEST_PATH="$REVIEW_DIR/phase2-baseline-manifest.yml"
 RUN_ID=${1:-run-1}
 RUN_DIR="$REVIEW_DIR/$RUN_ID"
 
-PRD_PATH=".projectpal/artifacts/prd/performance-architecture-and-token-efficiency.md"
-CRITIC_PROMPT_PATH="prompts/critic-agent.md"
-JUDGE_PROMPT_PATH="prompts/judge-agent.md"
+BRIEF_PATH=".projectpal/artifacts/brief/performance-architecture-and-token-efficiency.md"
+ARCHITECT_PROMPT_PATH="prompts/architect-agent.md"
+MANAGER_PROMPT_PATH="prompts/manager-agent.md"
 
 mkdir -p "$RUN_DIR"
 
@@ -19,14 +19,14 @@ project: performance-architecture-and-token-efficiency
 flow: phase2-baseline
 repo_root: $PROJECT_ROOT
 measured_inputs:
-  prd_artifact: $PRD_PATH
-  critic_prompt: $CRITIC_PROMPT_PATH
-  judge_prompt: $JUDGE_PROMPT_PATH
+  brief_artifact: $BRIEF_PATH
+  architect_prompt: $ARCHITECT_PROMPT_PATH
+  manager_prompt: $MANAGER_PROMPT_PATH
 run_contract:
   repo_state: "Use the current repo state without changing prompts or artifacts between runs."
-  source_prd: "Use the debated PRD artifact at $PRD_PATH as the Phase 2 source input for every baseline run."
-  critic_output: ".projectpal/artifacts/review/<run-id>/critic-output.md"
-  judge_output: ".projectpal/artifacts/review/<run-id>/judge-output.md"
+  source_brief: "Use the refined Brief artifact at $BRIEF_PATH as the Phase 2 source input for every baseline run."
+  architect_output: ".projectpal/artifacts/review/<run-id>/architect-output.md"
+  manager_output: ".projectpal/artifacts/review/<run-id>/manager-output.md"
   measurement_record: ".projectpal/artifacts/review/<run-id>/measurement.yml"
 entrypoint:
   command: "sh scripts/phase2-baseline-fixture.sh <run-id>"
@@ -43,39 +43,39 @@ Use this run directory for one baseline measurement pass of the current Phase 2 
 
 ## Fixed inputs
 
-- PRD artifact: \`$PRD_PATH\`
-- Critic prompt: \`$CRITIC_PROMPT_PATH\`
-- Judge prompt: \`$JUDGE_PROMPT_PATH\`
+- Brief artifact: \`$BRIEF_PATH\`
+- Architect prompt: \`$ARCHITECT_PROMPT_PATH\`
+- Manager prompt: \`$MANAGER_PROMPT_PATH\`
 
 ## Expected outputs
 
-- \`critic-output.md\` — the Critic review produced from the fixed PRD input
-- \`judge-output.md\` — the Judge output produced from the fixed PRD input plus the run's Critic output
+- \`architect-output.md\` — the Architect review produced from the fixed Brief input
+- \`manager-output.md\` — the Manager output produced from the fixed Brief input plus the Architect output
 - \`measurement.yml\` — counts and metadata for this run
 
 ## Run shape
 
 1. Keep the repo state unchanged for all baseline passes.
-2. Use the same PRD artifact for every run.
-3. Save Critic and Judge outputs in this directory.
-4. Record \`prd_words\`, \`critic_words\`, \`judge_words\`, and \`total_words\` in \`measurement.yml\`.
+2. Use the same Brief artifact for every run.
+3. Save Architect and Manager outputs in this directory.
+4. Record \`brief_words\`, \`architect_words\`, \`manager_words\`, and \`total_words\` in \`measurement.yml\`.
 EOF
 
 cat > "$RUN_DIR/measurement.yml" <<EOF
 flow: phase2-baseline
 run_id: $RUN_ID
-input_ref: $PRD_PATH
-critic_output_ref: .projectpal/artifacts/review/$RUN_ID/critic-output.md
-judge_output_ref: .projectpal/artifacts/review/$RUN_ID/judge-output.md
-prd_words:
-critic_words:
-judge_words:
+input_ref: $BRIEF_PATH
+architect_output_ref: .projectpal/artifacts/review/$RUN_ID/architect-output.md
+manager_output_ref: .projectpal/artifacts/review/$RUN_ID/manager-output.md
+brief_words:
+architect_words:
+manager_words:
 total_words:
 measured_at:
 notes:
 EOF
 
-touch "$RUN_DIR/critic-output.md" "$RUN_DIR/judge-output.md"
+touch "$RUN_DIR/architect-output.md" "$RUN_DIR/manager-output.md"
 
 printf '%s\n' "Prepared baseline fixture at $RUN_DIR"
 printf '%s\n' "Manifest: $MANIFEST_PATH"

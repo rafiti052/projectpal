@@ -24,7 +24,7 @@ This index exists so the neutral source can refer to those responsibilities with
   Sub-agent contracts and Refinement / ticket generation orchestration.
 
 - `instructions/artifacts.md`
-  Artifact layout, frontmatter contracts, and Refinement / tech-spec templates.
+  Artifact layout, frontmatter contracts, and Refinement / Technical Details templates.
 
 ## Constraint
 

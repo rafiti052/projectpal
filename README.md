@@ -1,4 +1,4 @@
-# ProjectPal `v0.3.5`
+# ProjectPal `v0.3.6`
 
 A patient AI companion that turns chaotic ideas into shipped projects.
 
@@ -133,12 +133,12 @@ projectpal/
 │   └── SKILL.md               ← Generated Codex skill entrypoint (local install output, not versioned)
 ├── .mcp.json                  ← MemPalace MCP connection
 ├── prompts/
-│   ├── critic-agent.md        ← Internal Architect reviewer prompt
-│   ├── judge-agent.md         ← Internal Manager reviewer prompt
-│   ├── cynefin-classify.md    ← Domain classification prompt
-│   ├── prd-generate.md        ← Internal Brief drafting prompt
-│   ├── tech-spec-generate.md  ← Internal Technical Details drafting prompt
-│   └── tickets-generate.md    ← Ticket generation prompt
+│   ├── architect-agent.md            ← Internal Architect reviewer prompt
+│   ├── manager-agent.md              ← Internal Manager reviewer prompt
+│   ├── brief-generate.md             ← Internal Brief drafting prompt
+│   ├── technical-details-generate.md ← Internal Technical Details drafting prompt
+│   ├── tickets-generate.md           ← Ticket generation prompt
+│   └── cynefin-classify.md           ← Domain classification prompt
 ├── docs/
 │   ├── maintainer-codex-reinstall.md ← Maintainer-only clean reinstall guide
 │   └── north-star.md          ← Current product direction note

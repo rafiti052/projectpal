@@ -7,10 +7,10 @@ All generated documents go to `.projectpal/artifacts/` in the current project di
 ```
 .projectpal/
   artifacts/
-    prd/
-    tech-spec/
+    brief/
+    technical-details/
     tickets/
-    debate/
+    refinement/
   parking-lot.md
 ```
 
@@ -22,7 +22,7 @@ All generated documents use YAML frontmatter:
 ---
 project: <project-name>
 phase: <phase-number>
-type: prd | tech-spec | ticket | debate
+type: brief | technical-details | ticket | refinement
 status: <varies by artifact type>
 created: <ISO-8601>
 cynefin: simple | complicated | complex | chaotic
@@ -30,15 +30,15 @@ cynefin: simple | complicated | complex | chaotic
 ```
 
 Status vocabulary by artifact type:
-- PRD: `draft | debated | approved | archived`
-- Tech spec: `draft | approved | archived`
-- Debate: `complete`
+- Brief artifact (`brief`): `draft | refined | approved | archived`
+- Technical Details artifact (`technical-details`): `draft | approved | archived`
+- Refinement record (`refinement`): `complete`
 - Ticket bundle and tickets: `ready | queued | running | blocked | complete | deferred | archived`
 
-User-facing labels must follow the new UX even when file names keep the legacy internal artifact types:
-- `prd` artifact → present as the user's **Brief**
-- `tech-spec` artifact → present as **Technical Details**
-- `debate` artifact → backstage only; never present as a visible stage label unless the user explicitly asks to inspect the debate record
+User-facing labels must follow the new UX consistently:
+- `brief` artifact → present as the user's **Brief**
+- `technical-details` artifact → present as **Technical Details**
+- `refinement` artifact → backstage only; never present as a visible stage label unless the user explicitly asks to inspect the refinement record
 
 Check-in-facing artifacts should be presented through the ProjectPal shell, not dumped raw into chat.
 
@@ -48,26 +48,26 @@ Artifact review pattern:
 - artifact link or links
 - one approval question
 
-**Debate artifact template** (save to `.projectpal/artifacts/debate/<project-name>-debate.md`):
+**Refinement record template** (save to `.projectpal/artifacts/refinement/<project-name>-refinement.md`):
 ```yaml
 ---
 project: <project-name>
 phase: 2
-type: debate
+type: refinement
 status: complete
 created: <ISO-8601>
-critic-verdict: pass | pass-with-revisions | needs-rework
+architect-verdict: pass | pass-with-revisions | needs-rework
 ---
 ```
 
-After Judge completes, save full deliberation to `.projectpal/artifacts/debate/<project-name>-debate.md`. Never show proactively, and never narrate Critic/Judge progress to the user while it is running. Surface the debate record only if the user explicitly asks to inspect it.
+After the Manager finishes, save the full deliberation to `.projectpal/artifacts/refinement/<project-name>-refinement.md`. Never show it proactively, and never narrate Architect/Manager progress to the user while it is running. Surface the refinement record only if the user explicitly asks to inspect it.
 
-**Technical Details artifact template** (stored under the internal `tech-spec` type and folder):
+**Technical Details artifact template** (stored under the `technical-details` type and folder):
 ```yaml
 ---
 project: <project-name>
 phase: 4
-type: tech-spec
+type: technical-details
 status: draft | approved | archived
 created: <ISO-8601>
 cynefin: simple | complicated | complex | chaotic

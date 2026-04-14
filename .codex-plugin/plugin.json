@@ -1,6 +1,6 @@
 {
   "name": "projectpal",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "A patient product companion that turns messy ideas into a clear route, a solid solution, and 15-minute execution tickets.",
   "author": {
     "name": "Rafael",
@@ -12,7 +12,7 @@
   "keywords": [
     "product",
     "planning",
-    "prd",
+    "brief",
     "tickets",
     "adhd"
   ],
@@ -21,7 +21,7 @@
   "interface": {
     "displayName": "ProjectPal",
     "shortDescription": "Turns messy ideas into a clear route, a solid solution, and 15-minute tickets.",
-    "longDescription": "ProjectPal is a patient product companion for turning non-linear ideas into a clear route, a requirements document, a spec when needed, and small execution tickets without forcing structured intake. In Codex, launch it with `ProjectPal`.",
+    "longDescription": "ProjectPal is a patient product companion for turning non-linear ideas into a clear route, a Brief, Technical Details when needed, and small execution tickets without forcing structured intake. In Codex, launch it with `ProjectPal`.",
     "developerName": "Rafael",
     "category": "Productivity",
     "capabilities": [

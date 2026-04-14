@@ -20,7 +20,7 @@ usage:
   sh scripts/projectpal-flow.sh handoff-build <source-phase> <target-phase> <artifact-ref> <bridge-summary-file> [memory-summary-file] [dropped-context:true|false] [reentry-required:true|false]
   sh scripts/projectpal-flow.sh context-reset-evaluate <handoff-package-path>
   sh scripts/projectpal-flow.sh memory-summary <results-file> <repo-slug> [feat-slug] [phase] [kind] [limit]
-  sh scripts/projectpal-flow.sh build-phase-input <critic|judge|tech-spec|tickets> <approved-artifact-ref> <handoff-package-path> [memory-summary-file] [extra-artifact-ref]
+  sh scripts/projectpal-flow.sh build-phase-input <architect|manager|technical-details|tickets> <approved-artifact-ref> <handoff-package-path> [memory-summary-file] [extra-artifact-ref]
   sh scripts/projectpal-flow.sh sync-resume-bridge <state-path> <approved-artifact-ref> <bridge-summary-file> [resume-source]
   sh scripts/projectpal-flow.sh reduction-report <baseline-summary-path> <new-flow-summary-path> [output-path]
   sh scripts/projectpal-flow.sh phase7-batch-close-check <ticket-bundle-path>
@@ -373,7 +373,7 @@ command_prepare_repo() {
     blocker_detail="I couldn't create ProjectPal's local workspace in .projectpal/ yet."
     blocker_next_step="Create .projectpal/state.yml in this repo, then run ProjectPal again."
   else
-    mkdir -p "$projectpal_dir" "$artifacts_dir"/prd "$artifacts_dir"/tech-spec "$artifacts_dir"/tickets "$artifacts_dir"/debate
+    mkdir -p "$projectpal_dir" "$artifacts_dir"/brief "$artifacts_dir"/technical-details "$artifacts_dir"/tickets "$artifacts_dir"/refinement
     if [ ! -f "$state_path" ]; then
       {
         printf '%s\n' "repo_slug: $repo_slug"

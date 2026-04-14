@@ -8,7 +8,7 @@ created: 2026-04-10T22:05:00Z
 
 ## Summary
 This fixture models one parallel-ready batch and one blocked dependency path for Phase 7.
-It exists to verify wave scheduling, exclusive write ownership, bridge-save checkpoints, and final integration reporting in one repeatable bundle.
+It exists to verify wave scheduling, exclusive write ownership, bridge-save milestones, and final integration reporting in one repeatable bundle.
 
 ## Coverage Check
 - Implementation Plan step 3 maps to tickets 101 and 102
@@ -34,7 +34,7 @@ It exists to verify wave scheduling, exclusive write ownership, bridge-save chec
 - Ticket 101 exclusively owns `prompts/tickets-generate.md`
 - Ticket 102 exclusively owns `scripts/projectpal-flow.sh`
 - Ticket 103 is blocked until tickets 101 and 102 are complete
-- Ticket 104 owns `.projectpal/state.yml` for bridge-sync checkpoint updates
+- Ticket 104 owns `.projectpal/state.yml` for bridge-sync milestone updates
 - Ticket 105 owns `scripts/projectpal-flow-tests.sh`
 - Ticket 106 owns verification notes only
 

@@ -10,7 +10,7 @@ Receive a Phase 0 conversation transcript. Output a complexity zone with confide
 
 ## Complexity zones
 
-**Clear path** — Clear cause-and-effect. Best practice exists. The user already knows enough to move quickly through scope framing and a requirements document.
+**Clear path** — Clear cause-and-effect. Best practice exists. The user already knows enough to move quickly into a Brief and Tickets.
 
 **Needs a plan** — Cause-and-effect exists but requires analysis. Expert knowledge needed. The user knows the problem; the solution requires thinking through.
 

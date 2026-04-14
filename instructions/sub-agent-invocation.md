@@ -52,53 +52,53 @@ Agent(Cynefin Classifier):
 
 ---
 
-### 2. PRD Generator
+### 2. Problem Solver
 Invoked at Phase 1 (see Phase 1 Brief Protocol above).
 ```
-Agent(PRD Generator):
-  input:  prompts/prd-generate.md + transcript + confirmed complexity assessment
-          + Parking Lot items (phase:prd) + MemPalace results (inline)
-  output: complete PRD document with YAML frontmatter
+Agent(Problem Solver):
+  input:  prompts/brief-generate.md + transcript + confirmed complexity assessment
+          + Parking Lot items (phase:brief) + MemPalace results (inline)
+  output: complete Brief document with YAML frontmatter
 ```
-Pre-Refinement brevity audit: always run the brevity audit before Critic/Judge. If output remains >2,000 words after the audit, surface warning before Refinement.
+Pre-Refinement brevity audit: always run the brevity audit before Architect/Manager. If output remains >2,000 words after the audit, surface warning before Refinement.
 
 ---
 
-### 3. Critic
+### 3. Architect
 Invoked at Phase 2. Skipped for Clear path problems.
 ```
-Agent(Critic):
-  input:  prompts/critic-agent.md + full PRD text (inline)
+Agent(Architect):
+  input:  prompts/architect-agent.md + full Brief text (inline)
   output: structured review with verdict [PASS | PASS WITH REVISIONS | NEEDS REWORK]
 ```
 
 ---
 
-### 4. Judge
-Invoked at Phase 2, only after Critic returns PASS or PASS WITH REVISIONS.
+### 4. Manager
+Invoked at Phase 2, only after the Architect returns PASS or PASS WITH REVISIONS.
 ```
-Agent(Judge):
-  input:  prompts/judge-agent.md + full PRD text + Critic output (inline)
-  output: Judge Deliberation + Final PRD (Debated) under exact header ## Final PRD (Debated)
+Agent(Manager):
+  input:  prompts/manager-agent.md + full Brief text + Architect output (inline)
+  output: Manager Deliberation + Final Brief (Refined) under exact header ## Final Brief (Refined)
 ```
 
 **6-step Refinement protocol:**
 ```
-Step 1: PRD Generator sub-agent completes → brevity audit → word count check → saved to artifacts
+Step 1: Problem Solver sub-agent completes → brevity audit → word count check → saved to artifacts
 Step 2: If >2,000 words after brevity audit: warn user before proceeding
-        Agent(Critic) receives: critic-agent.md + full PRD text (inline)
-Step 3: Pal captures Critic output
+        Agent(Architect) receives: architect-agent.md + full Brief text (inline)
+Step 3: Pal captures Architect output
 Step 4: NEEDS REWORK routing:
         - PASS or PASS WITH REVISIONS → proceed to Step 5
-        - NEEDS REWORK → stop, surface Critic's top issue, revise PRD. Return to Phase 1.
-Step 5: Agent(Judge) receives: judge-agent.md + full PRD text + Critic output (inline)
-Step 6: Pal saves debated PRD (status: debated) → presents at the Solution Check-in with a short summary of the debated outcome
+        - NEEDS REWORK → stop, surface the Architect's top issue, revise the Brief. Return to Phase 1.
+Step 5: Agent(Manager) receives: manager-agent.md + full Brief text + Architect output (inline)
+Step 6: Pal saves the refined Brief (status: refined) → presents at the Solution Check-in with a short summary of the refined outcome
         - Blockers must be answered explicitly before proceeding
         - Non-blocker concerns must be surfaced one by one and explicitly passed, revised, or deferred by the user
         - After the summary, ask only one question at a time
 ```
 
-**Re-debate rule:** If a debated PRD is changed before the Solution Check-in is approved, and the change is substantial enough to alter a requirement, persona, assumption, success criterion, risk, or scope boundary, return the PRD to Phase 2 and rerun Critic and Judge before presenting it again. Minor wording cleanup that preserves meaning does not require a fresh debate pass.
+**Re-refinement rule:** If a refined Brief is changed before the Solution Check-in is approved, and the change is substantial enough to alter a requirement, persona, assumption, success criterion, risk, or scope boundary, return the Brief to Phase 2 and rerun the Architect and Manager before presenting it again. Minor wording cleanup that preserves meaning does not require a fresh refinement pass.
 
 ---
 
@@ -106,9 +106,9 @@ Step 6: Pal saves debated PRD (status: debated) → presents at the Solution Che
 Invoked at Phase 4 when the route is Needs a plan (see Phase 4 Planning Protocol above).
 ```
 Agent(Technical Details Generator):
-  input:  prompts/tech-spec-generate.md + full approved PRD text
-          + MemPalace results + Parking Lot items (phase:4 / phase:tech-spec) (inline)
-  output: complete internal tech-spec document with YAML frontmatter
+  input:  prompts/technical-details-generate.md + full approved Brief text
+          + MemPalace results + Parking Lot items (phase:4 / phase:technical-details) (inline)
+  output: complete internal Technical Details document with YAML frontmatter
 ```
 
 ---
@@ -125,14 +125,14 @@ Agent(Ticket Generator):
 **Phase 6 ticket protocol:**
 ```
 Step 1: Read the approved planning artifact set
-        - Needs a plan: read approved Technical Details artifact from .projectpal/artifacts/tech-spec/<name>.md
-        - Clear path: derive tickets from the approved PRD and the already-bounded route
+        - Needs a plan: read approved Technical Details artifact from .projectpal/artifacts/technical-details/<name>.md
+        - Clear path: derive tickets from the approved Brief and the already-bounded route
 Step 2: Read Parking Lot items tagged phase:6 or phase:execution
-Step 3: Agent(Ticket Generator) receives: tickets-generate.md + spec + parking lot (inline)
+Step 3: Agent(Ticket Generator) receives: tickets-generate.md + technical-details artifact + parking lot (inline)
 Step 4: Pal captures ticket set output
 Step 5: Save each ticket as individual file: .projectpal/artifacts/tickets/<project-id>-NNN.md
         (zero-padded 3-digit numbers, e.g. myproject-001.md)
 Step 6: Proceed to Phase 7 Implementation Protocol
 ```
 
-For Clear path problems: keep the PRD Generator, skip Critic, Judge, and the Technical Details Generator, then move through Phase 3 → Phase 6 → Phase 7 → Phase 8.
+For Clear path problems: keep the Problem Solver, skip the Architect, Manager, and Technical Details Generator, then move through Phase 3 → Phase 6 → Phase 7 → Phase 8.

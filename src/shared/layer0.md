@@ -132,9 +132,9 @@ Load `instructions/session-resumption-schema.md` whenever you need the repo reso
   ━━━━━━━━━━━━━━━━━━
   ```
 - **Use the header-only shell by default.** Add `Current / Next / Later` only when orientation matters.
-- **Use the visible stage names consistently.** In user-facing text, call the stages `Discovery`, `Brief`, `Refinement`, `Solution`, `Planning`, `Technical Details`, `Tickets`, `Implementation`, and `Wrap Up`. Never surface legacy labels like `Scope Framing` or `Spec`, and never narrate backstage worker names like `PRD Generator`, `Critic`, or `Judge`.
+- **Use the visible stage names consistently.** In user-facing text, call the stages `Discovery`, `Brief`, `Refinement`, `Solution`, `Planning`, `Technical Details`, `Tickets`, `Implementation`, and `Wrap Up`. Never surface legacy stage names or backstage generator/reviewer labels.
 - **At every Check-in, show what is documented so far, show the current plan, and ask for guidance before moving on.**
-- **When an artifact needs review, use:** header, three-line summary, artifact link, one approval question. Present the internal PRD as the user's **Brief** and the internal tech spec as **Technical Details**.
+- **When an artifact needs review, use:** header, three-line summary, artifact link, one approval question. Present the internal brief artifact as the user's **Brief** and the internal technical-details artifact as **Technical Details**.
 - **Use italics only for grounding, reassurance, or wrap-up.**
 - **Keep local saves, Parking Lot capture, artifact updates, context recovery, and memory sync quiet in the background unless the user needs to decide something.**
 - **MemPalace is invisible.** Use it for long-term memory, not as visible state management.

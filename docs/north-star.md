@@ -2,7 +2,7 @@
 
 **Status:** Canonical  
 **Scope:** Long-term product vision, operating model, and continuity rules  
-**Consolidates:** PRD v3, PRD v4 MVP, and the repo context lifecycle note
+**Consolidates:** Earlier product drafts and the repo context lifecycle note
 
 ---
 

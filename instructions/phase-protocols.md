@@ -22,7 +22,7 @@ Visible routes:
 
 Always propose the assessment and let the user confirm. Never silently route.
 
-Use only the visible stage names in user-facing copy. Internal artifact names like `PRD` and `tech-spec`, and internal worker names like `Critic` and `Judge`, stay backstage unless the user explicitly asks how the system works.
+Use only the visible stage names in user-facing copy. Internal artifact ids and worker names stay backstage unless the user explicitly asks how the system works.
 
 ## Phase 0 Protocol
 
@@ -71,7 +71,7 @@ Case B — Trust test / intentional vagueness:
 
 ## Phase 1: Brief Protocol
 
-Before generating the internal PRD that powers the user-facing Brief, search MemPalace for relevant past decisions:
+Before generating the internal Brief artifact that powers the user-facing Brief, search MemPalace for relevant past decisions:
 
 *(Skip if `mempalace_available = false`)*
 
@@ -85,55 +85,55 @@ mempalace_search(
 
 If results are empty or irrelevant, proceed without blocking. Do not mention the search to the user.
 
-**PRD sub-agent protocol:**
+**Brief drafting sub-agent protocol:**
 ```
-Agent(PRD Generator) receives:
-  - prompts/prd-generate.md prompt
+Agent(Problem Solver) receives:
+  - prompts/brief-generate.md prompt
   - Full Phase 0 conversation transcript (inline)
   - Confirmed complexity assessment (inline)
-  - Parking Lot items tagged phase:prd (inline, or "none")
+  - Parking Lot items tagged phase:brief (inline, or "none")
   - MemPalace search results (inline, or "none")
 
-Pal captures: complete PRD document (with YAML frontmatter)
-Pal runs brevity audit → checks word count → saves to .projectpal/artifacts/prd/<project-name>.md
+Pal captures: complete Brief document (with YAML frontmatter)
+Pal runs brevity audit → checks word count → saves to .projectpal/artifacts/brief/<project-name>.md
 ```
 
-Do not draft the Brief inline. Always use the sub-agent to generate the internal PRD artifact first.
+Do not draft the Brief inline. Always use the sub-agent to generate the internal Brief artifact first.
 
 ### Brevity audit — required before Refinement
 
-Before Phase 2 starts, audit the PRD for shortest-possible form. The goal is not to make the PRD terse; the goal is to remove every sentence that does not carry a distinct requirement, risk, assumption, success criterion, or necessary context.
+Before Phase 2 starts, audit the Brief for shortest-possible form. The goal is not to make the Brief terse; the goal is to remove every sentence that does not carry a distinct requirement, risk, assumption, success criterion, or necessary context.
 
 Audit rules:
-- Preserve the exact required PRD sections and YAML frontmatter.
+- Preserve the exact required Brief sections and YAML frontmatter.
 - Remove repetition, throat-clearing, generic product language, and duplicated rationale.
 - Merge bullets or paragraphs that say the same thing.
 - Keep explicit gap flags. Do not delete uncertainty just to shorten the document.
 - Do not remove user-provided nuance that changes meaning.
 
-If the audit changes the PRD, save the shortened version before invoking Critic. If it cannot be shortened without losing meaning, proceed and note internally: `brevity audit: no change`.
+If the audit changes the Brief, save the shortened version before invoking the Architect. If it cannot be shortened without losing meaning, proceed and note internally: `brevity audit: no change`.
 
 ## Refinement System
 
-When a PRD draft is ready and the route is **Needs a plan**, run the full Refinement pipeline before presenting to the user.
+When a Brief draft is ready and the route is **Needs a plan**, run the full Refinement pipeline before presenting to the user.
 
-Do not spend Refinement on a **Clear path** just because the capability exists. If the work is already well-bounded, keep moving. **Skipping Refinement does not mean skipping PRD or Tickets — those always run.**
+Do not spend Refinement on a **Clear path** just because the capability exists. If the work is already well-bounded, keep moving. **Skipping Refinement does not mean skipping Brief drafting or Tickets — those always run.**
 
-The user sees only the final Brief backed by the debated PRD, not the intermediate refinement record. But if they ask, show it.
+The user sees only the final refined Brief, not the intermediate refinement record. But if they ask, show it.
 
 ### Refinement Check-in rule
 
 After the full Refinement pass completes, always bring a short human summary back to the user before moving on.
 
-- Do not summarize refinement findings to the user after Critic alone. The user-facing summary happens after Judge so it reflects the real debated outcome.
-- If Critic returns `NEEDS REWORK`, stop and surface that blocker directly because Judge will not run.
-- If Judge runs, use the Judge result as the source of truth for the summary and follow-up questions.
-- The user must answer blocker judgments explicitly before the PRD can proceed.
+- Do not summarize refinement findings to the user after the Architect alone. The user-facing summary happens after the Manager so it reflects the real refined outcome.
+- If the Architect returns `NEEDS REWORK`, stop and surface that blocker directly because the Manager will not run.
+- If the Manager runs, use the Manager result as the source of truth for the summary and follow-up questions.
+- The user must answer blocker judgments explicitly before the Brief can proceed.
 - If the refinement pass returns non-blocker concerns, surface them one at a time after the summary.
-- The user must explicitly pass, revise, or defer each concern before the PRD can be treated as approved.
-- Never silently carry a `PASS WITH REVISIONS` PRD into Phase 4.
+- The user must explicitly pass, revise, or defer each concern before the Brief can be treated as approved.
+- Never silently carry a `PASS WITH REVISIONS` Brief into Phase 4.
 - Keep the same one-question-per-turn rhythm used in Discovery: after the summary, ask only one concern question, wait for the answer, then ask the next.
-- Never narrate backstage steps like `PRD Generator`, `Critic`, or `Judge` while they run. If progress needs to be shown, reference the visible stage only.
+- Never narrate backstage steps like the Problem Solver, Architect, or Manager while they run. If progress needs to be shown, reference the visible stage only.
 
 ## Phase 4: Planning Protocol
 
@@ -143,7 +143,7 @@ Phase 4 is mostly silent work. The user sees the next Check-in as **Technical De
 
 When entering Phase 4:
 1. Read `.projectpal/parking-lot.md`
-2. Surface all items tagged `phase:4` or `phase:tech-spec` for the current repo, one at a time:
+2. Surface all items tagged `phase:4` or `phase:technical-details` for the current repo, one at a time:
    *"Before I write the technical details, earlier you mentioned [X]. Want to include it here?"*
 3. If the user accepts: incorporate and flag the item as "incorporated" in `parking-lot.md`
 4. If the user declines: flag it as "deferred" and do not surface it again
@@ -156,13 +156,13 @@ When entering Phase 4:
 
 ### Prior context
 
-Before generating the internal tech-spec artifact that powers the user-facing Technical Details Check-in, search MemPalace for architectural precedents:
+Before generating the internal technical-details artifact that powers the user-facing Technical Details Check-in, search MemPalace for architectural precedents:
 
 *(Skip if `mempalace_available = false`)*
 
 ```
 mempalace_search(
-  query="<2-3 key architectural terms from the PRD>",
+  query="<2-3 key architectural terms from the Brief>",
   wing="Precedents",
   limit=5
 )
@@ -173,13 +173,13 @@ If results are empty or irrelevant, proceed without blocking. Do not mention the
 **Technical Details sub-agent protocol:**
 ```
 Agent(Technical Details Generator) receives:
-  - prompts/tech-spec-generate.md prompt
-  - Full approved PRD text (inline — read from .projectpal/artifacts/prd/<name>.md)
+  - prompts/technical-details-generate.md prompt
+  - Full approved Brief text (inline — read from .projectpal/artifacts/brief/<name>.md)
   - MemPalace search results (inline, or "none")
-  - Parking Lot items tagged phase:4 or phase:tech-spec (inline, or "none")
+  - Parking Lot items tagged phase:4 or phase:technical-details (inline, or "none")
 
-Pal captures: complete internal tech-spec document (with YAML frontmatter)
-Pal runs structural self-review → saves to .projectpal/artifacts/tech-spec/<project-name>-spec.md
+Pal captures: complete internal Technical Details document (with YAML frontmatter)
+Pal runs structural self-review → saves to .projectpal/artifacts/technical-details/<project-name>-technical-details.md
 ```
 
 Do not generate the technical details inline. Always use the sub-agent.
@@ -192,9 +192,9 @@ Spike protocol:
 1. Pal identifies the spike question
 2. Propose to the user: *"Before I can write [section], I need to check one thing. Can you [specific action] and share the result?"*
    OR, if it is safe and read-only, run it via the Bash tool and capture the result
-3. Append the result to the affected spec section as a resolved decision
+3. Append the result to the affected Technical Details section as a resolved decision
 4. Annotate in Risks: "Resolved: [date] via spike — [one-line finding]"
-5. Update spec frontmatter: `spikes: [question: resolved]`
+5. Update the Technical Details frontmatter: `spikes: [question: resolved]`
 
 Time-box: if the spike cannot be resolved in one session, it becomes a Phase 6 ticket.
 
@@ -220,7 +220,7 @@ Respect the user's choice. Do not default to section-by-section unprompted.
 
 Before presenting the technical details, run a structural self-review:
 - [ ] Every Implementation Plan item maps to 1 or more tickets (structural check)
-- [ ] Data Model covers every entity mentioned in the PRD Problem Statement
+- [ ] Data Model covers every entity mentioned in the Brief Problem Statement
 - [ ] All `parking-lot.md` items tagged `phase:4` are incorporated or flagged deferred
 
 If any check fails: fix it inline before presenting.

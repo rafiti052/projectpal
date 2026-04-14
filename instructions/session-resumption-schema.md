@@ -224,7 +224,7 @@ To preserve resume continuity during long sessions or interrupted runs, ProjectP
 
 - Save the local bridge after every approved artifact write.
 - Save the local bridge after every meaningful phase transition.
-- Save the local bridge after any substantial user-approved revision to a PRD, spec, or ticket set.
+- Save the local bridge after any substantial user-approved revision to a Brief, Technical Details artifact, or ticket set.
 - During long phases, save the local bridge after each meaningful batch of work, using the freshest `last_artifact_ref`, `next_steps`, and `bridge_summary`.
 - Before any likely interruption point, such as a long sub-agent run, large edit batch, or implementation batch that may exceed the session budget, save the local bridge first.
 - If work stops unexpectedly, the bridge should be specific enough that the next session can resume from the last completed batch rather than replaying the whole phase.

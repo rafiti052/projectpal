@@ -1,14 +1,14 @@
 # Ticket Generation — Prompt
 
-You are generating the complete implementation ticket backlog from an approved Tech Spec.
+You are generating the complete implementation ticket backlog from approved Technical Details.
 
 ## Role
 
-Receive an approved Tech Spec and produce a full ordered set of tickets plus the bundle-level execution structure that Phase 7 will read. Each ticket scopes to one ~15-minute focus session. Generate the complete backlog in one pass, ordered by real dependencies and grouped into waves. The user picks up tickets cold — each one is self-contained.
+Receive approved Technical Details and produce a full ordered set of tickets plus the bundle-level execution structure that Phase 7 will read. Each ticket scopes to one ~15-minute focus session. Generate the complete backlog in one pass, ordered by real dependencies and grouped into waves. The user picks up tickets cold — each one is self-contained.
 
 ## Input
 
-1. **Approved Tech Spec** — Implementation Plan is the primary source; all other sections provide context
+1. **Approved Technical Details** — Implementation Plan is the primary source; all other sections provide context
 2. **Parking Lot items tagged `phase:execution` or `phase:6`** — Incorporate as additional tickets if relevant
 
 ## Output Contract
@@ -39,7 +39,7 @@ The bundle artifact must include these sections in this order:
 ### Bundle section rules
 
 - **Summary:** Explain the implementation-planning goal in 2 to 4 sentences. State that the bundle is contract-first and wave-based.
-- **Coverage Check:** Map every Implementation Plan item from the Tech Spec to one or more ticket ids. No Implementation Plan item may be left unmapped.
+- **Coverage Check:** Map every Implementation Plan item from the Technical Details artifact to one or more ticket ids. No Implementation Plan item may be left unmapped.
 - **Waves:** Define each wave with:
   - wave label or id
   - entry criteria
@@ -62,11 +62,11 @@ The bundle artifact must include these sections in this order:
 - Use `builder` as the default execution owner.
 - Add `reviewer` or `verifier` only as optional role slots for a wave when the work is cross-file, high-risk, or needs independent checking.
 - Do not create new default personas beyond `builder`.
-- Prefer file-level ownership boundaries. Use subsystem-level boundaries only when the spec implies a broader but still exclusive write scope.
+- Prefer file-level ownership boundaries. Use subsystem-level boundaries only when the technical plan implies a broader but still exclusive write scope.
 
 ## Ordering
 
-Sort tickets by topological dependency order: tickets with no dependencies first, then each ticket after all its dependencies are listed. Within dependency-free groups, follow the workstream order from the spec's Implementation Plan.
+Sort tickets by topological dependency order: tickets with no dependencies first, then each ticket after all its dependencies are listed. Within dependency-free groups, follow the workstream order from the Technical Details Implementation Plan.
 
 ## Ticket Format
 
@@ -90,16 +90,16 @@ depends_on: [<ticket numbers as integers, empty list if none>]
 
 - **Wave:** Name the wave this ticket belongs to.
 - **What:** One clear thing to do — verb + object.
-- **Why:** How this connects to the spec goal (one sentence).
-- **Owner:** The active owner for the ticket. Default to `builder` unless the spec or wave explicitly justifies another role slot.
+- **Why:** How this connects to the technical goal (one sentence).
+- **Owner:** The active owner for the ticket. Default to `builder` unless the technical plan or wave explicitly justifies another role slot.
 - **Persona:** Optional. Only include when a `reviewer` or `verifier` role slot is intentionally assigned.
 - **Status:** Start every Phase 6 ticket as `ready`. The bundle and tickets must preserve the execution-state vocabulary Phase 7 will use later: `queued`, `blocked`, `running`, `complete`, `deferred`.
 - **Primary files:** Optional but preferred when a ticket writes to a small, clear file set.
 - **Allowed writes:** Required. List the exact files or subsystems this ticket may change.
 - **Verification:** Required. List explicit checks the executor can run or inspect later.
 - **Done when:** A concrete, verifiable completion state. Prefer: artifact exists at [path], test passes for [condition], or user can perform [observable action]. Never: "task is complete," "work is done," or any activity-completion language.
-- **Handoff notes:** Optional. Use when a later ticket needs a specific follow-up, bridge-sync checkpoint, or integration reminder.
-- **Notes:** Always include: "Source: [Implementation Plan step / workstream item]". If decomposed from an L-sized spec item: "Decomposed from L-sized spec item: [original item name]." Add any gotchas or references.
+- **Handoff notes:** Optional. Use when a later ticket needs a specific follow-up, bridge-sync check-in, or integration reminder.
+- **Notes:** Always include: "Source: [Implementation Plan step / workstream item]". If decomposed from an L-sized planning item: "Decomposed from L-sized planning item: [original item name]." Add any gotchas or references.
 
 ## Ticket Validity Rules
 
@@ -118,7 +118,7 @@ If any of these checks fail, revise the ticket before finalizing the bundle.
 ## Workflow
 
 **Step 1 — Parse the Implementation Plan.**
-List every item from the spec's Implementation Plan. Note its size (S or M) and any explicit dependencies.
+List every item from the Technical Details Implementation Plan. Note its size (S or M) and any explicit dependencies.
 
 **Step 2 — Handle L-sized items.**
 If any Implementation Plan item is L-sized (or unambiguously > 45 min): decompose it into ≥2 sequential S/M tickets before assigning numbers. Preserve the dependency chain through the decomposed tickets. Flag each decomposed ticket in Notes.
@@ -146,13 +146,13 @@ Review the `depends_on` chains and ownership boundaries together. If two tickets
 ## Anti-patterns
 
 - **Never chain tickets that can run in parallel.** Incorrect depends_on blocks execution unnecessarily.
-- **Never use `estimated_minutes: 15` for an M-sized item.** S = 15 min, M = 45 min. Apply the value that matches the spec size label.
+- **Never use `estimated_minutes: 15` for an M-sized item.** S = 15 min, M = 45 min. Apply the value that matches the planning size label.
 - **Never omit `Allowed writes`.** A ticket without an exclusive write scope is invalid for parallel execution.
 - **Never omit `Verification`.** A contract-first ticket without explicit checks is incomplete.
 - **Never put a ticket in multiple waves.** One ticket belongs to one wave only.
 - **Never assign reviewer or verifier as new default personas.** They are optional role slots, not the normal execution path.
 - **Never leave the bundle without a final integration report scaffold.**
 - **Never write activity-completion "Done when."** "Feature is implemented" is not verifiable. "File exists at [path]" is.
-- **Never produce a ticket for scope excluded in the PRD.**
+- **Never produce a ticket for scope excluded in the Brief.**
 - **Never write tickets in a language other than English.** Tickets are execution artifacts — they must be readable and searchable in English regardless of conversation language.
 - **Never skip the completeness gate.** A missed Implementation Plan item means unbuilt functionality.

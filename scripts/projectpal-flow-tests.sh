@@ -27,7 +27,7 @@ cat > "$TMP_DIR/sample.md" <<'EOF'
 ---
 project: sample
 phase: 1
-type: prd
+type: brief
 status: draft
 ---
 
@@ -49,7 +49,7 @@ EOF
 cat > "$TMP_DIR/handoff.yml" <<'EOF'
 source_phase: 4
 target_phase: 6
-artifact_ref: .projectpal/artifacts/tech-spec/example-spec.md
+artifact_ref: .projectpal/artifacts/technical-details/example-technical-details.md
 bridge_summary: |
   Resume from bridge summary.
 dropped_context: true
@@ -225,7 +225,7 @@ split_output=$(run_flow split-evaluate 1200 1000 false true example 1)
 assert_contains "$split_output" "split_required: true"
 assert_contains "$split_output" "slice_slug: example-slice-1"
 
-handoff_output=$(run_flow handoff-build 4 6 .projectpal/artifacts/tech-spec/example-spec.md "$TMP_DIR/bridge-summary.md")
+handoff_output=$(run_flow handoff-build 4 6 .projectpal/artifacts/technical-details/example-technical-details.md "$TMP_DIR/bridge-summary.md")
 assert_contains "$handoff_output" "resume_input: Resume from the approved artifact and bridge summary only."
 
 reset_output=$(run_flow context-reset-evaluate "$TMP_DIR/handoff.yml")
@@ -236,8 +236,8 @@ memory_output=$(run_flow memory-summary "$TMP_DIR/memory-results.txt" projectpal
 assert_contains "$memory_output" "feat:target phase:7 kind:review"
 assert_contains "$memory_output" "feat:target phase:6 kind:feature-scope"
 
-phase_input_output=$(run_flow build-phase-input tickets .projectpal/artifacts/tech-spec/example-spec.md "$TMP_DIR/handoff.yml" "" .projectpal/artifacts/implementation-aid.md)
-assert_contains "$phase_input_output" "- Approved artifact ref: \`.projectpal/artifacts/tech-spec/example-spec.md\`"
+phase_input_output=$(run_flow build-phase-input tickets .projectpal/artifacts/technical-details/example-technical-details.md "$TMP_DIR/handoff.yml" "" .projectpal/artifacts/implementation-aid.md)
+assert_contains "$phase_input_output" "- Approved artifact ref: \`.projectpal/artifacts/technical-details/example-technical-details.md\`"
 assert_contains "$phase_input_output" "- Extra artifact ref: \`.projectpal/artifacts/implementation-aid.md\`"
 
 fixture_close_output=$(run_flow phase7-batch-close-check "$FIXTURE_PATH")
@@ -281,11 +281,11 @@ assert_contains "$proof_flow_output" "path_switch_visible_owner: codex-pal"
 assert_contains "$proof_flow_output" "parallel_delegated_work_blocked: true"
 assert_contains "$proof_flow_output" "parallel_delegation_visible_owner: pal"
 
-run_flow sync-resume-bridge "$TMP_DIR/state.yml" .projectpal/artifacts/tech-spec/example-spec.md "$TMP_DIR/bridge-summary.md" repo-bridge > /dev/null
+run_flow sync-resume-bridge "$TMP_DIR/state.yml" .projectpal/artifacts/technical-details/example-technical-details.md "$TMP_DIR/bridge-summary.md" repo-bridge > /dev/null
 synced_state=$(cat "$TMP_DIR/state.yml")
 assert_contains "$synced_state" "resume_source: repo-bridge"
 assert_contains "$synced_state" "repo_root_hint: /tmp/original-root"
-assert_contains "$synced_state" "last_artifact_ref: .projectpal/artifacts/tech-spec/example-spec.md"
+assert_contains "$synced_state" "last_artifact_ref: .projectpal/artifacts/technical-details/example-technical-details.md"
 assert_contains "$synced_state" "Resume from the approved artifact and bridge summary only."
 
 reduction_output=$(run_flow reduction-report "$TMP_DIR/baseline-summary.yml" "$TMP_DIR/new-flow-summary.yml")
