@@ -2,7 +2,7 @@ repo_slug: projectpal-test
 repo_root_hint: /tmp/projectpal-test
 current_project: test-project
 current_phase: 7
-cynefin_domain: simple
+complexity_domain: simple
 last_session: "2026-04-15T12:00:00.000Z"
 resume_source: local-bridge
 synced_at: "2026-04-15T12:00:00.000Z"

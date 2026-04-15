@@ -1,4 +1,4 @@
-<!-- Ownership: Neutral index of Layer 1 responsibilities referenced by generated runtime surfaces. -->
+
 
 # Shared Layer 1 Index
 
@@ -9,22 +9,17 @@ This index exists so the neutral source can refer to those responsibilities with
 ## Deferred instruction map
 
 - `instructions/phase-protocols.md`
-  Phase 0, Phase 1, Refinement, and Phase 4/7/8 detailed protocols.
-
+Phase 0, Phase 1, Refinement, and Phase 4/7/8 detailed protocols.
 - `instructions/mempalace-onboarding.md`
-  MemPalace setup, reconnect, and local-only onboarding flows.
-
+MemPalace setup, reconnect, and local-only onboarding flows.
 - `instructions/session-resumption-schema.md`
-  Repo resolution, resume schemas, partial-context logic, and bridge save cadence.
-
+Repo resolution, resume schemas, partial-context logic, and bridge save cadence.
 - `instructions/mempalace-integration.md`
-  Repo-scoped memory behavior, diary use, and artifact loading rules.
-
+Repo-scoped memory behavior, diary use, and artifact loading rules.
 - `instructions/sub-agent-invocation.md`
-  Sub-agent contracts and Refinement / ticket generation orchestration.
-
+Sub-agent contracts and Refinement / ticket generation orchestration.
 - `instructions/artifacts.md`
-  Artifact layout, frontmatter contracts, and Refinement / Technical Details templates.
+Artifact layout, frontmatter contracts, and Refinement / Technical Details templates.
 
 ## Constraint
 

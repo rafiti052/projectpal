@@ -34,11 +34,13 @@
   },
   "agents": {
     "pal": "Pal",
-    "problem_solver": "Problem Solver",
+    "strategist": "Strategist",
+    "complexity_analyst": "Complexity Analyst",
+    "designer": "Designer",
     "architect": "Architect",
     "manager": "Manager",
     "tech_lead": "Tech Lead",
-    "ticket_generator": "Tech Lead"
+    "scrum_master": "Scrum Master"
   },
   "ui": {
     "check_in": "Check-in",

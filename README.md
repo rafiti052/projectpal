@@ -140,10 +140,11 @@ projectpal/
 ├── prompts/
 │   ├── architect-agent.md            ← Internal Architect reviewer prompt
 │   ├── manager-agent.md              ← Internal Manager reviewer prompt
-│   ├── brief-generate.md             ← Internal Brief drafting prompt
-│   ├── technical-details-generate.md ← Internal Technical Details drafting prompt
-│   ├── tickets-generate.md           ← Ticket generation prompt
-│   └── cynefin-classify.md           ← Domain classification prompt
+│   ├── strategist-agent.md           ← Strategist Brief drafting prompt
+│   ├── designer-agent.md             ← Designer wave-review prompt
+│   ├── complexity-analyst.md         ← Complexity classification prompt
+│   ├── tech-lead-agent.md            ← Technical Details drafting prompt
+│   └── scrum-master-agent.md         ← Ticket generation prompt
 ├── docs/
 │   ├── maintainer-codex-reinstall.md ← Maintainer-only clean reinstall guide
 │   └── north-star.md          ← Current product direction note
@@ -169,7 +170,7 @@ Repo detection resolves the git repo root first and uses that directory name as 
 | M4 | Technical Details + tickets | ✅ |
 | M5 | Parking Lot + session resumption | ✅ |
 | M6 | MemPalace onboarding — graceful detection, install guidance, local-only fallback | ✅ |
-| M7 | Full sub-agent pipeline — all 6 internal roles wired, with shipped labels aligned to Problem Solver, Architect, Manager, and Tech Lead | ✅ |
+| M7 | Full sub-agent pipeline — seven internal roles wired (Strategist, Architect, Manager, Tech Lead, Scrum Master, Complexity Analyst, Designer) | ✅ |
 | **The Test** | **The website gets rewritten** | **pending** |
 
 ## The North Star

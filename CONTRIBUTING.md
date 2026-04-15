@@ -2,6 +2,27 @@
 
 Thanks for contributing. This guide gets you from a fresh clone to a working dev environment.
 
+## Product-first contribution rule
+
+Every contribution (manual or AI-assisted) must deliver clear value to the **shell product** that end users interact with.
+
+- TypeScript/Node code under `src/`, `tests/`, and scripts are runtime helpers for now.
+- Helper/runtime-only work is valid only when it is explicitly tied to user-visible behavior, install flow, or shipped assistant experience.
+- If a change does not improve what users can do in ProjectPal shell surfaces (`AGENTS.md`, `CLAUDE.md`, installed skills/rules/prompts), it is not complete yet.
+- When adding internals, include the shipping path in the same change (or document the exact follow-up blocker in the ticket artifact).
+- Before opening a PR, run `sh scripts/projectpal-runtime-tests.sh` to verify generated and installed user-facing surfaces still reflect intended behavior.
+
+### Temporary runtime scaffolding workflow
+
+It is acceptable to create temporary TypeScript/runtime helper files, tests, and scripts to think through a feature and verify behavior quickly.
+
+Before committing:
+
+1. Keep only files that are required for shipped shell behavior or its persistent verification gates.
+2. Remove temporary scaffolding (`src/**` runtime experiments, ad-hoc tests, throwaway scripts) that does not directly ship user value.
+3. Regenerate runtime surfaces (`sh sync-codex-plugin.sh`) and re-run runtime checks (`pnpm runtime:test`).
+4. Confirm the final diff is clean, architecture-aligned, and focused on end-user outcomes.
+
 ---
 
 ## Prerequisites
