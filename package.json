@@ -6,7 +6,8 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "layer0": "tsx scripts/layer0-check.ts --fixture"
+    "layer0": "tsx scripts/layer0-check.ts --fixture",
+    "runtime:test": "sh scripts/projectpal-runtime-tests.sh"
   },
   "dependencies": {
     "yaml": "^2.7.0"

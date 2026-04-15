@@ -31,7 +31,7 @@ It exists to verify wave scheduling, exclusive write ownership, bridge-save mile
 - Role slots: builder, verifier optional
 
 ## Ownership Boundaries
-- Ticket 101 exclusively owns `prompts/tickets-generate.md`
+- Ticket 101 exclusively owns `prompts/scrum-master-agent.md`
 - Ticket 102 exclusively owns `scripts/projectpal-flow.sh`
 - Ticket 103 is blocked until tickets 101 and 102 are complete
 - Ticket 104 owns `.projectpal/state.yml` for bridge-sync milestone updates

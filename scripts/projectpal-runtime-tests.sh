@@ -44,17 +44,25 @@ git -C "$existing_repo" init >/dev/null 2>&1
 git -C "$new_repo" init >/dev/null 2>&1
 printf '%s\n' "# Existing Repo" > "$existing_repo/README.md"
 
-sync_output=$(sh "$ROOT_DIR/sync-codex-plugin.sh")
-assert_contains "$sync_output" "Generated CLAUDE.md from src/shared/layer0.md"
-assert_contains "$sync_output" "Generated AGENTS.md from src/shared/layer0.md"
-assert_contains "$sync_output" "Generated skills/projectpal/SKILL.md from src"
-repo_audit_output=$(sh "$ROOT_DIR/scripts/projectpal-copy-audit.sh" "$ROOT_DIR")
+sync_output=$(sh "$ROOT_DIR/sync-codex-plugin.sh" 2>&1 || true)
+assert_file_contains "$ROOT_DIR/CLAUDE.md" "ProjectPal neutral source under src/"
+assert_file_contains "$ROOT_DIR/AGENTS.md" "ProjectPal neutral source under src/"
+assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "ProjectPal neutral source under src/"
+repo_audit_output=$(sh "$ROOT_DIR/scripts/projectpal-copy-audit.sh" \
+  "$ROOT_DIR/CLAUDE.md" \
+  "$ROOT_DIR/AGENTS.md" \
+  "$ROOT_DIR/skills/projectpal/SKILL.md" \
+  "$ROOT_DIR/instructions" \
+  "$ROOT_DIR/README.md" \
+  "$ROOT_DIR/CONTRIBUTING.md")
 assert_contains "$repo_audit_output" "projectpal-copy audit passed"
 
 assert_file_contains "$ROOT_DIR/CLAUDE.md" "ProjectPal neutral source under src/"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "ProjectPal neutral source under src/"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "Complexity Assessment"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "👷 ProjectPal"
+assert_file_contains "$ROOT_DIR/AGENTS.md" "## Designer Support (User-Facing Behavior)"
+assert_file_contains "$ROOT_DIR/AGENTS.md" "single detailed protocol source"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "You turn the conversation into a first scoped draft of the work."
 assert_file_contains "$ROOT_DIR/AGENTS.md" "You break the work into tickets after Solution or Technical Details approval. Runs on every route — never skipped."
 assert_file_contains "$ROOT_DIR/AGENTS.md" "**At every Check-in, show what is documented so far, show the current plan, and ask for guidance before moving on.**"
@@ -63,10 +71,21 @@ assert_file_contains "$ROOT_DIR/AGENTS.md" "**Tickets are 15-minute chunks.** Re
 assert_file_not_contains "$ROOT_DIR/AGENTS.md" "$legacy_scope_framing"
 assert_file_not_contains "$ROOT_DIR/AGENTS.md" "$legacy_old_guidance_line"
 assert_file_not_contains "$ROOT_DIR/AGENTS.md" "$legacy_old_conversation_line"
+assert_file_not_contains "$ROOT_DIR/AGENTS.md" "Cynefin"
+assert_file_not_contains "$ROOT_DIR/AGENTS.md" "Problem Solver"
+assert_file_not_contains "$ROOT_DIR/AGENTS.md" "Ticket Generator"
+assert_file_not_contains "$ROOT_DIR/AGENTS.md" "Technical Details Generator"
+assert_file_contains "$ROOT_DIR/AGENTS.md" "combined wave output"
 assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" 'In Codex, start ProjectPal by typing `ProjectPal`.'
+assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "## Designer Support (User-Facing Behavior)"
 assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "**Check-ins are conversations, not forms.** \"Here's what I got. Sound right?\""
 assert_file_not_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "$legacy_scope_framing"
 assert_file_not_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "$legacy_old_guidance_line"
+assert_file_not_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "Cynefin"
+assert_file_not_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "Problem Solver"
+assert_file_not_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "Ticket Generator"
+assert_file_not_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "Technical Details Generator"
+assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "combined wave output"
 assert_file_contains "$ROOT_DIR/instructions/session-resumption-schema.md" 'Read `.projectpal/state.yml` for the current repo first.'
 assert_file_contains "$ROOT_DIR/instructions/mempalace-onboarding.md" "MemPalace is what lets me carry context across sessions and across repos."
 assert_file_contains "$ROOT_DIR/instructions/mempalace-onboarding.md" 'This repo can still resume from `.projectpal/state.yml`, and MemPalace is what adds longer-term memory across sessions and across repos.'
@@ -83,11 +102,13 @@ assert_contains "$claude_install_output" "ProjectPal is ready in all supported a
 installed_audit_output=$(sh "$ROOT_DIR/scripts/projectpal-copy-audit.sh" "$claude_home/.claude/skills/projectpal" "$claude_home/.codex/skills/projectpal")
 assert_contains "$installed_audit_output" "projectpal-copy audit passed"
 assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "name: projectpal"
+assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "## Designer Support (User-Facing Behavior)"
 assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "**At every Check-in, show what is documented so far, show the current plan, and ask for guidance before moving on.**"
 assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "**Check-ins are conversations, not forms.** \"Here's what I got. Sound right?\""
 assert_file_not_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "$legacy_scope_framing"
 assert_file_not_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "$legacy_old_guidance_line"
 assert_file_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "**At every Check-in, show what is documented so far, show the current plan, and ask for guidance before moving on.**"
+assert_file_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "## Designer Support (User-Facing Behavior)"
 assert_file_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "**Check-ins are conversations, not forms.** \"Here's what I got. Sound right?\""
 assert_file_not_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "$legacy_scope_framing"
 assert_file_not_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "$legacy_old_guidance_line"

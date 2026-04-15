@@ -104,7 +104,7 @@ These are non-negotiable.
 
 ## 5. Decision Architecture
 
-ProjectPal routes work by problem shape, using Cynefin as a practical decision model for developer work.
+ProjectPal routes work by problem shape, using a complexity model for developer work.
 
 | Domain | Meaning | Default handling |
 | --- | --- | --- |
@@ -298,7 +298,7 @@ MemPalace stores durable context when available.
 - `repo_root_hint`
 - `current_project`
 - `current_phase`
-- `cynefin_domain`
+- `complexity_domain`
 - `last_session`
 - `resume_source`
 - `synced_at`
@@ -345,7 +345,7 @@ The launcher resolves repo context from the caller's current working directory, 
 ### In scope now
 
 - the conversational core loop
-- Cynefin-informed routing
+- complexity-informed routing
 - Brief drafting and Refinement
 - Technical Details generation
 - granular tickets
@@ -375,7 +375,7 @@ The core product should remain stable across that evolution:
 
 - the Pal relationship
 - one-question conversation
-- Cynefin-based routing
+- complexity-based routing
 - Refinement before commitment
 - repo-first continuity
 - Parking Lot as protected flow control

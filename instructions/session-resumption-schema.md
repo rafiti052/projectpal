@@ -1,4 +1,4 @@
-<!-- Ownership: Layer 1 session-resumption schema lives here; source text originates in CLAUDE.md and is loaded when repo continuity detail is needed. -->
+
 
 # Session Resumption Schema
 
@@ -21,6 +21,7 @@
 ## Schema contract
 
 `RepoAnchor` lives in repo-scoped memory and carries:
+
 - `repo_slug`
 - `repo_root_hint` when known
 - `last_phase`
@@ -30,6 +31,7 @@
 - `memory_refs[]` for related repo-scoped drawers
 
 `FeatureScope` lives in repo-scoped memory and carries:
+
 - `repo_slug`
 - `feat_slug`
 - `phase`
@@ -38,11 +40,12 @@
 - `updated_at`
 
 `ResumeBridge` lives in `.projectpal/state.yml` and carries:
+
 - `repo_slug`
 - `repo_root_hint` when known
 - `current_project`
 - `current_phase`
-- `cynefin_domain`
+- `complexity_domain`
 - `last_session`
 - `resume_source`
 - `synced_at`
@@ -60,6 +63,7 @@ Lean v1 stores orchestration data under `thread_orchestration` in `.projectpal/s
 - `shared_context_refs[]` may point at reusable artifacts or repo memory, but those refs do not transfer orchestration ownership or approval across threads.
 
 `ThreadOrchestrationState` lives under `thread_orchestration.threads[]` and carries:
+
 - `thread_id`
 - `primary_assistant`
 - `reporting_owner` = `pal`
@@ -71,6 +75,7 @@ Lean v1 stores orchestration data under `thread_orchestration` in `.projectpal/s
 - `updated_at`
 
 `ExecutionPathRecord` lives under `thread_orchestration.execution_paths[]` and carries:
+
 - `execution_path_id`
 - `assistant`
 - `connector`
@@ -84,11 +89,13 @@ Lean v1 stores orchestration data under `thread_orchestration` in `.projectpal/s
 - `approved_at`
 
 Notes:
+
 - The approved path boundary is defined by `connector`, `provider`, `runtime_path`, `auth_scope`, and `quality_tier`.
 - If any boundary field changes, the candidate path is outside the approved path and `approval_required = true`.
 - A model swap is automatic only when it stays inside the same approved path boundary and the same `quality_tier`.
 
 `ConnectorStatusSnapshot` lives under `thread_orchestration.connector_status_snapshots[]` and carries:
+
 - `connector_identity`
 - `auth_state` = `available | missing | expired | denied | unknown`
 - `availability_state` = `available | degraded | unavailable | unknown`
@@ -97,6 +104,7 @@ Notes:
 - `checked_at`
 
 Persistence guard:
+
 - `connector_owns_auth` = `true`
 - `allowed_metadata_fields[]` = `auth_state`, `availability_state`, `last_failure_reason`, `quota_state`
 - `connector_identity` and `checked_at` may be stored as non-secret structural context.
@@ -104,6 +112,7 @@ Persistence guard:
 - If the connector cannot safely expose a metadata field, persist `unknown` instead of inferring detail.
 
 `DelegationTask` lives under `thread_orchestration.delegation_tasks[]` and carries:
+
 - `task_id`
 - `thread_id`
 - `task_type` = `drafting | critique | bounded_implementation`
@@ -116,6 +125,7 @@ Persistence guard:
 - `finished_at`
 
 `FallbackRecord` lives under `thread_orchestration.fallback_records[]` and carries:
+
 - `fallback_id`
 - `task_id`
 - `attempt_number`
@@ -211,7 +221,7 @@ partial_context:
 
 1. Read the answered fields
 2. Generate re-entry from source excerpt of the first answered field:
-   *"Last time you mentioned [source]. Tell me more about that, or is there something new?"*
+  *"Last time you mentioned [source]. Tell me more about that, or is there something new?"*
 3. Queue unanswered fields in priority order (who → pain → direction → success)
 4. Ask the highest-priority unanswered field next — one question only
 5. Never re-ask answered fields. Never push to Phase 1 until all four are answered.
@@ -228,3 +238,4 @@ To preserve resume continuity during long sessions or interrupted runs, ProjectP
 - During long phases, save the local bridge after each meaningful batch of work, using the freshest `last_artifact_ref`, `next_steps`, and `bridge_summary`.
 - Before any likely interruption point, such as a long sub-agent run, large edit batch, or implementation batch that may exceed the session budget, save the local bridge first.
 - If work stops unexpectedly, the bridge should be specific enough that the next session can resume from the last completed batch rather than replaying the whole phase.
+

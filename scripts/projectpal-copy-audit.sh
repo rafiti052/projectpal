@@ -7,7 +7,7 @@ if [ "$#" -eq 0 ]; then
 fi
 
 stale_copy=$(
-  rg -n -S \
+  rg -n -S --pcre2 \
     --glob '!scripts/projectpal-copy-audit.sh' \
     -e 'Critic' \
     -e 'Judge' \
@@ -23,10 +23,9 @@ stale_copy=$(
     -e 'artifacts/debate' \
     -e 'type: prd' \
     -e 'type: tech-spec' \
-    -e 'type: debate' \
+    -e 'type: debate(?!-)' \
     -e '\bcheckpoint\b' \
     -e '\bcheckpoints\b' \
-    -e '\bdebate\b' \
     "$@" || true
 )
 

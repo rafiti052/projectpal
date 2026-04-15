@@ -34,13 +34,22 @@ Phase 0 is complete when ProjectPal can answer all four of these from the conver
 3. What's the proposed direction? (at least a vague solution shape)
 4. What does success look like? (rough is fine — "I'd know it's working if...")
 
+### Designer opt-in trigger (Discovery)
+
+During Discovery, evaluate whether the user request is design-relevant (layout, interaction flow, information hierarchy, accessibility behavior, or cross-device responsiveness).
+
+- If design relevance is strong and no higher-priority Discovery question is unresolved, ask:
+  - *"This sounds design-relevant. Want me to include a Designer pass as we shape it?"*
+- Preserve one-question cadence. If core Discovery readiness is still unresolved, that readiness question outranks Designer opt-in in the current turn.
+- If user declines Designer opt-in, do not re-ask immediately. Permit at most one re-offer in the same session only when materially stronger design signals appear.
+
 Track these internally. Never display a checklist or progress bar to the user. When all four are answerable, invoke the complexity classifier sub-agent, but only at the natural end of an exchange, never mid-response.
 
 Actively test whether the work can safely be treated as a **Clear path**, especially in existing repos with strong conventions and well-bounded scope. Refinement is expensive, so do not force it when the work is already tight and obvious.
 
-**Complexity classifier sub-agent protocol:**
+**Complexity Analyst sub-agent protocol:**
 ```
-Agent(Cynefin Classifier) receives: prompts/cynefin-classify.md prompt + full Phase 0 conversation transcript (inline)
+Agent(Complexity Analyst) receives: prompts/complexity-analyst.md prompt + full Phase 0 conversation transcript (inline)
 Pal captures: complexity zone, confidence, plain-terms summary, route sentence, and whether one more question is needed
 ```
 
@@ -50,7 +59,7 @@ Standard transition: *"I think I have the shape of it now. This feels like [rout
 
 If the user asks what that means: *"To me, this looks like [complexity zone] because [plain English reason]. Does that feel right, or is it messier than that?"*
 
-Always propose the assessment in plain English first. Reveal the internal Cynefin label only if the user asks for it or the implementation needs it. If the classifier says one more question is needed, ask that question before proposing any route.
+Always propose the assessment in plain English first. Reveal the internal complexity label only if the user asks for it or the implementation needs it. If the Complexity Analyst says one more question is needed, ask that question before proposing any route.
 
 **Thin-answer handling:**
 
@@ -87,8 +96,8 @@ If results are empty or irrelevant, proceed without blocking. Do not mention the
 
 **Brief drafting sub-agent protocol:**
 ```
-Agent(Problem Solver) receives:
-  - prompts/brief-generate.md prompt
+Agent(Strategist) receives:
+  - prompts/strategist-agent.md prompt
   - Full Phase 0 conversation transcript (inline)
   - Confirmed complexity assessment (inline)
   - Parking Lot items tagged phase:brief (inline, or "none")
@@ -121,19 +130,20 @@ Do not spend Refinement on a **Clear path** just because the capability exists. 
 
 The user sees only the final refined Brief, not the intermediate refinement record. But if they ask, show it.
 
-### Refinement Check-in rule
+### Refinement Check-in rule (3-way debate)
 
-After the full Refinement pass completes, always bring a short human summary back to the user before moving on.
+Run Refinement as the bounded debate in `instructions/sub-agent-invocation.md` (Strategist ↔ Architect ↔ Manager, max three rounds). The user sees only the **Pal-synthesized** Brief and a short summary — not the debate record unless they ask.
 
-- Do not summarize refinement findings to the user after the Architect alone. The user-facing summary happens after the Manager so it reflects the real refined outcome.
+- Do not surface a user-facing Refinement summary after the Architect alone. If any persona **rejects**, run the Strategist revision loop before the user sees anything new.
 - If the Architect returns `NEEDS REWORK`, stop and surface that blocker directly because the Manager will not run.
-- If the Manager runs, use the Manager result as the source of truth for the summary and follow-up questions.
-- The user must answer blocker judgments explicitly before the Brief can proceed.
-- If the refinement pass returns non-blocker concerns, surface them one at a time after the summary.
+- After **all** sign-offs are `approved` or `approved-with-concern`, the Pal synthesizes the final Brief into the artifact and **that** version drives the Check-in summary.
+- If round 3 exhausts without consensus, escalate with an unresolved summary — do not silently merge.
+- The user must answer blocker judgments explicitly before the Brief can proceed when blockers remain.
+- If the pass returns non-blocker concerns, surface them one at a time after the summary.
 - The user must explicitly pass, revise, or defer each concern before the Brief can be treated as approved.
-- Never silently carry a `PASS WITH REVISIONS` Brief into Phase 4.
+- Never silently carry a `PASS WITH REVISIONS` posture into Phase 4 without user handling of flagged concerns.
 - Keep the same one-question-per-turn rhythm used in Discovery: after the summary, ask only one concern question, wait for the answer, then ask the next.
-- Never narrate backstage steps like the Problem Solver, Architect, or Manager while they run. If progress needs to be shown, reference the visible stage only.
+- Never narrate backstage steps like the Strategist, Architect, or Manager while they run. If progress needs to be shown, reference the visible stage only.
 
 ## Phase 4: Planning Protocol
 
@@ -172,8 +182,8 @@ If results are empty or irrelevant, proceed without blocking. Do not mention the
 
 **Technical Details sub-agent protocol:**
 ```
-Agent(Technical Details Generator) receives:
-  - prompts/technical-details-generate.md prompt
+Agent(Tech Lead) receives:
+  - prompts/tech-lead-agent.md prompt
   - Full approved Brief text (inline — read from .projectpal/artifacts/brief/<name>.md)
   - MemPalace search results (inline, or "none")
   - Parking Lot items tagged phase:4 or phase:technical-details (inline, or "none")
@@ -235,15 +245,25 @@ After tickets are generated and saved, implementation begins. Do not clean up ar
 - Read the ticket set from `.projectpal/artifacts/tickets/`.
 - Read the bundle by wave order first. Do not start a later wave until the current wave's exit criteria are satisfied or the remaining blocked work is explicitly deferred.
 - Treat `begin_thread` as the ownership gate for thread-local orchestration: the first assistant in a thread sets `primary_assistant`, and every later entry to that same thread preserves the existing owner instead of silently reassigning it.
+- Each ticket is executed by an **Engineer** instance (implementation worker). Multiple Engineers may run in parallel within a wave when `depends_on` and `allowed_writes` allow it. Each Engineer only writes within its ticket's `allowed_writes` scope.
 - Within a wave, parallelize only the tickets whose `depends_on` chain is satisfied and whose `allowed_writes` do not overlap on an exclusive write surface.
 - Keep write ownership clear when parallelizing: each worker gets a distinct file or module responsibility and must not revert other workers' edits.
 - Treat `builder` as the default execution owner. Use `reviewer` or `verifier` only when the wave or ticket explicitly asks for an optional role slot.
+- After each wave completes, if `designer_opt_in=true`, invoke `Agent(Designer)` on the **combined wave output** before starting the next wave. A `changes-requested` verdict blocks the next wave until the Pal resolves the listed changes.
 - Update ticket state in place as `queued`, `blocked`, `running`, `complete`, or `deferred`.
 - When a ticket is blocked, record the exact dependency or ownership boundary that caused the block before moving on.
 - Prefer existing codebase patterns and small, verifiable changes over broad rewrites.
 - After each meaningful batch, run the smallest useful verification for the changed surface.
 - Before any likely interruption point or long-running batch, sync `.projectpal/state.yml` so resume starts from the latest finished wave or ticket group.
 - If a ticket cannot be implemented in the current session, leave artifacts intact and write the exact next ticket or action to the diary.
+
+### Designer review-pass completion gate (when opted in)
+
+If `designer_opt_in=true` for the active thread:
+- Run **wave-level** Designer review after each Implementation wave (combined output), per `instructions/sub-agent-invocation.md`.
+- Optionally retain a lightweight pre-plan / post-plan pass if the batch contract still calls for it — do not substitute those for the wave gate when tickets are driving execution.
+- Require final visual/experience review completion before Wrap Up closure when UI shipped in the batch.
+- Treat missing final review or an unresolved `changes-requested` wave as a phase-closure blocker, not as an optional note.
 
 ### Lean v1 fallback policy
 

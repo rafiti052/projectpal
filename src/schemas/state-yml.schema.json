@@ -9,7 +9,7 @@
     "repo_root_hint": { "type": "string" },
     "current_project": { "type": ["string", "null"] },
     "current_phase": { "type": ["integer", "null"] },
-    "cynefin_domain": { "type": ["string", "null"] },
+    "complexity_domain": { "type": ["string", "null"] },
     "last_session": { "type": ["string", "null"] },
     "resume_source": { "type": ["string", "null"] },
     "synced_at": { "type": ["string", "null"] },
