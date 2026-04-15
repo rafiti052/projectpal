@@ -27,17 +27,23 @@ Scan the Brief's Risks & Open Questions. For each open question:
 - If it's a preference (non-blocking): make a recommendation, state the rationale, and flag as a decision point for user confirmation.
 
 **Step 3 — Draft all 8 sections.**
-Write the technical details. Respect the Brief scope — do not gold-plate.
+Write the technical details. Respect the Brief scope — do not gold-plate. Prefer **note, don't build** in **Risks & Unknowns** for hypothetical scale (name where rigor might grow later; do not commit to frameworks or layers the Brief did not require).
 
-**Step 4 — Size all Implementation Plan items.**
+**Step 4 — AHA self-audit (Avoid Hasty Abstractions) on your drafted output.**
+Scan the **drafted** Technical Details (all sections, especially Implementation Plan, Dependencies & Stack, Key Technical Decisions, and Risks) for: (a) **premature test infrastructure** — frameworks, harnesses, coverage gates, CI matrices not required by the Brief or proven failure mode; (b) **speculative architectural layers** — new services, indirection, or patterns the Brief did not ask for; (c) **over-engineered scaffolding** — machinery that exceeds current scope. For each hit in **your output**: remove it, shrink to the Brief's intent, or rewrite as a short **Risks & Unknowns** line that *names* a future fork without building it.
+
+**Before suggesting removal of existing repo contracts:** Read `.projectpal/artifacts/brief/connector-wiring.md` and any other **approved in-repo Brief** that mandates infrastructure. **Do not** treat connector-mandated surfaces (router, approval gate, fallback, session fields tied to that track) as AHA "cleanup" targets — AHA trims **new** plan text that exceeds Brief scope, not shipped contracts another Brief still needs.
+
+**Step 5 — Size all Implementation Plan items.**
 Each item must be sized S (~~15 min) or M (~~45 min). If any item is L (>45 min): decompose it inline into ≥2 ordered S/M sub-steps before finalizing. Label decomposed sub-steps clearly with the parent item's name.
 
-**Step 5 — Structural self-review.**
+**Step 6 — Structural self-review.**
 Before finalizing, verify:
 
 - Every entity mentioned in the Brief Problem Statement appears in the Data Model
 - Every Implementation Plan item is sized S or M (no L items remain)
 - All Parking Lot items tagged `phase:4` or `phase:technical-details` are incorporated or flagged as Deferred
+- The AHA self-audit did not leave premature test infra or speculative layers in the plan unless the Brief or a stated failure mode truly demands them
 
 If any check fails: fix inline before producing output.
 
@@ -81,4 +87,8 @@ spikes: [<question>: resolved | open]  # omit if none
 - **Never bury a blocking spike in Risks only.** A blocking unknown must appear as Step 1 of the Implementation Plan.
 - **Never silently commit to an open decision.** Recommend a direction and flag it for confirmation.
 - **Never include a mermaid diagram for a simple system.** The threshold is ≥3 components with non-obvious interactions.
+- **Never default in test frameworks, harnesses, or coverage machinery** unless the Brief or an explicit quality bar in scope requires them — smallest verification that fits the work wins.
+- **Never add architectural layers or services** the Brief did not ask for — acknowledge scaling paths in Risks; do not build them in the Implementation Plan without demonstrated need.
+- **Never use AHA to strip Brief-mandated infrastructure** — e.g. connector wiring and lean v1 contracts documented in `.projectpal/artifacts/brief/connector-wiring.md` stay unless a superseding Brief says otherwise.
+- **Never satisfy AHA cosmetically** — renaming "framework setup" to "quality work" without shrinking scope is still hasty abstraction.
 

@@ -54,8 +54,11 @@ Write each of the 7 sections. Calibrate Proposed Solution depth by complexity zo
 
 For Kill Criteria: calibrate depth but never omit the section.
 
-**Step 5 — Self-verify before finalizing.**
-Check: (a) no invented requirements — every claim traces to a user utterance; (b) all four readiness dimensions appear in ≥1 section; (c) every gap is flagged explicitly with "This wasn't discussed yet: [topic]"; (d) the three Proposed Solution subsections exist and are non-placeholder unless gaps are explicitly flagged there too.
+**Step 5 — AHA pass (Avoid Hasty Abstractions).**
+Before self-verify: scan **Proposed Solution**, **Scope**, and **Success Criteria** for depth the transcript did not earn — (a) test frameworks, harnesses, or coverage plans with no user basis; (b) services, platforms, or architectural layers not grounded in what was said; (c) speculative scaling commitments presented as decided work. For each hit: remove it, tighten to intent, or move **one** honest sentence to **Risks & Open Questions** as *where complexity might live later* — **note, don't build**. AHA is about **depth of commitment**, not facts: **Never invent requirements** still wins; this step only strips *extra* implementation or test rigging the transcript does not support.
+
+**Step 6 — Self-verify before finalizing.**
+Check: (a) no invented requirements — every claim traces to a user utterance; (b) all four readiness dimensions appear in ≥1 section; (c) every gap is flagged explicitly with "This wasn't discussed yet: [topic]"; (d) the three Proposed Solution subsections exist and are non-placeholder unless gaps are explicitly flagged there too; (e) the AHA pass did not reintroduce hasty abstraction after you trimmed it.
 
 ## Output
 
@@ -97,4 +100,5 @@ Write the body in the language the user spoke. If the conversation was multiling
 - **Never pad flagged sections.** "This wasn't discussed yet: [topic]" is complete and correct output.
 - **Never skip the English Summary** if the body is in another language.
 - **Never remove the three Proposed Solution subsections** — if empty, each must say what was not discussed.
+- **Never smuggle implementation or test infrastructure** the user did not earn in the transcript — frameworks, harnesses, default stacks, or new subsystems belong in Risks as a future *maybe*, not in Scope or Proposed Solution as a commitment, unless the user (or an explicit in-repo Brief supplied to you) already demanded them.
 
