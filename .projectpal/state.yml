@@ -1,0 +1,51 @@
+repo_slug: projectpal
+repo_root_hint: /Users/rafael/Dev/projectpal
+current_project: flow-optimization-and-personas
+current_phase: 0
+complexity_domain: complicated
+last_session: 2026-04-15T22:10:00-03:00
+resume_source: local-bridge
+synced_at: 2026-04-15T22:10:00-03:00
+artifacts_dir: .projectpal/artifacts
+bridge_summary: |
+  Persona Debate Cycle is closed in-repo: seven sub-agent prompts, debate protocol in contracts,
+  phase-protocol and artifact updates, complexity rename (state + labels + north star), legacy
+  four prompts removed, runtime + copy-audit tests green. Next up: v0.4.x flow-optimization track —
+  AHA in Planning/Technical Details, then flow audit (see parking lot).
+last_artifact_ref: .projectpal/artifacts/brief/connector-wiring.md
+partial_context:
+  complete: true
+  readiness:
+    who_has_the_problem:
+      answered: true
+      source: "Continue v0.4.x flow-optimization: AHA principle in Planning/Technical Details, then token-flow audit after persona behavior is stable."
+    whats_the_pain:
+      answered: true
+      source: "Persona pipeline + naming work shipped; remaining pain is depth of Planning/Technical Details (AHA) and later trimming orchestration token waste."
+    proposed_direction:
+      answered: true
+      source: "Pick up AHA in Planning/Technical Details next; defer heavy flow optimization until after that lands."
+    what_does_success_look_like:
+      answered: true
+      source: "AHA reflected in internal docs and prompts where it changes behavior; flow audit produces a concrete trim list without destabilizing the new debate path."
+thread_orchestration:
+  active_thread_id: codex-session-20260415T120038-0300
+  threads:
+    - thread_id: codex-session-20260415T120038-0300
+      primary_assistant: codex
+      reporting_owner: pal
+      state: idle
+      approved_execution_path_id: null
+      approval_state: not_needed
+      shared_context_refs:
+        - .projectpal/artifacts/brief/connector-wiring.md
+      created_at: 2026-04-15T12:00:38-03:00
+      updated_at: 2026-04-15T22:10:00-03:00
+  execution_paths: []
+  connector_status_snapshots: []
+  delegation_tasks: []
+  fallback_records: []
+next_steps:
+  - Open parking lot item for AHA in Planning/Technical Details when you start the next session.
+  - Optional: formalize connector-wiring from the brief into a new artifact set if that track becomes active.
+  - Run `pnpm runtime:test` after any further doc or layer0 edits.
