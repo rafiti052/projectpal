@@ -14,12 +14,15 @@ The goal is to stop treating generated runtime files as the source of truth and 
 ```text
 src/
   README.md
+  fallback-handler.md
   shared/
     layer0.md
     layer1-index.md
   adapters/
     claude.md
     codex.md
+    cursor.md
+    gemini.md
     runtime-output-prefix.md
     codex-skill-header.md
     codex-skill-footer.md
@@ -56,6 +59,9 @@ src/
 
 ## Scope
 
-This source tree is currently scoped to the shipped Claude and Codex surfaces only.
+This source tree is still centered on the shipped Claude and Codex runtime surfaces, but it now also carries the contract and install-source material for Gemini routing and Cursor setup.
 
-Future runtimes such as Gemini or Cursor may get adapters later, but they are intentionally out of scope for this phase so the neutral source does not get abstract too early.
+That means the shared source owns:
+- generated Claude and Codex runtime instructions
+- adapter contracts for Gemini and Cursor
+- repo-install templates such as `templates/routing.yml` and `templates/cursor-rules-projectpal.md`

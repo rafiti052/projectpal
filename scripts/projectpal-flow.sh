@@ -254,6 +254,7 @@ command_probe_assistants() {
   target_dir=$(canonical_dir "${1:-.}")
   claude_signal=false
   codex_signal=false
+  cursor_signal=false
   preferred=codex
   confidence=inconclusive
   fallback_used=true
@@ -264,6 +265,9 @@ command_probe_assistants() {
   if [ -f "$target_dir/.codex-plugin/plugin.json" ] || [ -f "$target_dir/skills/projectpal/SKILL.md" ] || [ -f "$target_dir/sync-codex-plugin.sh" ]; then
     codex_signal=true
   fi
+  if [ -f "$target_dir/sync-cursor-skill.sh" ]; then
+    cursor_signal=true
+  fi
 
   if [ -n "${PROJECTPAL_ASSISTANT_HINT:-}" ]; then
     preferred=$PROJECTPAL_ASSISTANT_HINT
@@ -271,6 +275,10 @@ command_probe_assistants() {
     fallback_used=false
   elif [ "$claude_signal" = "true" ] && [ "$codex_signal" = "false" ]; then
     preferred=claude
+    confidence=high
+    fallback_used=false
+  elif [ "$claude_signal" = "false" ] && [ "$codex_signal" = "false" ] && [ "$cursor_signal" = "true" ]; then
+    preferred=cursor
     confidence=high
     fallback_used=false
   elif [ "$claude_signal" = "false" ] && [ "$codex_signal" = "true" ]; then
@@ -285,12 +293,16 @@ command_probe_assistants() {
   printf '%s\n' "signals:"
   printf '%s\n' "  - claude:$claude_signal"
   printf '%s\n' "  - codex:$codex_signal"
+  printf '%s\n' "  - cursor:$cursor_signal"
 }
 
 assistant_handoff_message() {
   case ${1:-codex} in
     claude)
       printf '%s\n' "Open Claude Code in this repo and run /projectpal."
+      ;;
+    cursor)
+      printf '%s\n' "Open Cursor in this repo and start ProjectPal."
       ;;
     gemini)
       printf '%s\n' "Open Gemini in this repo and start ProjectPal."
@@ -358,10 +370,14 @@ command_prepare_repo() {
   artifacts_dir=$projectpal_dir/artifacts
   state_path=$projectpal_dir/state.yml
   gitignore_path=$repo_root/.gitignore
+  cursor_rules_dir=$repo_root/.cursor/rules
+  cursor_rules_path=$cursor_rules_dir/projectpal.md
+  cursor_rules_template=$SCRIPT_DIR/../templates/cursor-rules-projectpal.md
   blocker_mode=${PROJECTPAL_PREPARE_REPO_MODE:-}
   ok=true
   state_status=existing
   gitignore_status=already-present
+  cursor_rules_status=already-present
   blocker_name=
   blocker_detail=
   blocker_next_step=
@@ -394,6 +410,12 @@ command_prepare_repo() {
   fi
 
   if [ "$ok" = "true" ]; then
+    if [ ! -f "$cursor_rules_path" ] && [ -f "$cursor_rules_template" ]; then
+      mkdir -p "$cursor_rules_dir"
+      cp "$cursor_rules_template" "$cursor_rules_path"
+      cursor_rules_status=created
+    fi
+
     if [ "$blocker_mode" = "block-gitignore" ]; then
       ok=false
       gitignore_status=blocked
@@ -424,6 +446,8 @@ command_prepare_repo() {
   printf '%s\n' "projectpal_dir: $projectpal_dir"
   printf '%s\n' "state_path: $state_path"
   printf '%s\n' "state_status: $state_status"
+  printf '%s\n' "cursor_rules_path: $cursor_rules_path"
+  printf '%s\n' "cursor_rules_status: $cursor_rules_status"
   printf '%s\n' "gitignore_path: $gitignore_path"
   printf '%s\n' "gitignore_status: $gitignore_status"
   if [ "$ok" = "false" ]; then

@@ -1,0 +1,20 @@
+version: 1
+connectors:
+  gemini:
+    approved: true
+    approved_at: "2026-04-15T12:00:00.000Z"
+    declined_at: null
+    preferred_model: gemini-fast
+    override_model: null
+  cursor:
+    approved: null
+    approved_at: null
+    declined_at: null
+    preferred_model: null
+    override_model: null
+routing_rules:
+  - phase: 2
+    task_type: refinement
+    connector: gemini
+    model: gemini-fast
+    fallback: primary

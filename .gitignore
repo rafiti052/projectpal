@@ -1,4 +1,8 @@
 .DS_Store
+node_modules/
+dist/
+pnpm-lock.yaml
+.cursor/
 .projectpal/
 .claude/
 /CLAUDE.md
