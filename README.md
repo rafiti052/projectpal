@@ -42,8 +42,9 @@ sh ./install-projectpal.sh
 Supported assistants right now:
 - Codex
 - Claude Code
+- Cursor
 
-The installer always refreshes the generated runtime surfaces from `src/` first, then installs the assistant-specific integration you choose.
+The installer always refreshes the generated runtime surfaces from `src/` first, installs the assistant-specific integrations, and creates `~/.projectpal/routing.yml` if it does not exist yet.
 
 ### Codex
 
@@ -65,11 +66,13 @@ ProjectPal does **not** claim that `/projectpal` is a native Codex slash command
 
 ### Claude Code
 
-```bash
-sh ./install-projectpal.sh claude
-```
+Run the installer, choose `claude` when prompted, then open Claude Code and run `/projectpal`.
 
-Then open Claude Code and run `/projectpal`.
+### Cursor
+
+Run the installer, choose `cursor` when prompted, then open a prepared repo in Cursor.
+
+ProjectPal's global Cursor registration is written to `~/.cursor/mcp.json`, and repo-local rules are copied into `.cursor/rules/projectpal.md` when the repo is prepared through the ProjectPal flow.
 
 ### Refresh Generated Surfaces
 
@@ -120,11 +123,13 @@ Then restart your AI assistant and start ProjectPal again.
 ```
 projectpal/
 ├── src/                       ← Neutral ProjectPal source for generated runtime surfaces
-├── install-projectpal.sh      ← Single install entrypoint that prompts for Claude or Codex
+├── install-projectpal.sh      ← Single install entrypoint that prompts for Claude, Codex, or Cursor
+├── sync-cursor-skill.sh       ← Install Cursor registration into ~/.cursor/mcp.json
 ├── CLAUDE.md                  ← Generated Claude runtime surface (local install output, not versioned)
 ├── AGENTS.md                  ← Generated agents-compatible runtime surface (local install output, not versioned)
 ├── sync-claude-skill.sh       ← Install generated Claude runtime surface into Claude Code
 ├── sync-codex-plugin.sh       ← Generate Claude and Codex runtime surfaces from src/
+├── templates/                 ← Install-time templates such as routing.yml and Cursor rules
 ├── .codex-plugin/
 │   └── plugin.json            ← Codex plugin manifest
 ├── .agents/plugins/

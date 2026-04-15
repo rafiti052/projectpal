@@ -1,0 +1,24 @@
+{
+  "name": "projectpal",
+  "version": "0.4.0",
+  "description": "ProjectPal runtime — connector orchestration layer",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "layer0": "tsx scripts/layer0-check.ts --fixture"
+  },
+  "dependencies": {
+    "yaml": "^2.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}
