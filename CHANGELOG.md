@@ -8,6 +8,34 @@ All notable changes to ProjectPal are documented here.
 
 ---
 
+## [0.4.0] — 2026-04-15
+
+### Added
+- Node.js connector runtime layer (TypeScript, pnpm, vitest) — foundation for the future CLI.
+- `src/types/connector.ts` and `src/types/routing.ts` — shared connector interface contracts.
+- `src/adapter-registry.ts` — lightweight adapter registry for connector resolution.
+- `src/approval-gate.ts` — atomic routing.yml writes with session-scoped decline flags.
+- `src/connector-router.ts` — first-match routing, reads routing.yml fresh on every resolve call.
+- `src/adapters/gemini-adapter.ts` — Gemini connector with `setInterval` heartbeat, model mapping, and `check_status`.
+- `src/fallback-handler.ts` — materiality heuristic with comment-preserving state.yml append.
+- `scripts/layer0-check.ts` — Layer 0 parity checker; exits non-zero if >2 failures across both adapters.
+- `tests/thread-isolation.test.ts` — 5 thread isolation scenarios via vitest.
+- `tests/fixtures/` — fixture state and routing files for deterministic parity checks.
+- `sync-cursor-skill.sh` — installs ProjectPal MCP registration into `~/.cursor/mcp.json`.
+- `templates/cursor-rules-projectpal.md` — Cursor rules template, copied to repos on prep.
+- `templates/routing.yml` — default routing.yml template for fresh installs.
+- `src/schemas/routing-yml.schema.json` and `src/schemas/state-yml.schema.json` — JSON schemas for both config files.
+- Neutral-source adapter contracts for Gemini, Cursor, ConnectorAdapter, ApprovalGate, ConnectorRouter, and FallbackHandler.
+- `CONTRIBUTING.md` — contributor guide with multi-option Node install (nvm, fnm, volta, system package).
+- `scripts/setup-dev.sh` — opinionated nvm shortcut for contributors on Linux/WSL/macOS; verified on Amazon Linux 2023.
+- `.nvmrc` — pins Node 20 LTS; auto-detected by nvm, fnm, and volta.
+
+### Changed
+- `.gitignore` now excludes `node_modules/`, `dist/`, `pnpm-lock.yaml`, and `.cursor/`.
+- README version bumped to `v0.4.0`.
+
+---
+
 ## [0.3.6] — 2026-04-14
 
 ### Changed
