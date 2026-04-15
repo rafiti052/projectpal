@@ -37,6 +37,7 @@ Verify all 7 expected sections are present and non-empty. A missing section = `[
 - Are the proposed solutions buildable with the constraints stated?
 - Are there dependencies or risks not addressed in Risks & Open Questions?
 - Is the scope realistic given what was said about resources or timeline?
+- **AHA lens (Avoid Hasty Abstractions):** Does the Brief commit to test infrastructure (frameworks, harnesses, coverage machinery), new services, or architectural layers **out of proportion** to what the transcript and scope actually established? If yes, cite the section and quote the problematic text — typically `[Major]`; use `[Blocker]` only if it would derail execution or invents unmappable work. **Never rewrite the Brief** — flag only.
 
 **Step 4 — Success Criteria.**
 

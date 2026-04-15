@@ -47,6 +47,8 @@ Track these internally. Never display a checklist or progress bar to the user. W
 
 Actively test whether the work can safely be treated as a **Clear path**, especially in existing repos with strong conventions and well-bounded scope. Refinement is expensive, so do not force it when the work is already tight and obvious.
 
+**Avoid hasty abstractions (AHA) in Discovery:** You may **name** where tests, rigor, or architecture might matter later — keep it light and conversational — without locking the user into a stack, framework, or build path they have not chosen yet. Prefer one honest acknowledgment over a premature plan. **Do not contradict** approved in-repo work that already commits to infrastructure (for example connector wiring tracked under `.projectpal/artifacts/brief/connector-wiring.md`) — AHA steers *new* conversation away from invented depth; it does not erase mandated contracts elsewhere in the repo.
+
 **Complexity Analyst sub-agent protocol:**
 ```
 Agent(Complexity Analyst) receives: prompts/complexity-analyst.md prompt + full Phase 0 conversation transcript (inline)
@@ -232,6 +234,7 @@ Before presenting the technical details, run a structural self-review:
 - [ ] Every Implementation Plan item maps to 1 or more tickets (structural check)
 - [ ] Data Model covers every entity mentioned in the Brief Problem Statement
 - [ ] All `parking-lot.md` items tagged `phase:4` are incorporated or flagged deferred
+- [ ] **AHA:** The Technical Details draft does not front-load test frameworks, harnesses, speculative architectural layers, or scaffolding the Brief did not earn; scaling paths may appear in Risks as **note, don't build**. **Carve-out:** Do not treat connector-mandated surfaces from `.projectpal/artifacts/brief/connector-wiring.md` as debt to remove — only trim *new* plan text that exceeds Brief scope.
 
 If any check fails: fix it inline before presenting.
 
@@ -254,6 +257,7 @@ After tickets are generated and saved, implementation begins. Do not clean up ar
 - When a ticket is blocked, record the exact dependency or ownership boundary that caused the block before moving on.
 - Prefer existing codebase patterns and small, verifiable changes over broad rewrites.
 - After each meaningful batch, run the smallest useful verification for the changed surface.
+- **AHA in Implementation:** Do not introduce new default test frameworks, harnesses, or global coverage machinery unless the **ticket** or **Brief** explicitly requires them — prefer the smallest check that proves the change (existing scripts, targeted commands, or manual inspection called out in the ticket). **Carve-out:** Work that implements connector routing, approval gates, or fallbacks per `.projectpal/artifacts/brief/connector-wiring.md` keeps those obligations — AHA blocks *extra* rigging, not that brief's scope.
 - Before any likely interruption point or long-running batch, sync `.projectpal/state.yml` so resume starts from the latest finished wave or ticket group.
 - If a ticket cannot be implemented in the current session, leave artifacts intact and write the exact next ticket or action to the diary.
 

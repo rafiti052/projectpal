@@ -10,7 +10,7 @@ The Pal surfaces each item when its phase arrives.
 
 - [follow-up] [feat:agent-platform-expansion] [phase:prd] [priority:P1] Remaining orchestration work after v0.4.0: richer event/history records, cross-assistant handoff behavior, and helper visibility overlay refinement. Scaffolding, reconciliation machinery, and multi-adapter execution all shipped in v0.4.0. (project: projectpal; captured: 2026-04-14; updated: 2026-04-15; status: open)
 
-- [active] [feat:flow-optimization-and-personas] [phase:discovery] [priority:P0] Four-item sequence for v0.4.x: (1) Strategist + debate pipeline — shipped in repo. (2) Designer persona + wave gate — shipped in repo. (3) **AHA principle in Planning/Technical Details** — next. (4) Flow optimization audit — after AHA. (project: projectpal; captured: 2026-04-15; updated: 2026-04-15; status: open)
+- [active] [feat:flow-optimization-and-personas] [phase:discovery] [priority:P0] Four-item sequence for v0.4.x: (1) Strategist + debate pipeline — shipped in repo. (2) Designer persona + wave gate — shipped in repo. (3) **AHA principle (pipeline-wide: prompts, phase-protocols, layer0)** — shipped in repo 2026-04-16. (4) Flow optimization audit — next after AHA. (project: projectpal; captured: 2026-04-15; updated: 2026-04-16; status: open)
 
 - [follow-up] [feat:persona-debate-cycle] [phase:implementation] [priority:P0] Scrub "Cynefin" naming and land seven-persona debate cycle — shipped in repo (prompts, instructions, schemas, tests). (project: projectpal; captured: 2026-04-15; updated: 2026-04-15; status: incorporated)
 
