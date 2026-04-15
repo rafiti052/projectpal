@@ -16,8 +16,8 @@ src/
   README.md
   fallback-handler.md
   shared/
-    layer0.md
-    layer1-index.md
+    core.md
+    runtime-index.md
   adapters/
     claude.md
     codex.md
@@ -33,10 +33,10 @@ src/
 
 ## Responsibilities
 
-- `shared/layer0.md`
+- `shared/core.md`
   Canonical shared runtime body for the always-loaded ProjectPal surface. This is the content that should generate `CLAUDE.md`, `AGENTS.md`, and the shared body inside `skills/projectpal/SKILL.md`.
 
-- `shared/layer1-index.md`
+- `shared/runtime-index.md`
   Neutral index of deferred instruction files and their responsibilities. This keeps the source aware of the split between shared runtime behavior and the detailed files under `instructions/`.
 
 - `adapters/claude.md`
@@ -49,7 +49,7 @@ src/
   Shared generated-file prefix used by runtime outputs so they clearly identify the neutral source.
 
 - `adapters/codex-skill-header.md` and `adapters/codex-skill-footer.md`
-  Codex skill-specific wrapper snippets that surround the shared Layer 0 body.
+  Codex skill-specific wrapper snippets that surround the shared core body.
 
 - `generation/contract.md`
   Source-first generation rules: what gets generated, in what order, and what verification is required after changes.

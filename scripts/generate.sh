@@ -4,9 +4,11 @@
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+REPO_ROOT="$SCRIPT_DIR/.."
+cd "$REPO_ROOT"
 
 SOURCE_DIR="src"
-SHARED_FILE="$SOURCE_DIR/shared/layer0.md"
+SHARED_FILE="$SOURCE_DIR/shared/core.md"
 PREFIX_FILE="$SOURCE_DIR/adapters/runtime-output-prefix.md"
 SKILL_HEADER_FILE="$SOURCE_DIR/adapters/codex-skill-header.md"
 CLAUDE_FILE="CLAUDE.md"
@@ -54,13 +56,13 @@ diverged=0
 [ "$skill_existed"  -eq 1 ] && [ "$prev_skill"  != "$new_skill"  ] && diverged=1
 
 if [ "$diverged" -eq 1 ]; then
-  printf '\n%s\n' "sync-codex-plugin: generated output diverged from existing files." >&2
+  printf '\n%s\n' "generate: output diverged from existing files." >&2
   [ "$prev_claude" != "$new_claude" ] && printf '  changed: %s\n' "$CLAUDE_FILE" >&2
   [ "$prev_agents" != "$new_agents" ] && printf '  changed: %s\n' "$AGENTS_FILE" >&2
   [ "$prev_skill"  != "$new_skill"  ] && printf '  changed: %s\n' "$SKILL_FILE" >&2
   printf '\n%s\n' "Generated output has been written. To reconcile:" >&2
   printf '%s\n' "  a) Accept as-is — the generated files are now on disk." >&2
-  printf '%s\n' "  b) Review source — open src/shared/layer0.md to absorb any manual edits first, then re-run." >&2
+  printf '%s\n' "  b) Review source — open src/shared/core.md to absorb any manual edits first, then re-run." >&2
   exit 1
 fi
 

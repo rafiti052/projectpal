@@ -3,7 +3,7 @@
 set -eu
 
 if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
-  printf '%s\n' "usage: sh scripts/markdown-word-budget.sh <markdown-path> [budget-limit]" >&2
+  printf '%s\n' "usage: sh scripts/word-budget.sh <markdown-path> [budget-limit]" >&2
   exit 1
 fi
 
@@ -11,7 +11,7 @@ MARKDOWN_PATH=$1
 BUDGET_LIMIT=${2:-1000}
 
 if [ ! -f "$MARKDOWN_PATH" ]; then
-  printf '%s\n' "markdown-word-budget: file not found: $MARKDOWN_PATH" >&2
+  printf '%s\n' "word-budget: file not found: $MARKDOWN_PATH" >&2
   exit 1
 fi
 

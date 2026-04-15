@@ -8,10 +8,10 @@ These are currently shared ProjectPal behavior blocks that should move into the 
 
 | Current file | Current block | Classification | Planned neutral home |
 |--------------|---------------|----------------|----------------------|
-| `CLAUDE.md` | Full Layer 0 runtime body | Shared | `src/shared/layer0.md` |
-| `AGENTS.md` | Full Layer 0 runtime body | Shared generated mirror | `src/shared/layer0.md` |
-| `skills/projectpal/SKILL.md` | Embedded ProjectPal runtime body copied from `CLAUDE.md` | Shared generated body | `src/shared/layer0.md` |
-| `instructions/*.md` | Detailed deferred protocols and contracts | Shared deferred detail | referenced by `src/shared/layer1-index.md` |
+| `CLAUDE.md` | Full core runtime body | Shared | `src/shared/core.md` |
+| `AGENTS.md` | Full core runtime body | Shared generated mirror | `src/shared/core.md` |
+| `skills/projectpal/SKILL.md` | Embedded ProjectPal runtime body copied from `CLAUDE.md` | Shared generated body | `src/shared/core.md` |
+| `instructions/*.md` | Detailed deferred protocols and contracts | Shared deferred detail | referenced by `src/shared/runtime-index.md` |
 
 ## Runtime-specific wrapper inventory
 
@@ -38,8 +38,8 @@ These files support runtime operation but are not themselves the authoring sourc
 | `.claude/settings.local.json` | local Claude permissions/settings | local runtime config |
 | `.gemini/commands/projectpal.toml` | current Gemini adapter command | future runtime config |
 | `.gemini/settings.json` | Gemini MCP/config state | future runtime config |
-| `sync-cursor-skill.sh` | installs Cursor global registration | install tooling |
-| `sync-codex-plugin.sh` | current direct generation script | generation tooling, to be migrated to the neutral-source contract |
+| `scripts/install-cursor.sh` | installs Cursor global registration | install tooling |
+| `scripts/generate.sh` | generation script | generation tooling |
 
 ## Minimum wrapper boundary summary
 

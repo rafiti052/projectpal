@@ -1,10 +1,9 @@
 #!/usr/bin/env tsx
-// Layer 0 parity checker — pre-ship quality gate for both adapters.
-// Ticket: agent-platform-expansion-011
+// Install parity checker — pre-ship quality gate for both adapters.
 //
 // Usage:
-//   pnpm tsx scripts/layer0-check.ts            # uses live state + routing
-//   pnpm tsx scripts/layer0-check.ts --fixture  # uses fixture files (no live API needed)
+//   pnpm tsx scripts/check-install.ts            # uses live state + routing
+//   pnpm tsx scripts/check-install.ts --fixture  # uses fixture files (no live API needed)
 //
 // Exits 0 when failures ≤ 2 (co-ship unblocked).
 // Exits 1 when failures > 2 (co-ship blocked).
@@ -129,7 +128,7 @@ function check3ThreadLocalWrites(state: Record<string, unknown>, adapter: string
 
 // ── Runner ─────────────────────────────────────────────────────────────────
 function run(): void {
-  console.log('Layer 0 Parity Check — agent-platform-expansion');
+  console.log('Install Parity Check');
   console.log('='.repeat(52));
   console.log(`Mode: ${useFixture ? 'fixture' : 'live'}`);
   console.log(`State:   ${statePath}`);

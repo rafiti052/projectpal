@@ -9,24 +9,24 @@ DEFAULT_SUMMARY_LIMIT=150
 usage() {
   cat <<'EOF' >&2
 usage:
-  sh scripts/projectpal-flow.sh resolve-repo-context [cwd]
-  sh scripts/projectpal-flow.sh read-resume-bridge <state-path> [cwd]
-  sh scripts/projectpal-flow.sh probe-assistants [cwd]
-  sh scripts/projectpal-flow.sh probe-mempalace [cwd]
-  sh scripts/projectpal-flow.sh prepare-repo [cwd]
-  sh scripts/projectpal-flow.sh onboarding-flow [cwd]
-  sh scripts/projectpal-flow.sh artifact-budget-check <markdown-path> [budget-limit] [exception-note-file] [compact-summary-file]
-  sh scripts/projectpal-flow.sh split-evaluate <word-count> <budget-limit> <unresolved-scope:true|false> <exception-needed:true|false> <parent-project> [entry-phase]
-  sh scripts/projectpal-flow.sh handoff-build <source-phase> <target-phase> <artifact-ref> <bridge-summary-file> [memory-summary-file] [dropped-context:true|false] [reentry-required:true|false]
-  sh scripts/projectpal-flow.sh context-reset-evaluate <handoff-package-path>
-  sh scripts/projectpal-flow.sh memory-summary <results-file> <repo-slug> [feat-slug] [phase] [kind] [limit]
-  sh scripts/projectpal-flow.sh build-phase-input <architect|manager|technical-details|tickets> <approved-artifact-ref> <handoff-package-path> [memory-summary-file] [extra-artifact-ref]
-  sh scripts/projectpal-flow.sh sync-resume-bridge <state-path> <approved-artifact-ref> <bridge-summary-file> [resume-source]
-  sh scripts/projectpal-flow.sh reduction-report <baseline-summary-path> <new-flow-summary-path> [output-path]
-  sh scripts/projectpal-flow.sh phase7-batch-close-check <ticket-bundle-path>
-  sh scripts/projectpal-flow.sh thread-orchestration-isolation-check <fixture-path>
-  sh scripts/projectpal-flow.sh agent-orchestration-proof-flow-check <fixture-path>
-  sh scripts/projectpal-flow.sh generate-implementation-aid <output-path> <source-file>...
+  sh scripts/onboarding-flow.sh resolve-repo-context [cwd]
+  sh scripts/onboarding-flow.sh read-resume-bridge <state-path> [cwd]
+  sh scripts/onboarding-flow.sh probe-assistants [cwd]
+  sh scripts/onboarding-flow.sh probe-mempalace [cwd]
+  sh scripts/onboarding-flow.sh prepare-repo [cwd]
+  sh scripts/onboarding-flow.sh onboarding-flow [cwd]
+  sh scripts/onboarding-flow.sh artifact-budget-check <markdown-path> [budget-limit] [exception-note-file] [compact-summary-file]
+  sh scripts/onboarding-flow.sh split-evaluate <word-count> <budget-limit> <unresolved-scope:true|false> <exception-needed:true|false> <parent-project> [entry-phase]
+  sh scripts/onboarding-flow.sh handoff-build <source-phase> <target-phase> <artifact-ref> <bridge-summary-file> [memory-summary-file] [dropped-context:true|false] [reentry-required:true|false]
+  sh scripts/onboarding-flow.sh context-reset-evaluate <handoff-package-path>
+  sh scripts/onboarding-flow.sh memory-summary <results-file> <repo-slug> [feat-slug] [phase] [kind] [limit]
+  sh scripts/onboarding-flow.sh build-phase-input <architect|manager|technical-details|tickets> <approved-artifact-ref> <handoff-package-path> [memory-summary-file] [extra-artifact-ref]
+  sh scripts/onboarding-flow.sh sync-resume-bridge <state-path> <approved-artifact-ref> <bridge-summary-file> [resume-source]
+  sh scripts/onboarding-flow.sh reduction-report <baseline-summary-path> <new-flow-summary-path> [output-path]
+  sh scripts/onboarding-flow.sh phase7-batch-close-check <ticket-bundle-path>
+  sh scripts/onboarding-flow.sh thread-orchestration-isolation-check <fixture-path>
+  sh scripts/onboarding-flow.sh agent-orchestration-proof-flow-check <fixture-path>
+  sh scripts/onboarding-flow.sh generate-implementation-aid <output-path> <source-file>...
 EOF
   exit 1
 }
@@ -40,7 +40,7 @@ bool_or_false() {
 
 require_file() {
   if [ ! -f "$1" ]; then
-    printf '%s\n' "projectpal-flow: file not found: $1" >&2
+    printf '%s\n' "onboarding-flow: file not found: $1" >&2
     exit 1
   fi
 }
@@ -259,13 +259,13 @@ command_probe_assistants() {
   confidence=inconclusive
   fallback_used=true
 
-  if [ -f "$target_dir/.claude/settings.local.json" ] || [ -f "$target_dir/src/shared/layer0.md" ] || [ -f "$target_dir/sync-claude-skill.sh" ]; then
+  if [ -f "$target_dir/.claude/settings.local.json" ] || [ -f "$target_dir/src/shared/core.md" ] || [ -f "$target_dir/scripts/install-claude.sh" ]; then
     claude_signal=true
   fi
-  if [ -f "$target_dir/.codex-plugin/plugin.json" ] || [ -f "$target_dir/skills/projectpal/SKILL.md" ] || [ -f "$target_dir/sync-codex-plugin.sh" ]; then
+  if [ -f "$target_dir/.codex-plugin/plugin.json" ] || [ -f "$target_dir/skills/projectpal/SKILL.md" ] || [ -f "$target_dir/scripts/generate.sh" ]; then
     codex_signal=true
   fi
-  if [ -f "$target_dir/sync-cursor-skill.sh" ]; then
+  if [ -f "$target_dir/scripts/install-cursor.sh" ]; then
     cursor_signal=true
   fi
 
@@ -535,7 +535,7 @@ command_artifact_budget_check() {
   require_file "$markdown_path"
 
   word_count=$(
-    sh "$SCRIPT_DIR/markdown-word-budget.sh" "$markdown_path" "$budget_limit" |
+    sh "$SCRIPT_DIR/word-budget.sh" "$markdown_path" "$budget_limit" |
       awk -F': ' '/^word_count:/ { print $2 }'
   )
 
@@ -546,7 +546,7 @@ command_artifact_budget_check() {
   else
     exception_required=true
     if [ -z "$exception_note_file" ]; then
-      printf '%s\n' "projectpal-flow: exception note required for oversized artifact: $markdown_path" >&2
+      printf '%s\n' "onboarding-flow: exception note required for oversized artifact: $markdown_path" >&2
       exit 2
     fi
     require_file "$exception_note_file"
@@ -847,7 +847,7 @@ command_reduction_report() {
   new_value=$(awk -F': ' '/^baseline_median_total_words:/ { print $2; exit }' "$new_flow_summary_path")
 
   if [ -z "$baseline" ] || [ -z "$new_value" ]; then
-    printf '%s\n' "projectpal-flow: reduction report needs baseline_median_total_words in both summary files" >&2
+    printf '%s\n' "onboarding-flow: reduction report needs baseline_median_total_words in both summary files" >&2
     exit 1
   fi
 
