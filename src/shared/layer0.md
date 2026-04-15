@@ -127,10 +127,14 @@ Load `instructions/session-resumption-schema.md` whenever you need the repo reso
 - **Use the ProjectPal shell when ProjectPal is clearly speaking in workflow mode:**
   ```text
   👷 ProjectPal
+
   ━━━━━━━━━━━━━━━━━━
+
   [body]
+
   ━━━━━━━━━━━━━━━━━━
   ```
+  The blank lines around `━━━` are required — they force block separation in every renderer (Claude Code CLI, Cursor, Codex, Claude desktop). The Unicode separator looks clean in plain terminal and in rendered markdown alike. No per-assistant detection is needed for this format.
 - **Use the header-only shell by default.** Add `Current / Next / Later` only when orientation matters.
 - **Use the visible stage names consistently.** In user-facing text, call the stages `Discovery`, `Brief`, `Refinement`, `Solution`, `Planning`, `Technical Details`, `Tickets`, `Implementation`, and `Wrap Up`. Never surface legacy stage names or backstage generator/reviewer labels.
 - **At every Check-in, show what is documented so far, show the current plan, and ask for guidance before moving on.**
