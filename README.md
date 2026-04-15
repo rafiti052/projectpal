@@ -79,7 +79,7 @@ ProjectPal's global Cursor registration is written to `~/.cursor/mcp.json`, and 
 If you are changing the neutral source or runtime wrappers directly:
 
 ```bash
-sh ./sync-codex-plugin.sh
+sh scripts/generate.sh
 ```
 
 That regenerates:
@@ -124,11 +124,9 @@ Then restart your AI assistant and start ProjectPal again.
 projectpal/
 ├── src/                       ← Neutral ProjectPal source for generated runtime surfaces
 ├── install-projectpal.sh      ← Single install entrypoint that prompts for Claude, Codex, or Cursor
-├── sync-cursor-skill.sh       ← Install Cursor registration into ~/.cursor/mcp.json
 ├── CLAUDE.md                  ← Generated Claude runtime surface (local install output, not versioned)
 ├── AGENTS.md                  ← Generated agents-compatible runtime surface (local install output, not versioned)
-├── sync-claude-skill.sh       ← Install generated Claude runtime surface into Claude Code
-├── sync-codex-plugin.sh       ← Generate Claude and Codex runtime surfaces from src/
+├── scripts/                   ← Contributor tools (generate, install, test, audit)
 ├── templates/                 ← Install-time templates such as routing.yml and Cursor rules
 ├── .codex-plugin/
 │   └── plugin.json            ← Codex plugin manifest

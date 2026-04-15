@@ -18,7 +18,7 @@ All notable changes to ProjectPal are documented here.
 - `src/connector-router.ts` — first-match routing, reads routing.yml fresh on every resolve call.
 - `src/adapters/gemini-adapter.ts` — Gemini connector with `setInterval` heartbeat, model mapping, and `check_status`.
 - `src/fallback-handler.ts` — materiality heuristic with comment-preserving state.yml append.
-- `scripts/layer0-check.ts` — Layer 0 parity checker; exits non-zero if >2 failures across both adapters.
+- `scripts/check-install.ts` — Install parity checker; exits non-zero if >2 failures across both adapters.
 - `tests/thread-isolation.test.ts` — 5 thread isolation scenarios via vitest.
 - `tests/fixtures/` — fixture state and routing files for deterministic parity checks.
 - `sync-cursor-skill.sh` — installs ProjectPal MCP registration into `~/.cursor/mcp.json`.
@@ -72,7 +72,7 @@ All notable changes to ProjectPal are documented here.
 - MemPalace onboarding now explains local-only continuity in repo-first terms, including that `.projectpal/state.yml` still lets the same repo pick back up later.
 - Onboarding bridge summaries now save calm repo handoff context instead of setup jargon such as memory mode or assistant metadata.
 - User-facing stage descriptions now keep the friendly visible names aligned with the quieter voice system, using softer descriptions like scoped draft, build plan, and build steps.
-- Generated runtime surfaces were refreshed from `src/shared/layer0.md` after the user-facing naming cleanup.
+- Generated runtime surfaces were refreshed from `src/shared/core.md` after the user-facing naming cleanup.
 - README version bumped to `v0.3.1`.
 - Codex plugin manifest version bumped to `0.3.1`.
 

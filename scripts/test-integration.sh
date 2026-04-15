@@ -3,7 +3,7 @@
 set -eu
 
 ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
-TMP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/projectpal-runtime-tests.XXXXXX")
+TMP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/projectpal-integration-tests.XXXXXX")
 trap 'rm -rf "$TMP_DIR"' EXIT INT TERM
 
 assert_contains() {
@@ -44,11 +44,11 @@ git -C "$existing_repo" init >/dev/null 2>&1
 git -C "$new_repo" init >/dev/null 2>&1
 printf '%s\n' "# Existing Repo" > "$existing_repo/README.md"
 
-sync_output=$(sh "$ROOT_DIR/sync-codex-plugin.sh" 2>&1 || true)
+sync_output=$(sh "$ROOT_DIR/scripts/generate.sh" 2>&1 || true)
 assert_file_contains "$ROOT_DIR/CLAUDE.md" "ProjectPal neutral source under src/"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "ProjectPal neutral source under src/"
 assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "ProjectPal neutral source under src/"
-repo_audit_output=$(sh "$ROOT_DIR/scripts/projectpal-copy-audit.sh" \
+repo_audit_output=$(sh "$ROOT_DIR/scripts/audit-sync.sh" \
   "$ROOT_DIR/CLAUDE.md" \
   "$ROOT_DIR/AGENTS.md" \
   "$ROOT_DIR/skills/projectpal/SKILL.md" \
@@ -99,7 +99,7 @@ claude_home="$TMP_DIR/claude-home"
 mkdir -p "$claude_home"
 claude_install_output=$(HOME="$claude_home" sh "$ROOT_DIR/install-projectpal.sh")
 assert_contains "$claude_install_output" "ProjectPal is ready in all supported assistants."
-installed_audit_output=$(sh "$ROOT_DIR/scripts/projectpal-copy-audit.sh" "$claude_home/.claude/skills/projectpal" "$claude_home/.codex/skills/projectpal")
+installed_audit_output=$(sh "$ROOT_DIR/scripts/audit-sync.sh" "$claude_home/.claude/skills/projectpal" "$claude_home/.codex/skills/projectpal")
 assert_contains "$installed_audit_output" "projectpal-copy audit passed"
 assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "name: projectpal"
 assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "## Designer Support (User-Facing Behavior)"
@@ -125,14 +125,14 @@ if [ "$projectpal_entry_count" -ne 1 ]; then
   exit 1
 fi
 
-existing_flow_output=$(PROJECTPAL_ASSISTANT_HINT=codex PROJECTPAL_MEMPALACE_MODE=missing sh "$ROOT_DIR/scripts/projectpal-flow.sh" onboarding-flow "$existing_repo")
+existing_flow_output=$(PROJECTPAL_ASSISTANT_HINT=codex PROJECTPAL_MEMPALACE_MODE=missing sh "$ROOT_DIR/scripts/onboarding-flow.sh" onboarding-flow "$existing_repo")
 assert_contains "$existing_flow_output" "assistant_preferred: codex"
 assert_contains "$existing_flow_output" "repo_ready: true"
 assert_contains "$existing_flow_output" "final_next_step: Open Codex in this repo and type ProjectPal."
 assert_file_contains "$existing_repo/.cursor/rules/projectpal.md" "# ProjectPal"
 assert_file_not_contains "$existing_repo/.cursor/rules/projectpal.md" "pp-compress"
 
-new_flow_output=$(PROJECTPAL_ASSISTANT_HINT=codex PROJECTPAL_MEMPALACE_MODE=missing sh "$ROOT_DIR/scripts/projectpal-flow.sh" onboarding-flow "$new_repo")
+new_flow_output=$(PROJECTPAL_ASSISTANT_HINT=codex PROJECTPAL_MEMPALACE_MODE=missing sh "$ROOT_DIR/scripts/onboarding-flow.sh" onboarding-flow "$new_repo")
 assert_contains "$new_flow_output" "assistant_preferred: codex"
 assert_contains "$new_flow_output" "repo_ready: true"
 assert_contains "$new_flow_output" "final_next_step: Open Codex in this repo and type ProjectPal."

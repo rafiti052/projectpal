@@ -8,7 +8,7 @@ Document the minimal Claude-specific wrapper content that must remain outside th
 
 ## Current boundary
 
-- `CLAUDE.md` currently contains the shared Layer 0 body directly.
+- `CLAUDE.md` currently contains the shared core body directly.
 - There is no meaningful Claude-only behavioral wrapper beyond file identity and source-of-truth comments.
 
 ## Planned adapter responsibility
@@ -54,8 +54,8 @@ Rules:
 The current generated-file prefix is shared through:
 - `src/adapters/runtime-output-prefix.md`
 
-Everything else should come from `src/shared/layer0.md`.
+Everything else should come from `src/shared/core.md`.
 
 ## Minimum wrapper conclusion
 
-For lean v1, the Claude wrapper stays minimal but no longer empty: it owns the reference adapter's internal result and status contract, while shared product behavior still lives in `src/shared/layer0.md`.
+For lean v1, the Claude wrapper stays minimal but no longer empty: it owns the reference adapter's internal result and status contract, while shared product behavior still lives in `src/shared/core.md`.

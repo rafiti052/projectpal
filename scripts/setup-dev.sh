@@ -110,5 +110,5 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 echo "Next steps:"
 echo "  pnpm test        # run thread isolation tests"
-echo "  pnpm layer0      # run Layer 0 parity check"
+echo "  pnpm check:install  # run install parity check"
 echo ""

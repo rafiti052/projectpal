@@ -10,7 +10,7 @@ Every contribution (manual or AI-assisted) must deliver clear value to the **she
 - Helper/runtime-only work is valid only when it is explicitly tied to user-visible behavior, install flow, or shipped assistant experience.
 - If a change does not improve what users can do in ProjectPal shell surfaces (`AGENTS.md`, `CLAUDE.md`, installed skills/rules/prompts), it is not complete yet.
 - When adding internals, include the shipping path in the same change (or document the exact follow-up blocker in the ticket artifact).
-- Before opening a PR, run `sh scripts/projectpal-runtime-tests.sh` to verify generated and installed user-facing surfaces still reflect intended behavior.
+- Before opening a PR, run `sh scripts/test-integration.sh` to verify generated and installed user-facing surfaces still reflect intended behavior.
 
 ### Temporary runtime scaffolding workflow
 
@@ -20,7 +20,7 @@ Before committing:
 
 1. Keep only files that are required for shipped shell behavior or its persistent verification gates.
 2. Remove temporary scaffolding (`src/**` runtime experiments, ad-hoc tests, throwaway scripts) that does not directly ship user value.
-3. Regenerate runtime surfaces (`sh sync-codex-plugin.sh`) and re-run runtime checks (`pnpm runtime:test`).
+3. Regenerate runtime surfaces (`sh scripts/generate.sh`) and re-run runtime checks (`pnpm test:integration`).
 4. Confirm the final diff is clean, architecture-aligned, and focused on end-user outcomes.
 
 ---
@@ -105,8 +105,8 @@ sh scripts/setup-dev.sh
 |---------|-------------|
 | `pnpm typecheck` | TypeScript type check — zero errors expected |
 | `pnpm test` | Thread isolation tests via vitest |
-| `pnpm layer0` | Layer 0 parity check against fixture files |
-| `pnpm tsx scripts/layer0-check.ts` | Layer 0 check against live state and routing files |
+| `pnpm check:install` | Install parity check against fixture files |
+| `pnpm tsx scripts/check-install.ts` | Install check against live state and routing files |
 
 ---
 

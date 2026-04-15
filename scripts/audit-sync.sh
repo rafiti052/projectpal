@@ -8,7 +8,7 @@ fi
 
 stale_copy=$(
   rg -n -S --pcre2 \
-    --glob '!scripts/projectpal-copy-audit.sh' \
+    --glob '!scripts/audit-sync.sh' \
     -e 'Critic' \
     -e 'Judge' \
     -e 'PRD' \

@@ -30,21 +30,21 @@ ensure_routing_config() {
 
 # ── Step 1: Generate all runtime surfaces from source ───────────────────────
 
-if ! sh "$SCRIPT_DIR/sync-codex-plugin.sh"; then
-  printf '\n%s\n' "install-projectpal: sync-codex-plugin.sh reported divergence — see above." >&2
+if ! sh "$SCRIPT_DIR/scripts/generate.sh"; then
+  printf '\n%s\n' "install-projectpal: generate.sh reported divergence — see above." >&2
   printf '%s\n' "Resolve the divergence and re-run install-projectpal.sh." >&2
   exit 1
 fi
 
 # ── Step 2: Install global skill for all assistants ─────────────────────────
 
-sh "$SCRIPT_DIR/sync-claude-skill.sh"
+sh "$SCRIPT_DIR/scripts/install-claude.sh"
 printf '%s\n' "✓ Claude Code — basic config installed."
 
-sh "$SCRIPT_DIR/sync-codex-skill.sh"
+sh "$SCRIPT_DIR/scripts/install-codex.sh"
 printf '%s\n' "✓ Codex — basic config installed."
 
-sh "$SCRIPT_DIR/sync-cursor-skill.sh"
+sh "$SCRIPT_DIR/scripts/install-cursor.sh"
 printf '%s\n' "✓ Cursor — basic config installed."
 
 ensure_routing_config

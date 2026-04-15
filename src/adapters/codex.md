@@ -47,7 +47,7 @@ These adapter-owned snippets now live in:
 - `src/adapters/codex-skill-header.md`
 - `src/adapters/codex-skill-footer.md`
 
-The shared ProjectPal behavior should come from `src/shared/layer0.md`.
+The shared ProjectPal behavior should come from `src/shared/core.md`.
 
 ## Minimum wrapper conclusion
 

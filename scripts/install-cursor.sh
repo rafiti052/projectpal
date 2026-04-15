@@ -4,12 +4,14 @@
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+REPO_ROOT="$SCRIPT_DIR/.."
+cd "$REPO_ROOT"
 CURSOR_DIR="$HOME/.cursor"
 MCP_FILE="$CURSOR_DIR/mcp.json"
 
 mkdir -p "$CURSOR_DIR"
 
-MCP_FILE="$MCP_FILE" PROJECTPAL_REPO_ROOT="$SCRIPT_DIR" python3 <<'PY'
+MCP_FILE="$MCP_FILE" PROJECTPAL_REPO_ROOT="$REPO_ROOT" python3 <<'PY'
 import json
 import os
 from pathlib import Path
