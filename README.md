@@ -60,7 +60,8 @@ ProjectPal
 
 That is the canonical Codex entrypoint.
 
-Codex reads the plugin manifest from `.codex-plugin/plugin.json`, which points at `skills/projectpal/SKILL.md` and the repo-local `.mcp.json`.
+The generated Codex package lives in `build/codex/`, and its packaged manifest lives at `build/codex/.codex-plugin/plugin.json`.
+The repo-local Codex wrapper manifest at `.codex-plugin/plugin.json` delegates to `build/codex/skills/projectpal/SKILL.md` and keeps the repo-local `.mcp.json` reference.
 
 ProjectPal does **not** claim that `/projectpal` is a native Codex slash command.
 
@@ -80,12 +81,16 @@ If you are changing the neutral source or runtime wrappers directly:
 
 ```bash
 sh scripts/generate.sh
+sh scripts/build-platform.sh codex
 ```
 
 That regenerates:
 - `CLAUDE.md`
 - `AGENTS.md`
 - `skills/projectpal/SKILL.md`
+- `build/codex/AGENTS.md`
+- `build/codex/skills/projectpal/SKILL.md`
+- `build/codex/.codex-plugin/plugin.json`
 
 ### Maintainer checks (TypeScript tree)
 
@@ -100,6 +105,16 @@ pnpm check:install --fixture
 ```
 
 The last command matches the recorded **v0.4.0** release gate in [docs/audits/2026-04-15-release-readiness.md](docs/audits/2026-04-15-release-readiness.md).
+
+For the packaged multi-platform contract, also run:
+
+```bash
+sh scripts/validate-platform.sh codex
+sh tests/smoke/codex-build.sh
+sh scripts/smoke-install.sh
+```
+
+The Codex maintainer path is documented in [docs/maintainer-codex-reinstall.md](docs/maintainer-codex-reinstall.md).
 
 ### Dependencies
 
@@ -117,11 +132,16 @@ projectpal/
 ├── scripts/                   ← Contributor tools (generate, install, test, audit)
 ├── templates/                 ← Install-time templates such as Cursor rules
 ├── .codex-plugin/
-│   └── plugin.json            ← Codex plugin manifest
+│   └── plugin.json            ← Repo-local Codex wrapper manifest pointing at build/codex
+├── build/
+│   └── codex/
+│       ├── AGENTS.md          ← Generated Codex runtime mirror
+│       ├── skills/projectpal/SKILL.md
+│       └── .codex-plugin/plugin.json
 ├── .agents/plugins/
 │   └── marketplace.json       ← Optional local Codex marketplace entry
 ├── skills/projectpal/
-│   └── SKILL.md               ← Generated Codex skill entrypoint (local install output, not versioned)
+│   └── SKILL.md               ← Legacy generated Codex skill mirror kept for compatibility
 ├── prompts/
 │   ├── architect-agent.md            ← Internal Architect reviewer prompt
 │   ├── manager-agent.md              ← Internal Manager reviewer prompt
@@ -169,4 +189,4 @@ The current direction note lives in [docs/north-star.md](docs/north-star.md).
 
 ## Release notes
 
-Shipped versions are listed in [CHANGELOG.md](CHANGELOG.md). The **v0.4.0** verification record and closure table live in [docs/audits/2026-04-15-release-readiness.md](docs/audits/2026-04-15-release-readiness.md). The Codex plugin manifest at `.codex-plugin/plugin.json` carries the same semver as `package.json` for each release.
+Shipped versions are listed in [CHANGELOG.md](CHANGELOG.md). The **v0.4.0** verification record and closure table live in [docs/audits/2026-04-15-release-readiness.md](docs/audits/2026-04-15-release-readiness.md). The packaged Codex manifest at `build/codex/.codex-plugin/plugin.json` carries the same semver as `package.json` for each release, and the repo-local `.codex-plugin/plugin.json` wrapper should continue to point at that generated build tree.

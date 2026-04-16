@@ -48,6 +48,10 @@ sync_output=$(sh "$ROOT_DIR/scripts/generate.sh" 2>&1 || true)
 assert_file_contains "$ROOT_DIR/CLAUDE.md" "ProjectPal neutral source under src/"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "ProjectPal neutral source under src/"
 assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "ProjectPal neutral source under src/"
+codex_build_smoke_output=$(sh "$ROOT_DIR/tests/smoke/codex-build.sh")
+assert_contains "$codex_build_smoke_output" "codex build smoke passed"
+smoke_install_output=$(sh "$ROOT_DIR/scripts/smoke-install.sh")
+assert_contains "$smoke_install_output" "smoke install passed"
 repo_audit_output=$(sh "$ROOT_DIR/scripts/audit-sync.sh" \
   "$ROOT_DIR/CLAUDE.md" \
   "$ROOT_DIR/AGENTS.md" \
@@ -62,7 +66,9 @@ assert_file_contains "$ROOT_DIR/AGENTS.md" "ProjectPal neutral source under src/
 assert_file_contains "$ROOT_DIR/AGENTS.md" "Complexity Assessment"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "👷 ProjectPal"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "## Designer Support (User-Facing Behavior)"
+assert_file_contains "$ROOT_DIR/AGENTS.md" "## Delegation Support (User-Facing Behavior)"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "single detailed protocol source"
+assert_file_contains "$ROOT_DIR/AGENTS.md" "always ask whether the user wants dedicated agents to work behind the scenes"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "You turn the conversation into a first scoped draft of the work."
 assert_file_contains "$ROOT_DIR/AGENTS.md" "You break the work into tickets after Solution or Technical Details approval. Runs on every route — never skipped."
 assert_file_contains "$ROOT_DIR/AGENTS.md" "**At every Check-in, show what is documented so far, show the current plan, and ask for guidance before moving on.**"
@@ -78,7 +84,9 @@ assert_file_not_contains "$ROOT_DIR/AGENTS.md" "Technical Details Generator"
 assert_file_contains "$ROOT_DIR/AGENTS.md" "combined wave output"
 assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" 'In Codex, start ProjectPal by typing `ProjectPal`.'
 assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "## Designer Support (User-Facing Behavior)"
+assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "## Delegation Support (User-Facing Behavior)"
 assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "**Check-ins are conversations, not forms.** \"Here's what I got. Sound right?\""
+assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "always ask whether the user wants dedicated agents to work behind the scenes"
 assert_file_not_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "$legacy_scope_framing"
 assert_file_not_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "$legacy_old_guidance_line"
 assert_file_not_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "Cynefin"
@@ -86,7 +94,19 @@ assert_file_not_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "Problem Solver"
 assert_file_not_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "Ticket Generator"
 assert_file_not_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "Technical Details Generator"
 assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "combined wave output"
+assert_file_contains "$ROOT_DIR/build/codex/AGENTS.md" "ProjectPal neutral source under src/"
+assert_file_contains "$ROOT_DIR/build/codex/skills/projectpal/SKILL.md" 'In Codex, start ProjectPal by typing `ProjectPal`.'
+assert_file_contains "$ROOT_DIR/build/codex/.codex-plugin/plugin.json" '"defaultPrompt": ["ProjectPal"]'
+assert_file_contains "$ROOT_DIR/.codex-plugin/plugin.json" '"skills": "./build/codex/skills/"'
+assert_file_not_contains "$ROOT_DIR/.codex-plugin/plugin.json" '"skills": "./skills/"'
+assert_file_contains "$ROOT_DIR/README.md" '`build/codex/.codex-plugin/plugin.json`'
+assert_file_contains "$ROOT_DIR/README.md" '`build/codex/skills/projectpal/SKILL.md`'
+assert_file_contains "$ROOT_DIR/README.md" 'sh scripts/smoke-install.sh'
 assert_file_contains "$ROOT_DIR/instructions/session-resumption-schema.md" 'Read `.projectpal/state.yml` for the current repo first.'
+assert_file_contains "$ROOT_DIR/instructions/phase-protocols.md" "### Delegation opt-in gate (Discovery exit)"
+assert_file_contains "$ROOT_DIR/instructions/phase-protocols.md" "delegation_preference: enabled"
+assert_file_contains "$ROOT_DIR/instructions/sub-agent-invocation.md" "## Discovery-exit delegation gate"
+assert_file_contains "$ROOT_DIR/instructions/session-resumption-schema.md" "delegation_preference"
 install_output=$(HOME="$default_home" sh "$ROOT_DIR/install-projectpal.sh")
 assert_contains "$install_output" "ProjectPal is ready in all supported assistants."
 
@@ -98,12 +118,16 @@ installed_audit_output=$(sh "$ROOT_DIR/scripts/audit-sync.sh" "$claude_home/.cla
 assert_contains "$installed_audit_output" "projectpal-copy audit passed"
 assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "name: projectpal"
 assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "## Designer Support (User-Facing Behavior)"
+assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "## Delegation Support (User-Facing Behavior)"
 assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "**At every Check-in, show what is documented so far, show the current plan, and ask for guidance before moving on.**"
+assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "always ask whether the user wants dedicated agents to work behind the scenes"
 assert_file_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "**Check-ins are conversations, not forms.** \"Here's what I got. Sound right?\""
 assert_file_not_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "$legacy_scope_framing"
 assert_file_not_contains "$claude_home/.claude/skills/projectpal/SKILL.md" "$legacy_old_guidance_line"
 assert_file_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "**At every Check-in, show what is documented so far, show the current plan, and ask for guidance before moving on.**"
 assert_file_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "## Designer Support (User-Facing Behavior)"
+assert_file_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "## Delegation Support (User-Facing Behavior)"
+assert_file_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "always ask whether the user wants dedicated agents to work behind the scenes"
 assert_file_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "**Check-ins are conversations, not forms.** \"Here's what I got. Sound right?\""
 assert_file_not_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "$legacy_scope_framing"
 assert_file_not_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "$legacy_old_guidance_line"

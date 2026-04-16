@@ -4,28 +4,26 @@
 
 ## Goal
 
-Every feature touching ProjectPal runtime behavior should update the neutral source first, then regenerate the shipped runtime surfaces.
+Every feature touching ProjectPal runtime behavior should update the shared source first, then regenerate the host build outputs.
 
-## Planned generation order
+## Canonical generation order
 
 1. Edit neutral source files under `src/`
-2. Generate shared runtime outputs:
-  - `CLAUDE.md`
-  - `AGENTS.md`
-  - shared body inside `skills/projectpal/SKILL.md`
-3. Apply runtime-specific adapter wrappers:
-  - Claude adapter as needed
-  - Codex skill and packaging wrapper
-4. Run verification
-5. Record the regenerated runtime surfaces in the changelog
+2. Edit or add host-owned adapter inputs under `platforms/<host>/`
+3. Generate host outputs under `build/<host>/`
+4. Run verification against the `src/` + `platforms/<host>/` input boundary
+5. Repoint or refresh legacy wrapper surfaces only if that ticket explicitly owns them
 
 ## Verification expectations
 
-- Generated runtime files clearly identify themselves as generated outputs
-- Shared behavior is not hand-maintained in multiple runtime files
-- README and install flow stay aligned with the shipped Codex-first path
-- Verification scripts or checklists confirm generation freshness
+- Generated build files clearly identify themselves as derived outputs
+- Shared behavior is not hand-maintained in multiple host trees
+- Each host reads only `src/` plus its own `platforms/<host>/` inputs
+- Each host writes only to `build/<host>/`
+- Shared install and smoke flows target `build/<host>/`
 
-## Current repo gap
+## Transitional bridge
 
-The repo still generates from `CLAUDE.md` directly. This contract defines the target workflow that later tickets will implement.
+The repo still has top-level wrappers such as `CLAUDE.md`, `AGENTS.md`, `skills/projectpal/SKILL.md`, and `templates/cursor-rules-projectpal.md`.
+
+Those wrappers remain in place for now, but they are no longer the canonical host packaging source. New host packaging work should land in `platforms/<host>/` and `build/<host>/`, then later tickets can repoint the wrappers at those generated trees.

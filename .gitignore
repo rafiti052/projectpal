@@ -2,12 +2,10 @@
 node_modules/
 dist/
 pnpm-lock.yaml
-
-# Local ProjectPal bridge (default: ignore everything under .projectpal/)
+/build/
+cursor-mcp/node_modules/
+/rules/
 .projectpal/*
-!.projectpal/state.yml
-!.projectpal/parking-lot.md
-
 .cursor/
 .claude/
 /CLAUDE.md

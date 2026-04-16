@@ -1,0 +1,15 @@
+{
+  "connector": "cursor",
+  "version": 1,
+  "routing_rules": [],
+  "mcpServers": {
+    "projectpal": {
+      "connector": "cursor",
+      "version": 1,
+      "routing_rules": [],
+      "installed_artifact_root": "build/cursor/cursor-mcp",
+      "launcher_path": "build/cursor/cursor-mcp/bin/projectpal-cursor-mcp",
+      "rules_path": "build/cursor/.cursor/rules/projectpal.md"
+    }
+  }
+}

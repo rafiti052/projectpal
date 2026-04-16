@@ -48,6 +48,7 @@ Lean v1 stores orchestration data under `thread_orchestration` in `.projectpal/s
 - `primary_assistant`
 - `reporting_owner` = `pal`
 - `state` = `active | waiting_for_approval | blocked | completed`
+- `delegation_preference` = `unknown | enabled | disabled`
 - `approved_execution_path_id`
 - `approval_state` = `not_needed | approved | approval_required | denied`
 - `shared_context_refs[]`
@@ -90,6 +91,7 @@ thread_orchestration:
       primary_assistant: "<assistant-id>"
       reporting_owner: pal
       state: "active | waiting_for_approval | blocked | completed"
+      delegation_preference: "unknown | enabled | disabled"
       approved_execution_path_id: "<path-id or null>"
       approval_state: "not_needed | approved | approval_required | denied"
       shared_context_refs: []
@@ -157,4 +159,3 @@ To preserve resume continuity during long sessions or interrupted runs, ProjectP
 - During long phases, save the local bridge after each meaningful batch of work, using the freshest `last_artifact_ref`, `next_steps`, and `bridge_summary`.
 - Before any likely interruption point, such as a long sub-agent run, large edit batch, or implementation batch that may exceed the session budget, save the local bridge first.
 - If work stops unexpectedly, the bridge should be specific enough that the next session can resume from the last completed batch rather than replaying the whole phase.
-

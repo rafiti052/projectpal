@@ -3,11 +3,8 @@
   "version": "0.4.0",
   "description": "A patient product companion that turns messy ideas into a clear route, a solid solution, and 15-minute execution tickets.",
   "author": {
-    "name": "Rafael",
-    "url": "https://github.com/rafiti052"
+    "name": "ProjectPal Contributors"
   },
-  "homepage": "https://github.com/rafiti052/projectpal",
-  "repository": "https://github.com/rafiti052/projectpal",
   "license": "MIT",
   "keywords": [
     "product",
@@ -16,16 +13,15 @@
     "parallelization",
     "orchestration"
   ],
-  "skills": "./build/codex/skills/",
+  "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "ProjectPal",
     "shortDescription": "Turns messy ideas into a clear route, a solid solution, and 15-minute tickets.",
     "longDescription": "ProjectPal is a patient product companion for turning non-linear ideas into a clear route, a Brief, Technical Details when needed, and small execution tickets without forcing structured intake. In Codex, launch it with `ProjectPal`.",
-    "developerName": "Rafael",
+    "developerName": "ProjectPal Contributors",
     "category": "Productivity",
     "capabilities": ["Interactive", "Write"],
-    "websiteURL": "https://github.com/rafiti052/projectpal",
     "defaultPrompt": ["ProjectPal"],
     "brandColor": "#2563EB"
   }

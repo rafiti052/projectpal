@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+# Claude PostToolUse compression hook for ProjectPal.
+
+set -euo pipefail
+
+THRESHOLD_WORDS=400
+CACHE_DIR=".projectpal/cache"
+
+TMPFILE=$(mktemp)
+trap 'rm -f "$TMPFILE"' EXIT
+cat > "$TMPFILE"
+
+jq empty "$TMPFILE" 2>/dev/null || exit 0
+
+TOOL_NAME=$(jq -r '.tool_name // empty' "$TMPFILE")
+[ "$TOOL_NAME" = "Read" ] || exit 0
+
+FILE_PATH=$(jq -r '.tool_input.file_path // empty' "$TMPFILE")
+[ -n "$FILE_PATH" ] || exit 0
+[ -f "$FILE_PATH" ] || exit 0
+
+CONTENT=$(jq -r '
+  .tool_response |
+  if type == "string" then .
+  elif type == "object" then
+    (.content? // []) | map(select(.type == "text") | .text) | join("\n")
+  else empty
+  end
+' "$TMPFILE")
+[ -n "$CONTENT" ] || exit 0
+
+WORD_COUNT=$(printf '%s' "$CONTENT" | wc -w | tr -d ' ')
+[ "$WORD_COUNT" -ge "$THRESHOLD_WORDS" ] || exit 0
+
+mkdir -p "$CACHE_DIR"
+CACHE_KEY=$(printf '%s' "$FILE_PATH" | md5 -q 2>/dev/null \
+  || printf '%s' "$FILE_PATH" | md5sum | cut -d' ' -f1)
+CACHE_FILE="$CACHE_DIR/${CACHE_KEY}.md"
+FILE_MTIME=$(stat -f %m "$FILE_PATH" 2>/dev/null \
+  || stat -c %Y "$FILE_PATH" 2>/dev/null \
+  || echo "0")
+
+if [ -f "$CACHE_FILE" ]; then
+  CACHED_MTIME=$(head -1 "$CACHE_FILE" | grep -oE 'mtime:[0-9]+' | cut -d: -f2 || true)
+  if [ "$CACHED_MTIME" = "$FILE_MTIME" ]; then
+    COMPRESSED_WORDS=$(head -1 "$CACHE_FILE" | grep -oE 'compressed:[0-9]+' | cut -d: -f2 || echo "?")
+    printf '📦 pp-compress [warm] %s — %sw → %sw (no re-read needed)\n\n' \
+      "$(basename "$FILE_PATH")" "$WORD_COUNT" "$COMPRESSED_WORDS"
+    tail -n +3 "$CACHE_FILE"
+    exit 0
+  fi
+fi
+
+SUMMARY=$(printf '%s' "$CONTENT" | awk '
+  /^#{1,4} / {
+    pending = $0
+    found_content = 0
+    next
+  }
+  pending != "" && /^[^[:space:]#]/ && NF > 0 && !found_content {
+    print pending
+    print $0
+    print ""
+    pending = ""
+    found_content = 1
+    next
+  }
+  pending != "" && /^[[:space:]]*$/ { next }
+  pending != "" {
+    print pending
+    print ""
+    pending = ""
+    found_content = 0
+  }
+  END { if (pending != "") print pending }
+')
+
+if [ -z "$(printf '%s' "$SUMMARY" | tr -d '[:space:]')" ]; then
+  SUMMARY=$(printf '%s' "$CONTENT" | head -50)
+fi
+
+COMPRESSED_WORDS=$(printf '%s' "$SUMMARY" | wc -w | tr -d ' ')
+
+{
+  printf '<!-- mtime:%s original:%s compressed:%s source:%s -->\n\n' \
+    "$FILE_MTIME" "$WORD_COUNT" "$COMPRESSED_WORDS" "$FILE_PATH"
+  printf '%s\n' "$SUMMARY"
+} > "$CACHE_FILE"
+
+printf '📦 pp-compress [saved] %s — %sw → %sw\n\n' \
+  "$(basename "$FILE_PATH")" "$WORD_COUNT" "$COMPRESSED_WORDS"
+printf '%s\n' "$SUMMARY"

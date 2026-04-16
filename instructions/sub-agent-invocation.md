@@ -40,6 +40,16 @@ Before invoking delegated work in lean v1, compare the candidate `ExecutionPathR
 - If the candidate `execution_path_id` does not match, the delegated path is outside the approved boundary and `approval_required = true`.
 - Delegated execution may proceed automatically only when the execution path boundary matches; otherwise require explicit approval.
 
+## Discovery-exit delegation gate
+
+ProjectPal asks the user once between **Discovery** and **Brief** whether specialist passes should run behind the scenes.
+
+- Store the answer on the active thread as `delegation_preference = enabled | disabled`.
+- The **Complexity Analyst** is the only delegated worker allowed before this gate.
+- Strategist, Architect, Manager, Tech Lead, Scrum Master, and Designer require `delegation_preference: enabled` before they are invoked automatically.
+- If `delegation_preference: disabled`, keep Phase 1 to Phase 6 work Pal-owned unless the user later gives a fresh yes for delegation.
+- Phase 7 Engineer dispatch is still gated by the explicit Implementation green light in `instructions/phase-protocols.md`. That stage-specific approval may authorize Engineer delegation even if earlier specialist delegation was declined.
+
 ## Lean v1 fallback evaluation
 
 When delegated work fails, evaluate fallback in one explicit step before any retry or substitution happens.
@@ -90,6 +100,8 @@ Agent(Strategist):
   output: complete Brief document with YAML frontmatter (opinionated product Brief, including User Goals / UX Outcomes / Value Framing subsections)
 ```
 
+Invoke only when `delegation_preference: enabled`.
+
 Pre-Refinement brevity audit: always run the brevity audit before Architect/Manager. If output remains >2,000 words after the audit, surface warning before Refinement.
 
 ---
@@ -105,6 +117,8 @@ Agent(Architect):
           + **Sign-off** line (approved | approved-with-concern | rejected)
 ```
 
+Invoke only when `delegation_preference: enabled`.
+
 ---
 
 ### 4. Manager
@@ -117,6 +131,8 @@ Agent(Manager):
   output: Manager Deliberation + **Sign-off** line (approved | approved-with-concern | rejected)
           + synthesis recommendations for the Pal (no standalone Final Brief — the Pal writes the approved Brief to the artifact)
 ```
+
+Invoke only when `delegation_preference: enabled`.
 
 **Debate protocol (bounded, max 3 rounds):**
 
@@ -148,6 +164,8 @@ Agent(Tech Lead):
   output: complete internal Technical Details document with YAML frontmatter
 ```
 
+Invoke only when `delegation_preference: enabled`.
+
 ---
 
 ### 6. Scrum Master
@@ -160,6 +178,8 @@ Agent(Scrum Master):
           + Parking Lot items (phase:6 / phase:execution) (inline)
   output: complete ordered ticket set, one ticket per Implementation Plan item, each with explicit allowed_writes for Engineer execution
 ```
+
+Invoke only when `delegation_preference: enabled`.
 
 **Phase 6 ticket protocol:**
 
@@ -185,6 +205,8 @@ Agent(Designer):
   input:  prompts/designer-agent.md + combined wave output (diffs or Pal summary) + approved Brief + Technical Details / tech spec (inline)
   output: Designer Review Record at .projectpal/artifacts/designer-review/<project>-wave-<id>.md (write via staging handoff when the record is long, then Pal promotes)
 ```
+
+Invoke only when `designer_opt_in=true` and `delegation_preference: enabled`, unless the user explicitly re-enables delegation at Implementation time.
 
 Gate: a `changes-requested` verdict blocks starting the next wave until the Pal resolves the listed changes (new tickets or direct fixes).
 

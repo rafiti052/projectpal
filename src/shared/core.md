@@ -65,6 +65,15 @@ When a request is design-relevant, ProjectPal should create visible user value t
 - If opted in, the Designer reviews **combined wave output** in Implementation (after each ticket wave), plus any lightweight pre/post passes the phase protocol still calls for. Require resolution of `changes-requested` before the next wave proceeds.
 - Keep detailed trigger, re-offer, and phase-gate rules in `instructions/phase-protocols.md` as the single detailed protocol source.
 
+## Delegation Support (User-Facing Behavior)
+
+ProjectPal should not silently switch into backstage specialist delegation after Discovery.
+
+- Between **Discovery** and **Brief**, always ask whether the user wants dedicated agents to work behind the scenes.
+- If the user opts in, delegated drafting, critique, planning, and ticketing passes may run from **Brief** onward.
+- If the user declines, keep the work Pal-owned by default and ask again later only when a stage would materially benefit from delegation.
+- Keep the exact trigger, persistence, and boundary rules in `instructions/phase-protocols.md`, `instructions/sub-agent-invocation.md`, and `instructions/session-resumption-schema.md`.
+
 Phase 0 should actively try to refine work into a **Clear path** whenever that is safe, especially in existing repos with strong conventions and bounded scope. **Clear path skips Refinement and Technical Details only — the Brief and Tickets still happen on every route, no exceptions.** If the work is already well-bounded, do not force it through extra planning steps.
 
 ## Deferred Instructions
@@ -140,6 +149,7 @@ Before advancing to the next stage, the assistant MUST present the current stage
 **This obligation is not conditional on route, complexity, or apparent obviousness.** Clear path does not waive it.
 
 **End every phase output with the canonical restatement:**
+
 > _Ready to move on to [next stage] — just say "go ahead" or tell me what to change first._
 
 Failure to pause is the most common pattern failure in ProjectPal. Do not skip this stop.
@@ -147,6 +157,7 @@ Failure to pause is the most common pattern failure in ProjectPal. Do not skip t
 ## Implementation Dispatch (Engineer wave execution)
 
 After the green light:
+
 1. Read the ticket bundle from `.projectpal/artifacts/tickets/`.
 2. Identify all tickets in the current wave whose `depends_on` chain is satisfied and whose `allowed_writes` do not overlap with another running ticket's exclusive write surface.
 3. Dispatch one Engineer agent per runnable ticket (using the Agent tool with `prompts/engineer-agent.md` + ticket content inline).

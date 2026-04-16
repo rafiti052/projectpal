@@ -8,16 +8,27 @@ REPO_ROOT="$SCRIPT_DIR/.."
 cd "$REPO_ROOT"
 CURSOR_DIR="$HOME/.cursor"
 MCP_FILE="$CURSOR_DIR/mcp.json"
+INSTALL_ROOT="$CURSOR_DIR/projectpal"
+PACKAGE_SRC="$REPO_ROOT/build/cursor/cursor-mcp"
+PACKAGE_DST="$INSTALL_ROOT/cursor-mcp"
+RULES_DST="$INSTALL_ROOT/rules"
 
-mkdir -p "$CURSOR_DIR"
+mkdir -p "$CURSOR_DIR" "$PACKAGE_DST/bin" "$RULES_DST"
 
-MCP_FILE="$MCP_FILE" PROJECTPAL_REPO_ROOT="$REPO_ROOT" python3 <<'PY'
+cp "$PACKAGE_SRC/package.json" "$PACKAGE_DST/package.json"
+cp "$PACKAGE_SRC/bin/projectpal-cursor-mcp" "$PACKAGE_DST/bin/projectpal-cursor-mcp"
+chmod +x "$PACKAGE_DST/bin/projectpal-cursor-mcp"
+cp "$REPO_ROOT/build/cursor/.cursor/rules/projectpal.md" "$RULES_DST/projectpal.md"
+
+MCP_FILE="$MCP_FILE" PROJECTPAL_INSTALL_ROOT="$INSTALL_ROOT" python3 <<'PY'
 import json
 import os
 from pathlib import Path
 
 mcp_path = Path(os.environ["MCP_FILE"])
-repo_root = os.environ["PROJECTPAL_REPO_ROOT"]
+install_root = Path(os.environ["PROJECTPAL_INSTALL_ROOT"])
+launcher_path = install_root / "cursor-mcp" / "bin" / "projectpal-cursor-mcp"
+rules_path = install_root / "rules" / "projectpal.md"
 
 data = {}
 if mcp_path.exists():
@@ -41,9 +52,9 @@ mcp_servers["projectpal"] = {
     "connector": "cursor",
     "version": 1,
     "routing_rules": [],
-    "source_repo": repo_root,
-    "skill_entrypoint": "ProjectPal",
-    "rules_template": "templates/cursor-rules-projectpal.md",
+    "installed_artifact_root": str(install_root),
+    "launcher_path": str(launcher_path),
+    "rules_path": str(rules_path),
 }
 
 mcp_path.write_text(json.dumps(data, indent=2) + "\n")

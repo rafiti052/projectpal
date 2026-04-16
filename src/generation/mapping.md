@@ -4,7 +4,7 @@
 
 ## Shared behavior inventory
 
-These are currently shared ProjectPal behavior blocks that should move into the neutral source:
+These are the shared ProjectPal behavior blocks that belong in `src/`:
 
 
 | Current file                 | Current block                                            | Classification          | Planned neutral home                        |
@@ -17,18 +17,17 @@ These are currently shared ProjectPal behavior blocks that should move into the 
 
 ## Runtime-specific wrapper inventory
 
-These blocks should remain outside the shared neutral source:
+These blocks should remain outside the shared shared source and now belong under `platforms/<host>/`:
 
 
 | Current file                  | Current block                       | Classification           | Planned adapter home                   |
 | ----------------------------- | ----------------------------------- | ------------------------ | -------------------------------------- |
-| `skills/projectpal/SKILL.md`  | skill frontmatter                   | Codex wrapper            | `src/adapters/codex.md`                |
-| `skills/projectpal/SKILL.md`  | Codex adapter preamble              | Codex wrapper            | `src/adapters/codex.md`                |
-| `skills/projectpal/SKILL.md`  | Codex packaging footer              | Codex wrapper            | `src/adapters/codex.md`                |
-| `.codex-plugin/plugin.json`   | plugin metadata and prompt triggers | Codex wrapper metadata   | `src/adapters/codex.md`                |
-| `CLAUDE.md`                   | ownership comment and file identity | Claude wrapper, minimal  | `src/adapters/claude.md`               |
-| `~/.cursor/mcp.json`          | Cursor registration metadata        | Cursor install wrapper   | `src/adapters/cursor.md`               |
-| `.cursor/rules/projectpal.md` | repo-local Cursor context           | Cursor repo template     | `templates/cursor-rules-projectpal.md` |
+| `skills/projectpal/SKILL.md`  | skill frontmatter and host preamble | Codex wrapper            | `platforms/codex/skill-header.md`      |
+| `.codex-plugin/plugin.json`   | plugin metadata and prompt triggers | Codex wrapper metadata   | `platforms/codex/plugin.json`          |
+| `CLAUDE.md`                   | Claude skill wrapper and footer     | Claude wrapper           | `platforms/claude/skill-*.md`          |
+| `bin/pp-compress`             | Claude hook helper                  | Claude hook glue         | `platforms/claude/hooks/pp-compress`   |
+| `~/.cursor/mcp.json`          | Cursor registration metadata        | Cursor install wrapper   | `platforms/cursor/mcp.json.template`   |
+| `.cursor/rules/projectpal.md` | repo-local Cursor context           | Cursor repo template     | `platforms/cursor/rules/projectpal.md` |
 
 
 ## Non-source operational files
@@ -40,8 +39,8 @@ These files support runtime operation but are not themselves the authoring sourc
 | ---------------------------------- | ----------------------------------- | --------------------- |
 | `.mcp.json`                        | project MCP server wiring           | operational config    |
 | `.claude/settings.local.json`      | local Claude permissions/settings   | local runtime config  |
-| `scripts/install-cursor.sh`        | installs Cursor global registration | install tooling       |
-| `scripts/generate.sh`              | generation script                   | generation tooling    |
+| `scripts/install-cursor.sh`        | legacy Cursor installer wrapper     | wrapper tooling       |
+| `scripts/generate.sh`              | legacy repo-root generation wrapper | wrapper tooling       |
 
 
 ## Minimum wrapper boundary summary
@@ -50,3 +49,10 @@ These files support runtime operation but are not themselves the authoring sourc
 - Codex: frontmatter, invocation preamble, plugin metadata, and packaging footer are the true wrapper boundary.
 - Cursor: registration metadata and repo-local rules template are wrapper-owned outside the shared body.
 - Connector runtime (routing/connector delegation) is intentionally deferred; v0.4 ships only the always-loaded Claude/Codex surfaces plus Cursor MCP registration.
+
+## Canonical layout summary
+
+- Shared product behavior lives under `src/`.
+- Host-owned adapter inputs live under `platforms/claude`, `platforms/codex`, and `platforms/cursor`.
+- Generated host outputs live under `build/claude`, `build/codex`, and `build/cursor`.
+- Legacy root-level wrappers stay in place only until later tickets repoint them at the generated host trees.
