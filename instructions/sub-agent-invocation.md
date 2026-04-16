@@ -4,7 +4,7 @@
 
 Use the **Agent** tool (not Task) to invoke all sub-agents. Agent is always available — Task requires schema loading and should not be used here.
 
-Seven sub-agents are active in the pipeline. All receive their input inline — never by file reference alone.
+Eight sub-agents are active in the pipeline. All receive their input inline — never by file reference alone.
 
 These worker names are internal only. Never announce them to the user or use them as progress labels. User-facing updates should stay in the visible stage language: `Discovery`, `Brief`, `Refinement`, `Solution`, `Planning`, `Technical Details`, `Tickets`, `Implementation`, and `Wrap Up`.
 
@@ -167,4 +167,36 @@ Gate: a `changes-requested` verdict blocks starting the next wave until the Pal 
 
 ---
 
+### 8. Engineer
+
+Invoked at Phase 7 for each ticket in the implementation batch. The Pal dispatches one ticket at a time; the Engineer executes the work scoped by that ticket and hands back to the Pal when finished.
+
+```
+Agent(Engineer):
+  input:  prompts/engineer-agent.md + ticket content (inline) + project context
+  output: completed ticket work + status update + blocker report (if any)
+```
+
+After completing its ticket, the Engineer returns control to the Pal, which updates the ticket status and decides whether to dispatch the next ticket or surface a blocker to the user.
+
+**Phase 7 wave-level parallel execution:**
+
+The Pal may spawn one Engineer agent per ticket within a wave when both conditions hold:
+
+1. The ticket's `depends_on` chain is fully satisfied (all upstream tickets are `complete`).
+2. The ticket's `allowed_writes` do not overlap on an exclusive write surface with any other currently running Engineer instance.
+
+When either condition is not met, the Pal falls back to sequential dispatch for the affected tickets.
+
+Rules for parallel Engineer execution:
+
+- Each Engineer instance only writes within its own ticket's `allowed_writes` scope. No Engineer may revert or modify another Engineer's output.
+- The Pal orchestrates the wave lifecycle: it spawns Engineers, tracks their status, and collects results. The Engineer hands back to the Pal after completing its ticket — it does not spawn further work or advance the wave on its own.
+- Write ownership must stay clear: each running Engineer gets a distinct file or module responsibility as defined by its ticket's `allowed_writes`.
+- This parallel pattern applies specifically to Phase 7 wave execution and does not override the lean v1 parallel delegation guard. The lean v1 guard blocks general parallel delegated work across the system; Engineer wave parallelism is an internal Phase 7 orchestration concern managed entirely by the Pal within a single active thread.
+
+---
+
 For Clear path problems: keep the **Strategist**, skip the Architect, Manager, and Tech Lead, then move through Phase 3 → Phase 6 → Phase 7 → Phase 8.
+
+The **Engineer** runs in Phase 7 on every route — Clear path included. Whenever Implementation begins, the Pal dispatches tickets to the Engineer regardless of complexity assessment.
