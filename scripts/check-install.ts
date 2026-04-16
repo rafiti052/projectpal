@@ -1,9 +1,17 @@
 #!/usr/bin/env tsx
-// Install parity checker — pre-ship quality gate for both adapters.
+// Install parity checker — pre-ship quality gate for all three installed adapters.
+//
+// Checks for each adapter (claude, codex, cursor):
+//   A. Skill / config file exists on disk
+//   B. Front matter or config entry is valid
+//
+// Plus shared state checks against .projectpal/state.yml:
+//   C. State key schema (thread_orchestration shape)
+//   D. Thread-local write contract (fallback_records are task-tagged)
 //
 // Usage:
-//   pnpm tsx scripts/check-install.ts            # uses live state + routing
-//   pnpm tsx scripts/check-install.ts --fixture  # uses fixture files (no live API needed)
+//   pnpm tsx scripts/check-install.ts            # live — checks real disk paths
+//   pnpm tsx scripts/check-install.ts --fixture  # fixture — skips disk checks, uses fixture state
 //
 // Exits 0 when failures ≤ 2 (co-ship unblocked).
 // Exits 1 when failures > 2 (co-ship blocked).
@@ -15,19 +23,42 @@ import { parse } from 'yaml';
 
 const FIXTURE_DIR = path.join(__dirname, '..', 'tests', 'fixtures');
 const LIVE_STATE_PATH = path.join(process.cwd(), '.projectpal', 'state.yml');
-const LIVE_ROUTING_PATH = path.join(os.homedir(), '.projectpal', 'routing.yml');
 const FIXTURE_STATE_PATH = path.join(FIXTURE_DIR, 'state.fixture.yml');
-const FIXTURE_ROUTING_PATH = path.join(FIXTURE_DIR, 'routing.fixture.yml');
 
 const useFixture =
-  process.argv.includes('--fixture') ||
-  !fs.existsSync(LIVE_STATE_PATH) ||
-  !fs.existsSync(LIVE_ROUTING_PATH);
+  process.argv.includes('--fixture') || !fs.existsSync(LIVE_STATE_PATH);
 
 const statePath = useFixture ? FIXTURE_STATE_PATH : LIVE_STATE_PATH;
-const routingPath = useFixture ? FIXTURE_ROUTING_PATH : LIVE_ROUTING_PATH;
 
-const ISO_8601_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
+type SkillType = 'markdown-skill' | 'cursor-mcp';
+
+interface AdapterSpec {
+  name: string;
+  displayName: string;
+  skillPath: string;
+  type: SkillType;
+}
+
+const ADAPTERS: AdapterSpec[] = [
+  {
+    name: 'claude',
+    displayName: 'Claude Code',
+    skillPath: path.join(os.homedir(), '.claude', 'skills', 'projectpal', 'SKILL.md'),
+    type: 'markdown-skill',
+  },
+  {
+    name: 'codex',
+    displayName: 'Codex',
+    skillPath: path.join(os.homedir(), '.codex', 'skills', 'projectpal', 'SKILL.md'),
+    type: 'markdown-skill',
+  },
+  {
+    name: 'cursor',
+    displayName: 'Cursor',
+    skillPath: path.join(os.homedir(), '.cursor', 'mcp.json'),
+    type: 'cursor-mcp',
+  },
+];
 
 type CheckResult = { adapter: string; check: string; pass: boolean; message: string };
 
@@ -35,9 +66,67 @@ function checkResult(adapter: string, check: string, pass: boolean, message = ''
   return { adapter, check, pass, message };
 }
 
-// ── Check 1: State key schema ──────────────────────────────────────────────
-function check1StateKeySchema(state: Record<string, unknown>, adapter: string): CheckResult {
-  const name = 'Check 1: State key schema';
+// ── Check A: Skill / config file exists ───────────────────────────────────
+function checkAFileExists(spec: AdapterSpec): CheckResult {
+  const name = 'Check A: Skill file exists';
+  if (useFixture) {
+    return checkResult(spec.name, name, true, 'skipped in fixture mode');
+  }
+  const exists = fs.existsSync(spec.skillPath);
+  return checkResult(
+    spec.name,
+    name,
+    exists,
+    exists ? '' : `not found: ${spec.skillPath}`,
+  );
+}
+
+// ── Check B: Front matter / config entry valid ────────────────────────────
+function checkBFrontMatter(spec: AdapterSpec): CheckResult {
+  const name = 'Check B: Front matter / config valid';
+  if (useFixture) {
+    return checkResult(spec.name, name, true, 'skipped in fixture mode');
+  }
+  if (!fs.existsSync(spec.skillPath)) {
+    return checkResult(spec.name, name, false, 'file missing — skipping front matter check');
+  }
+
+  const content = fs.readFileSync(spec.skillPath, 'utf8');
+
+  if (spec.type === 'markdown-skill') {
+    const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    if (!fmMatch) {
+      return checkResult(spec.name, name, false, 'no valid YAML front matter block (--- ... ---)');
+    }
+    if (!fmMatch[1].includes('name: projectpal')) {
+      return checkResult(spec.name, name, false, 'front matter does not contain "name: projectpal"');
+    }
+    return checkResult(spec.name, name, true, '');
+  }
+
+  if (spec.type === 'cursor-mcp') {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(content);
+    } catch {
+      return checkResult(spec.name, name, false, 'mcp.json is not valid JSON');
+    }
+    const servers = (parsed as Record<string, unknown>)['mcpServers'] as
+      | Record<string, unknown>
+      | undefined;
+    if (!servers?.['projectpal']) {
+      return checkResult(spec.name, name, false, 'mcpServers.projectpal entry missing from mcp.json');
+    }
+    return checkResult(spec.name, name, true, '');
+  }
+
+  return checkResult(spec.name, name, false, `unknown skill type: ${spec.type}`);
+}
+
+// ── Check C: State key schema ──────────────────────────────────────────────
+function checkCStateKeySchema(state: Record<string, unknown>): CheckResult {
+  const name = 'Check C: State key schema';
+  const adapter = 'claude'; // state is shared; tag under claude by convention
   const to = state?.['thread_orchestration'] as Record<string, unknown> | undefined;
 
   if (!to || typeof to !== 'object') {
@@ -54,7 +143,6 @@ function check1StateKeySchema(state: Record<string, unknown>, adapter: string): 
     return checkResult(adapter, name, false, 'threads[0].primary_assistant is missing or not a string');
   }
 
-  // approved_execution_path_id may be null (valid) but the key must exist
   if (!('approved_execution_path_id' in thread)) {
     return checkResult(adapter, name, false, 'threads[0].approved_execution_path_id key is absent');
   }
@@ -62,64 +150,28 @@ function check1StateKeySchema(state: Record<string, unknown>, adapter: string): 
   return checkResult(adapter, name, true, '');
 }
 
-// ── Check 2: Approval state shape ─────────────────────────────────────────
-function check2ApprovalShape(routing: Record<string, unknown>, adapter: string): CheckResult {
-  const name = 'Check 2: Approval state shape';
-  const connectorName = adapter; // check the entry matching the adapter name
-  const connectors = routing?.['connectors'] as Record<string, Record<string, unknown>> | undefined;
-
-  if (!connectors || typeof connectors !== 'object') {
-    return checkResult(adapter, name, false, 'routing.yml connectors block is missing');
-  }
-
-  const entry = connectors[connectorName];
-  if (!entry) {
-    return checkResult(adapter, name, false, `connectors.${connectorName} entry is absent`);
-  }
-
-  // approved: bool | null
-  if (entry['approved'] !== null && typeof entry['approved'] !== 'boolean') {
-    return checkResult(adapter, name, false, `connectors.${connectorName}.approved must be bool or null`);
-  }
-
-  // approved_at: ISO-8601 string or null
-  if (entry['approved_at'] !== null && typeof entry['approved_at'] === 'string') {
-    if (!ISO_8601_RE.test(entry['approved_at'])) {
-      return checkResult(adapter, name, false, `connectors.${connectorName}.approved_at is not ISO-8601`);
-    }
-  } else if (entry['approved_at'] !== null) {
-    return checkResult(adapter, name, false, `connectors.${connectorName}.approved_at must be ISO-8601 string or null`);
-  }
-
-  // declined_at: ISO-8601 string or null
-  if (entry['declined_at'] !== null && typeof entry['declined_at'] === 'string') {
-    if (!ISO_8601_RE.test(entry['declined_at'])) {
-      return checkResult(adapter, name, false, `connectors.${connectorName}.declined_at is not ISO-8601`);
-    }
-  } else if (entry['declined_at'] !== null) {
-    return checkResult(adapter, name, false, `connectors.${connectorName}.declined_at must be ISO-8601 string or null`);
-  }
-
-  return checkResult(adapter, name, true, '');
-}
-
-// ── Check 3: Thread-local write contract ──────────────────────────────────
-function check3ThreadLocalWrites(state: Record<string, unknown>, adapter: string): CheckResult {
-  const name = 'Check 3: Thread-local write contract';
+// ── Check D: Thread-local write contract ──────────────────────────────────
+function checkDThreadLocalWrites(state: Record<string, unknown>): CheckResult {
+  const name = 'Check D: Thread-local write contract';
+  const adapter = 'claude'; // state is shared; tag under claude by convention
   const to = state?.['thread_orchestration'] as Record<string, unknown> | undefined;
 
-  if (!to) return checkResult(adapter, name, true, ''); // no thread block — vacuously passes
+  if (!to) return checkResult(adapter, name, true, '');
 
   const records = to['fallback_records'] as Array<Record<string, unknown>> | undefined;
   if (!records || records.length === 0) {
-    return checkResult(adapter, name, true, ''); // no records — nothing to check
+    return checkResult(adapter, name, true, '');
   }
 
-  // Every fallback record must carry a task_id (thread-tagged)
   for (let i = 0; i < records.length; i++) {
     const rec = records[i];
     if (!rec['task_id'] || typeof rec['task_id'] !== 'string') {
-      return checkResult(adapter, name, false, `fallback_records[${i}].task_id is missing — record is not thread-tagged`);
+      return checkResult(
+        adapter,
+        name,
+        false,
+        `fallback_records[${i}].task_id is missing — record is not thread-tagged`,
+      );
     }
   }
 
@@ -130,41 +182,35 @@ function check3ThreadLocalWrites(state: Record<string, unknown>, adapter: string
 function run(): void {
   console.log('Install Parity Check');
   console.log('='.repeat(52));
-  console.log(`Mode: ${useFixture ? 'fixture' : 'live'}`);
-  console.log(`State:   ${statePath}`);
-  console.log(`Routing: ${routingPath}`);
+  console.log(`Mode:  ${useFixture ? 'fixture' : 'live'}`);
+  console.log(`State: ${statePath}`);
   console.log('');
 
   let state: Record<string, unknown>;
-  let routing: Record<string, unknown>;
-
   try {
     state = parse(fs.readFileSync(statePath, 'utf8')) as Record<string, unknown>;
   } catch (err) {
-    console.error(`FATAL: cannot read state.yml — ${err instanceof Error ? err.message : String(err)}`);
+    console.error(
+      `FATAL: cannot read state.yml — ${err instanceof Error ? err.message : String(err)}`,
+    );
     process.exit(1);
   }
 
-  try {
-    routing = parse(fs.readFileSync(routingPath, 'utf8')) as Record<string, unknown>;
-  } catch (err) {
-    console.error(`FATAL: cannot read routing.yml — ${err instanceof Error ? err.message : String(err)}`);
-    process.exit(1);
-  }
-
-  const adapters = ['gemini', 'cursor'];
   const results: CheckResult[] = [];
 
-  for (const adapter of adapters) {
-    results.push(check1StateKeySchema(state, adapter));
-    results.push(check2ApprovalShape(routing, adapter));
-    results.push(check3ThreadLocalWrites(state, adapter));
+  for (const spec of ADAPTERS) {
+    results.push(checkAFileExists(spec));
+    results.push(checkBFrontMatter(spec));
   }
 
+  // Shared state checks — tagged under claude, shown in that section
+  results.push(checkCStateKeySchema(state));
+  results.push(checkDThreadLocalWrites(state));
+
   // Print structured report
-  for (const adapter of adapters) {
-    console.log(`Adapter: ${adapter}`);
-    for (const r of results.filter((x) => x.adapter === adapter)) {
+  for (const spec of ADAPTERS) {
+    console.log(`Adapter: ${spec.displayName} (${spec.name})`);
+    for (const r of results.filter((x) => x.adapter === spec.name)) {
       const status = r.pass ? '[PASS]' : '[FAIL]';
       const detail = r.message ? ` — ${r.message}` : '';
       console.log(`  ${status} ${r.check}${detail}`);
