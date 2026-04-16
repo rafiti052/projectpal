@@ -1,4 +1,4 @@
-<!-- Ownership: Source-first generation contract for ProjectPal runtime surfaces. -->
+
 
 # Generation Contract
 
@@ -10,12 +10,12 @@ Every feature touching ProjectPal runtime behavior should update the neutral sou
 
 1. Edit neutral source files under `src/`
 2. Generate shared runtime outputs:
-   - `CLAUDE.md`
-   - `AGENTS.md`
-   - shared body inside `skills/projectpal/SKILL.md`
+  - `CLAUDE.md`
+  - `AGENTS.md`
+  - shared body inside `skills/projectpal/SKILL.md`
 3. Apply runtime-specific adapter wrappers:
-   - Claude adapter as needed
-   - Codex skill and packaging wrapper
+  - Claude adapter as needed
+  - Codex skill and packaging wrapper
 4. Run verification
 5. Record the regenerated runtime surfaces in the changelog
 

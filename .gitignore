@@ -6,6 +6,9 @@ pnpm-lock.yaml
 .projectpal/*
 !.projectpal/state.yml
 !.projectpal/parking-lot.md
+!.projectpal/artifacts/
+.projectpal/artifacts/*
+!.projectpal/artifacts/brief/
 !.projectpal/artifacts/tickets/
 
 .cursor/

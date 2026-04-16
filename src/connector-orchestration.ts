@@ -1,5 +1,6 @@
 // Orchestration entry: routing → approval gate → adapter.invoke.
-// Contract: connector-wiring Brief — external Brief draft path uses Gemini when routed.
+// Experimental until a ProjectPal CLI exists — see docs/north-star.md §14. Optional
+// routed delegation (e.g. Gemini) is not required for core Pal behavior in assistants today.
 
 import * as router from './connector-router';
 import * as gate from './approval-gate';

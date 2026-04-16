@@ -105,8 +105,9 @@ sh scripts/setup-dev.sh
 |---------|-------------|
 | `pnpm typecheck` | TypeScript type check — zero errors expected |
 | `pnpm test` | Thread isolation tests via vitest |
-| `pnpm check:install` | Install parity check against fixture files |
-| `pnpm tsx scripts/check-install.ts` | Install check against live state and routing files |
+| `pnpm check:install` | Install parity check — live `.projectpal/state.yml` + `~/.projectpal/routing.yml` when both exist, otherwise fixtures |
+| `pnpm check:install --fixture` | Same checks forced against repo fixtures (release gate) |
+| `pnpm tsx scripts/check-install.ts` | Direct invocation; add `--fixture` to match the release gate |
 
 ---
 

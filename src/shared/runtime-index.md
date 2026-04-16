@@ -1,5 +1,3 @@
-
-
 # Shared Layer 1 Index
 
 ProjectPal currently keeps detailed protocols in repo-local files under `instructions/`.

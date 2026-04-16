@@ -10,10 +10,15 @@ All generated documents go to `.projectpal/artifacts/` in the current project di
     tickets/
     refinement/          # debate records (`type: debate-record`) live here
     designer-review/
+  staging/               # transient sub-agent drafts (see sub-agent-invocation.md)
   parking-lot.md
 ```
 
-If `.projectpal/artifacts/` doesn't exist, create it before saving. All artifact paths are relative to the current working directory.
+If `.projectpal/artifacts/` does not exist, create it before saving. If you use the staging handoff, create `.projectpal/staging/` before the agent writes. All artifact paths are relative to the current working directory.
+
+## Staging drafts and promotion
+
+Sub-agents may write large drafts under `.projectpal/staging/<agent-slug>-<draft-id>.md` and return `artifact_draft_path` in their completion signal. The Pal validates content, then **promotes** into the canonical tree under `artifacts/` (see templates above). Staging files are disposable after a successful promotion; do not treat them as user-facing artifacts.
 
 All generated documents use YAML frontmatter:
 
@@ -51,6 +56,8 @@ Artifact review pattern:
 - three-line summary
 - artifact link or links
 - one approval question
+
+Mandated Check-ins named in `instructions/phase-protocols.md` (see **Check-in obligations**) use this shape unless that document specifies a different rhythm.
 
 **Debate record template** (save to `.projectpal/artifacts/refinement/<project-name>-debate.md`):
 

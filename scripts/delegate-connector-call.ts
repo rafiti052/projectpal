@@ -1,7 +1,8 @@
 #!/usr/bin/env npx tsx
 /**
  * Run a single routed connector call (routing.yml phase + task_type → adapter).
- * Used when the Pal delegates Brief drafting to Gemini per routing rule.
+ * Optional / experimental — same scope as src/connector-orchestration.ts (north-star §14).
+ * Used when a maintainer or future CLI exercises routed delegation (e.g. Gemini).
  *
  * Usage:
  *   pnpm exec tsx scripts/delegate-connector-call.ts <phase> <task_type> <task_id> <thread_id> < summary.txt
