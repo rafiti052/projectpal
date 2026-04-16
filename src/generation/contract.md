@@ -22,6 +22,15 @@ Every feature touching ProjectPal runtime behavior should update the shared sour
 - Each host writes only to `build/<host>/`
 - Shared install and smoke flows target `build/<host>/`
 
+## Build output policy
+
+`build/<host>/` is generated output.
+
+- Do not edit `build/**` by hand.
+- Do not commit `build/**` to git by default.
+- Regenerate locally with `sh scripts/build-platform.sh <claude|cursor|codex>` (or `all`) before validating.
+- Release automation should also build from `src/` + `platforms/<host>/` into `build/<host>/` and then package from `build/<host>/`, never from wrapper surfaces.
+
 ## Transitional bridge
 
 The repo still has top-level wrappers such as `CLAUDE.md`, `AGENTS.md`, `skills/projectpal/SKILL.md`, and `templates/cursor-rules-projectpal.md`.
