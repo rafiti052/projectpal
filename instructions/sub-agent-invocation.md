@@ -8,6 +8,30 @@ Eight sub-agents are active in the pipeline. All receive their input inline — 
 
 These worker names are internal only. Never announce them to the user or use them as progress labels. User-facing updates should stay in the visible stage language: `Discovery`, `Brief`, `Refinement`, `Solution`, `Planning`, `Technical Details`, `Tickets`, `Implementation`, and `Wrap Up`.
 
+## Sub-agent artifact handoff (staging)
+
+**Why:** Large structured outputs should not rely on pasting full documents into chat for the Pal to re-save. Prefer a **staging file** plus a short completion signal.
+
+**Staging path:** `.projectpal/staging/<agent-slug>-<draft-id>.md`
+
+- **`agent-slug`** — one of: `complexity-analyst`, `strategist`, `architect`, `manager`, `tech-lead`, `scrum-master`, `designer`, `engineer`.
+- **`draft-id`** — short unique suffix chosen by the Pal (time fragment, random token, or monotonic counter). Use lowercase ASCII and hyphens only.
+
+**Pal before dispatch (when using staging):** `mkdir -p .projectpal/staging`. Give the agent the exact repo-relative path to write.
+
+**Agent completion signal:** End with a compact reply that includes `artifact_draft_path: <repo-relative path>` to the staging file, plus any persona-mandated lines (verdict, sign-off, blocker, etc.).
+
+**Pal after return:**
+
+1. Read the staging file; confirm it is non-empty and matches the expected shape (YAML frontmatter when required for that artifact type).
+2. **Validate** against the active phase, Engineer `allowed_writes` when relevant, and canonical placement in `instructions/artifacts.md`.
+3. **Promote** to the final path (for example `.projectpal/artifacts/brief/…`, `technical-details/…`, `tickets/<NNN>.md`, `refinement/…`, `designer-review/…`). Prefer replacing the staging file with a move into the canonical tree; otherwise copy then delete the staging file.
+4. If validation fails, keep the staging file, explain the gap, and do not promote partial content.
+
+**Inline output:** Still valid for small payloads or when file writes are unavailable. Staging applies to **outputs** only — **inputs** to agents stay inline as stated above.
+
+**Engineer:** Primary work is still repo changes under `allowed_writes`. Use staging only when the ticket expects a long structured report separate from code edits.
+
 ## Lean v1 execution path contract
 
 Before invoking delegated work in lean v1, compare the candidate `ExecutionPathRecord` to the thread's approved path.
@@ -98,7 +122,7 @@ Agent(Manager):
 **Debate protocol (bounded, max 3 rounds):**
 
 ```
-Step 1: Agent(Strategist) drafts Brief → brevity audit → word count check → save working Brief
+Step 1: Agent(Strategist) drafts Brief → brevity audit → word count check → save working Brief (inline or staging handoff)
 Step 2: If >2,000 words after brevity audit: warn user before proceeding
 Step 3: Agent(Architect) receives: architect-agent.md + full Brief (inline) → critique + sign-off
 Step 4: Agent(Manager) receives: manager-agent.md + full Brief + Architect output (inline) → deliberation + sign-off
@@ -146,7 +170,7 @@ Step 1: Read the approved planning artifact set
         - Clear path: derive tickets from the approved Brief and the already-bounded route
 Step 2: Read Parking Lot items tagged phase:6 or phase:execution
 Step 3: Agent(Scrum Master) receives: scrum-master-agent.md + technical-details artifact + parking lot (inline)
-Step 4: Pal captures ticket set output
+Step 4: Pal captures ticket set output (inline or from `artifact_draft_path` when the Scrum Master used staging)
 Step 5: Save each ticket as individual file: .projectpal/artifacts/tickets/<NNN>.md (zero-padded 3-digit numbers)
 Step 6: Proceed to Phase 7 Implementation Protocol
 ```
@@ -160,7 +184,7 @@ Invoked in Phase 7 after each **wave** of Implementation tickets completes when 
 ```
 Agent(Designer):
   input:  prompts/designer-agent.md + combined wave output (diffs or Pal summary) + approved Brief + Technical Details / tech spec (inline)
-  output: Designer Review Record at .projectpal/artifacts/designer-review/<project>-wave-<id>.md
+  output: Designer Review Record at .projectpal/artifacts/designer-review/<project>-wave-<id>.md (write via staging handoff when the record is long, then Pal promotes)
 ```
 
 Gate: a `changes-requested` verdict blocks starting the next wave until the Pal resolves the listed changes (new tickets or direct fixes).

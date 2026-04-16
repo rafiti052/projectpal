@@ -1,5 +1,3 @@
-<!-- Ownership: ConnectorAdapter interface contract. All adapters (Gemini, Cursor) and callers (Router, FallbackHandler) import from this definition. Do not couple this file to any specific adapter. -->
-
 # ConnectorAdapter Interface Contract
 
 ## Purpose
@@ -83,3 +81,4 @@ DelegationTask:
 - This file is the single source of truth for all three interface shapes above.
 - No implementation code belongs here.
 - Any change to signatures must be reflected in all downstream adapter files before merge.
+

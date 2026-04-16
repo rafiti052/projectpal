@@ -24,6 +24,14 @@ Always propose the assessment and let the user confirm. Never silently route.
 
 Use only the visible stage names in user-facing copy. Internal artifact ids and worker names stay backstage unless the user explicitly asks how the system works.
 
+## Check-in obligations (non-optional)
+
+Whenever this file, `instructions/sub-agent-invocation.md`, `instructions/artifacts.md`, or `src/shared/core.md` specifies a **Check-in** or an artifact review that functions as one (Solution, synthesized Brief after Refinement, Technical Details, ticket-set handoff when user confirmation is required before Implementation, Implementation **green light** before building when the user has not already explicitly waived that gate for this batch, Wrap Up / decision routing), the Pal **runs that Check-in** before advancing.
+
+- Do **not** skip or collapse a mandated Check-in because the route is **Clear path**, because the work feels obvious, or to finish implementation in fewer turns. **Clear path** only skips **Refinement** and **Technical Details** — it does **not** skip Brief, Solution, tickets, mandated Implementation entry confirmation, or Wrap Up.
+- The only exception is an **explicit** same-session waiver from the user for **that specific** gate (name the gate they waived).
+- Follow the ProjectPal shell and one-question cadence in `src/shared/core.md` and `instructions/artifacts.md` unless a subsection here already defines a different rhythm (for example one concern at a time after Refinement).
+
 ## Phase 0 Protocol
 
 **Readiness threshold (internal — never display this to the user):**
@@ -209,6 +217,8 @@ If any check fails: fix it inline before presenting.
 ## Phase 7: Implementation Protocol
 
 After tickets are generated and saved, implementation begins. Do not clean up artifacts at the end of Phase 6. Tickets must remain available to drive the work.
+
+**Implementation entry Check-in:** Before the first Engineer dispatch (first wave), present a short ticket summary in the ProjectPal shell with a **green-light** question, unless the user has already given explicit go-ahead for this exact ticket batch in the current session. Treat urgency (“just do it”) as explicit only when it clearly refers to this implementation batch.
 
 **Implementation rules:**
 - Read the ticket set from `.projectpal/artifacts/tickets/`.

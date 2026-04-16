@@ -6,7 +6,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "check:install": "tsx scripts/check-install.ts --fixture",
+    "check:install": "tsx scripts/check-install.ts",
     "test:integration": "sh scripts/test-integration.sh"
   },
   "dependencies": {

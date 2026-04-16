@@ -110,5 +110,5 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 echo "Next steps:"
 echo "  pnpm test        # run thread isolation tests"
-echo "  pnpm check:install  # run install parity check"
+echo "  pnpm check:install --fixture  # install parity (fixture mode, matches release gate)"
 echo ""

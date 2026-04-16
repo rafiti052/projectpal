@@ -348,6 +348,10 @@ If those survive, the implementation can change without the product losing itsel
 
 When ProjectPal ships its own CLI tool with MCP support and orchestration machinery that runs outside the assistant runtimes, external model routing becomes viable.
 
+### Near-term schedule (explicit)
+
+**Connector wiring is not a near-term release target.** It stays in this document as the long-range product shape only. The repo may still carry small, experimental routing and adapter scaffolding toward a future CLI — that is **not** a promise to finish end-to-end connector wiring inside current assistant runtimes on any fixed horizon. Release checklists, parking-lot items, and `.projectpal/state.yml` **next_steps** should treat connector wiring as **backlog documented here**, not as an imminent ship commitment.
+
 ### The idea
 
 Role-scoped ranked model preferences per agent role, configured via a config file (not hand-edited — set up interactively). Each sub-agent tries from the top of its preference list, falls back on availability failures (missing key, quota, errors), with the primary assistant model as the guaranteed floor.
@@ -358,8 +362,9 @@ No current assistant runtime (Claude Code, Codex, Cursor) supports routing sub-a
 
 ### What exists
 
-- A Brief draft at `.projectpal/artifacts/brief/connector-wiring.md`
+- Optional concept brief when authored: `.projectpal/artifacts/brief/connector-wiring.md`
 - A post-setup config flow concept for editing role rankings after install
+- **In-repo inventory (experimental, CLI-oriented):** TypeScript modules such as `src/connector-orchestration.ts`, `src/connector-router.ts`, `src/approval-gate.ts`, `src/register-default-adapters.ts`, `src/adapters/gemini-adapter.ts`, and `scripts/delegate-connector-call.ts` — useful for future wiring work, not required for day-to-day Pal behavior in assistants today.
 
 ### Prerequisites
 

@@ -345,7 +345,7 @@ command_prepare_repo() {
     blocker_detail="I couldn't create ProjectPal's local workspace in .projectpal/ yet."
     blocker_next_step="Create .projectpal/state.yml in this repo, then run ProjectPal again."
   else
-    mkdir -p "$projectpal_dir" "$artifacts_dir"/brief "$artifacts_dir"/technical-details "$artifacts_dir"/tickets "$artifacts_dir"/refinement
+    mkdir -p "$projectpal_dir" "$projectpal_dir/staging" "$artifacts_dir"/brief "$artifacts_dir"/technical-details "$artifacts_dir"/tickets "$artifacts_dir"/refinement "$artifacts_dir"/designer-review
     if [ ! -f "$state_path" ]; then
       {
         printf '%s\n' "repo_slug: $repo_slug"
