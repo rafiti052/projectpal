@@ -27,7 +27,7 @@ ConnectorAdapter:
 
 ```
 DelegationResult:
-  result_state: string        # "success" | "failure" | "timeout"
+  result_state: string        # "success" | "failure" | "timeout" | "skipped"
   output: string | null
   failure_reason: string | null
   elapsed_seconds: int
@@ -35,9 +35,9 @@ DelegationResult:
 
 **Field notes:**
 
-- `result_state` must be one of the three literal strings above.
-- `output` is null on failure or timeout.
-- `failure_reason` is null on success; on failure, use one of: `"auth"`, `"quota"`, `"timeout"`, `"runtime_error"`, `"unknown"`.
+- `result_state` must be one of the four literal strings above. Use `"skipped"` when an adapter is intentionally not routable for a given task (e.g. Cursor in v1).
+- `output` is null on failure, timeout, or skipped.
+- `failure_reason` is null on success or skipped; on failure, use one of: `"auth"`, `"quota"`, `"timeout"`, `"runtime_error"`, `"unknown"`. Adapters may use an additional adapter-specific literal when none of these accurately describes the reason.
 - `elapsed_seconds` is always populated, including on failure.
 
 ---
@@ -72,6 +72,7 @@ DelegationTask:
   task_type: string
   acceptance_criteria_summary: string
   execution_path_id: string
+  phase: int
 ```
 
 ---

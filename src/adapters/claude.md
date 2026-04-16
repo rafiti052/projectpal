@@ -22,40 +22,35 @@ Keep the Claude adapter as thin as possible:
 
 The Claude Code path is the only delegated reference adapter in scope for lean v1.
 
-### `get_reference_connector_status`
+### `check_status` (reference adapter extension)
 
-Return one normalized `ConnectorStatusSnapshot` shape:
+Returns a `ConnectorStatusSnapshot` using the shared field names from `src/adapters/connector-adapter.md`:
 
-- `connector_identity`
-- `auth_state` = `available | missing | expired | denied | unknown`
-- `availability_state` = `available | degraded | unavailable | unknown`
-- `last_failure_reason` = `none | quota_exhausted | connector_exhausted | auth_failure | runtime_error | unknown`
-- `quota_state` = `available | exhausted | unknown`
-- `checked_at`
+- `connector` — identity string, e.g. `"claude"`
+- `reachable` — bool
+- `last_checked_at` — ISO-8601 or null
+- `last_failure_at` — ISO-8601 or null
 
 Rules:
 
-- Normalize any missing or ambiguous telemetry to `unknown`.
+- Normalize any missing or ambiguous telemetry to `unknown` / null.
 - Never return raw credential material, account identity, billing data, or raw quota values.
 
-### `delegate_via_reference_path`
+### `invoke` (reference adapter extension)
 
-Return one internal result shape:
+Returns a `DelegationResult` using the shared field names from `src/adapters/connector-adapter.md`:
 
-- `result_state` = `succeeded | failed | blocked`
-- `structured_result`
-- `normalized_failure`
-
-When `normalized_failure` is present, it may carry only:
-
-- `failure_reason` = `quota_exhausted | connector_exhausted | auth_failure | runtime_error | unknown`
+- `result_state` = `"success" | "failure" | "timeout"`
+- `output` — string or null
+- `failure_reason` = `"auth" | "quota" | "timeout" | "runtime_error" | "unknown"` or null
+- `elapsed_seconds` — int
 
 Rules:
 
 - The adapter returns internal result data only.
 - Non-primary assistants must not emit user-facing progress, decisions, or completion text.
 - Same-path fallback disclosure belongs to the next natural summary in Codex, not the delegated adapter output.
-- If the connector cannot prove a more specific failure reason, return `unknown`.
+- If the connector cannot prove a more specific failure reason, return `"unknown"`.
 
 The current generated-file prefix is shared through:
 

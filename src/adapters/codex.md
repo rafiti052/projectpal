@@ -17,15 +17,10 @@ Document the Codex-specific wrapper content that must remain outside the shared 
 - `skills/projectpal/SKILL.md` frontmatter:
   - skill name
   - description
-  - `source_of_truth`
 - Codex adapter preamble in `skills/projectpal/SKILL.md`:
   - canonical Codex invocation: `ProjectPal`
   - warning that `/projectpal` is not assumed to be a native slash command
   - note translating Claude-specific tool language into Codex equivalents
-- Codex packaging footer in `skills/projectpal/SKILL.md`:
-  - generated-file warning
-  - plugin packaging note
-  - `.codex-plugin/plugin.json` pointer
 - `.codex-plugin/plugin.json` metadata:
   - plugin identity
   - display metadata
@@ -44,7 +39,6 @@ The Codex adapter should own only:
 These adapter-owned snippets now live in:
 
 - `src/adapters/codex-skill-header.md`
-- `src/adapters/codex-skill-footer.md`
 
 The shared ProjectPal behavior should come from `src/shared/core.md`.
 
