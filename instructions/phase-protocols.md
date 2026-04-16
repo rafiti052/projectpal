@@ -303,8 +303,8 @@ If `designer_opt_in=true` for the active thread:
 
 ### Lean v1 parallel delegation guard
 
-- Explicit parallel delegated work is blocked in lean v1.
-- When a user asks for parallel delegated work, return one Pal-owned explanation that lean v1 only supports one delegated path at a time.
+- Explicit parallel delegated work is blocked in lean v1, **with one exception: Engineer wave parallelism** — the Pal may spawn one Engineer per runnable ticket within a wave when `depends_on` and `allowed_writes` allow it (see **Engineer invocation protocol** above).
+- All other parallel delegated work (non-Engineer paths, multi-Pal orchestration) is blocked. When a user asks for it, return one Pal-owned explanation that lean v1 only supports one delegated path at a time outside Engineer wave execution.
 - This guard applies to delegated parallelism only; it does not forbid independent non-delegated ProjectPal work in the same session.
 
 **Batch close rules:**
@@ -329,4 +329,8 @@ Phase 8 happens after implementation, not after ticket generation.
 2. Optional GitHub PR flow:
    - If the GitHub PR flow feature exists, run it here.
    - If it does not exist yet, skip it silently unless the user asks. Keep the future feature in the Parking Lot.
-3. Clean up `.projectpal/artifacts/` only after the Wrap Up summary is complete or deliberately skipped.
+3. **Artifact cleanup gate (required — do not skip):** Before touching any `.projectpal/staging/` files, ask:
+   > "Want me to clean up the staging files from this batch? I'll archive the tickets and remove the staging drafts."
+   - Wait for explicit yes (or equivalent) before proceeding.
+   - If the user says no or does not respond affirmatively: leave `.projectpal/staging/` as-is and note it in the session summary.
+4. Clean up `.projectpal/artifacts/` only after the user confirms cleanup in step 3.

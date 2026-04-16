@@ -66,3 +66,12 @@ For detailed protocols, load the relevant files from `instructions/`:
 - `instructions/sub-agent-invocation.md`
 - `instructions/artifacts.md`
 
+## Phase gate (hard stop)
+
+At every phase boundary, present the stage output and wait for explicit user approval before continuing. "Explicit approval" = "yes", "go ahead", "proceed", or equivalent. Silence is not approval.
+
+End every phase output with:
+> _Ready to move on to [next stage] — just say "go ahead" or tell me what to change first._
+
+Do not advance past a phase boundary without this stop — regardless of route complexity.
+

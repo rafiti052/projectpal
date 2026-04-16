@@ -1,6 +1,8 @@
 #!/bin/sh
 # Install the generated Claude runtime surface into Claude Code's skill directory.
 
+set -eu
+
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 cd "$SCRIPT_DIR/.."
 

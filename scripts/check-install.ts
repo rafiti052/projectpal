@@ -13,8 +13,8 @@
 //   pnpm tsx scripts/check-install.ts            # live — checks real disk paths
 //   pnpm tsx scripts/check-install.ts --fixture  # fixture — skips disk checks, uses fixture state
 //
-// Exits 0 when failures ≤ 2 (co-ship unblocked).
-// Exits 1 when failures > 2 (co-ship blocked).
+// Exits 0 when failures = 0 (co-ship unblocked).
+// Exits 1 when failures > 0 (co-ship blocked).
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -123,6 +123,23 @@ function checkBFrontMatter(spec: AdapterSpec): CheckResult {
   return checkResult(spec.name, name, false, `unknown skill type: ${spec.type}`);
 }
 
+// ── Check D: Cursor rules file reachable ──────────────────────────────────
+function checkDCursorRulesReachable(): CheckResult {
+  const name = 'Check D: Cursor rules file reachable';
+  const adapter = 'cursor';
+  if (useFixture) {
+    return checkResult(adapter, name, true, 'skipped in fixture mode');
+  }
+  const rulesPath = path.join(process.cwd(), '.cursor', 'rules', 'projectpal.md');
+  const exists = fs.existsSync(rulesPath);
+  return checkResult(
+    adapter,
+    name,
+    exists,
+    exists ? '' : `not found: ${rulesPath}`,
+  );
+}
+
 // ── Check C: State key schema ──────────────────────────────────────────────
 function checkCStateKeySchema(state: Record<string, unknown>): CheckResult {
   const name = 'Check C: State key schema';
@@ -175,6 +192,12 @@ function run(): void {
     results.push(checkBFrontMatter(spec));
   }
 
+  // Check D: Cursor-specific — rules file reachable
+  const cursorSpec = ADAPTERS.find((s) => s.name === 'cursor');
+  if (cursorSpec) {
+    results.push(checkDCursorRulesReachable());
+  }
+
   // Shared state checks — tagged under claude, shown in that section
   results.push(checkCStateKeySchema(state));
 
@@ -190,7 +213,7 @@ function run(): void {
   }
 
   const failures = results.filter((r) => !r.pass).length;
-  const threshold = 2;
+  const threshold = 0;
   console.log(`Result: ${failures} failure${failures !== 1 ? 's' : ''} (threshold: ${threshold})`);
 
   if (failures > threshold) {
