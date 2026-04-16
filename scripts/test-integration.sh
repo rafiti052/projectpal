@@ -87,11 +87,6 @@ assert_file_not_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "Ticket Generato
 assert_file_not_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "Technical Details Generator"
 assert_file_contains "$ROOT_DIR/skills/projectpal/SKILL.md" "combined wave output"
 assert_file_contains "$ROOT_DIR/instructions/session-resumption-schema.md" 'Read `.projectpal/state.yml` for the current repo first.'
-assert_file_contains "$ROOT_DIR/instructions/mempalace-onboarding.md" "MemPalace is what lets me carry context across sessions and across repos."
-assert_file_contains "$ROOT_DIR/instructions/mempalace-onboarding.md" 'This repo can still resume from `.projectpal/state.yml`, and MemPalace is what adds longer-term memory across sessions and across repos.'
-assert_file_not_contains "$ROOT_DIR/instructions/mempalace-onboarding.md" "my long-term memory layer"
-assert_file_not_contains "$ROOT_DIR/instructions/mempalace-onboarding.md" "they won't carry over"
-
 install_output=$(HOME="$default_home" sh "$ROOT_DIR/install-projectpal.sh")
 assert_contains "$install_output" "ProjectPal is ready in all supported assistants."
 
@@ -125,14 +120,14 @@ if [ "$projectpal_entry_count" -ne 1 ]; then
   exit 1
 fi
 
-existing_flow_output=$(PROJECTPAL_ASSISTANT_HINT=codex PROJECTPAL_MEMPALACE_MODE=missing sh "$ROOT_DIR/scripts/onboarding-flow.sh" onboarding-flow "$existing_repo")
+existing_flow_output=$(PROJECTPAL_ASSISTANT_HINT=codex sh "$ROOT_DIR/scripts/onboarding-flow.sh" onboarding-flow "$existing_repo")
 assert_contains "$existing_flow_output" "assistant_preferred: codex"
 assert_contains "$existing_flow_output" "repo_ready: true"
 assert_contains "$existing_flow_output" "final_next_step: Open Codex in this repo and type ProjectPal."
 assert_file_contains "$existing_repo/.cursor/rules/projectpal.md" "# ProjectPal"
 assert_file_not_contains "$existing_repo/.cursor/rules/projectpal.md" "pp-compress"
 
-new_flow_output=$(PROJECTPAL_ASSISTANT_HINT=codex PROJECTPAL_MEMPALACE_MODE=missing sh "$ROOT_DIR/scripts/onboarding-flow.sh" onboarding-flow "$new_repo")
+new_flow_output=$(PROJECTPAL_ASSISTANT_HINT=codex sh "$ROOT_DIR/scripts/onboarding-flow.sh" onboarding-flow "$new_repo")
 assert_contains "$new_flow_output" "assistant_preferred: codex"
 assert_contains "$new_flow_output" "repo_ready: true"
 assert_contains "$new_flow_output" "final_next_step: Open Codex in this repo and type ProjectPal."

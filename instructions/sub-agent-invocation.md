@@ -63,7 +63,7 @@ Invoked at Phase 1 (see Phase 1 Brief Protocol above).
 ```
 Agent(Strategist):
   input:  prompts/strategist-agent.md + transcript + confirmed complexity assessment
-          + Parking Lot items (phase:brief) + MemPalace results (inline)
+          + Parking Lot items (phase:brief) (inline)
   output: complete Brief document with YAML frontmatter (opinionated product Brief, including User Goals / UX Outcomes / Value Framing subsections)
 ```
 
@@ -121,7 +121,7 @@ Invoked at Phase 4 when the route is Needs a plan (see Phase 4 Planning Protocol
 ```
 Agent(Tech Lead):
   input:  prompts/tech-lead-agent.md + full approved Brief text
-          + MemPalace results + Parking Lot items (phase:4 / phase:technical-details) (inline)
+          + Parking Lot items (phase:4 / phase:technical-details) (inline)
   output: complete internal Technical Details document with YAML frontmatter
 ```
 

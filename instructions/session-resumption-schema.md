@@ -7,37 +7,17 @@
 1. Detect the active repo first.
 2. Read `.projectpal/state.yml` for the current repo first.
 3. If the local bridge exists and matches the current repo, it wins for the live session.
-4. Use repo-scoped memory only when the local bridge is missing, stale, or too incomplete to resume safely.
-5. If repo-scoped memory and `.projectpal/state.yml` disagree, prefer the local bridge for the current worktree and reconcile the repo-scoped summary on the next successful sync.
+4. If the local bridge is missing or too incomplete to resume safely, start fresh in Phase 0.
 
 ## Repo resolution rule
 
 - Resolve `repo_slug` from `git rev-parse --show-toplevel` and use the repo-root directory name as the slug.
 - If git root detection fails, fall back to the current working directory name and mark the result internally as low confidence.
 - Store a `repo_root_hint` in `.projectpal/state.yml` whenever a git root is available. If the stored hint does not match the current repo root, ignore the old bridge state and reinitialize it for the current repo.
-- First visit behavior: if `.projectpal/state.yml` exists for the current repo, seed the resume summary from it. If the local bridge is missing but repo-scoped memory exists, bootstrap from memory and create the bridge on first save. If neither exists, start fresh in Phase 0.
-- Parallel repo handling: different repos never share a bridge file. Multiple worktrees of the same repo share repo-scoped memory in `Projects/<repo-slug>`, but each worktree keeps its own local bridge as the primary live-session state until the next successful sync.
+- First visit behavior: if `.projectpal/state.yml` exists for the current repo, seed the resume summary from it. If neither exists, start fresh in Phase 0.
+- Parallel repo handling: different repos never share a bridge file. Each worktree keeps its own local bridge as the primary live-session state.
 
 ## Schema contract
-
-`RepoAnchor` lives in repo-scoped memory and carries:
-
-- `repo_slug`
-- `repo_root_hint` when known
-- `last_phase`
-- `last_resume_summary`
-- `last_next_step`
-- `last_seen_at`
-- `memory_refs[]` for related repo-scoped drawers
-
-`FeatureScope` lives in repo-scoped memory and carries:
-
-- `repo_slug`
-- `feat_slug`
-- `phase`
-- `status`
-- `summary`
-- `updated_at`
 
 `ResumeBridge` lives in `.projectpal/state.yml` and carries:
 

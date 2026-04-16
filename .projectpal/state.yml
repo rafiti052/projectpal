@@ -1,50 +1,38 @@
 repo_slug: projectpal
 repo_root_hint: /Users/rafael/Dev/projectpal
-current_project: connector-wiring
-current_phase: 1
-complexity_domain: complicated
-last_session: 2026-04-15T21:15:00-03:00
+current_project: remove-mempalace
+current_phase: 7
+complexity_domain: simple
+last_session: 2026-04-15T23:30:00-03:00
 resume_source: local-bridge
-synced_at: 2026-04-15T21:15:00-03:00
+synced_at: 2026-04-15T23:30:00-03:00
 artifacts_dir: .projectpal/artifacts
 bridge_summary: |
-  Discovery complete for connector-wiring. Complexity: Needs a plan. Brief drafted and saved.
-  Core idea: role-scoped ranked model routing with availability-based fallback to primary
-  assistant floor. Config-file driven with interactive setup. Inspired by claudeoctopus.
-  Moving to Refinement next (Architect → Manager debate).
-last_artifact_ref: .projectpal/artifacts/brief/connector-wiring.md
+  MemPalace removal complete. Deleted .mcp.json, instructions/mempalace-onboarding.md,
+  instructions/mempalace-integration.md. Stripped all MemPalace references from 18 files
+  across source, generated surfaces, instructions, prompts, scripts, and docs.
+  Integration tests pass. Installed skill synced. Only CHANGELOG.md retains history.
+last_artifact_ref: .projectpal/parking-lot.md
 partial_context:
   complete: true
-  readiness:
-    who_has_the_problem:
-      answered: true
-      source: "ProjectPal sub-agents (Strategist, Architect, Manager, etc.) that currently all run on the host assistant's model with no alternative."
-    whats_the_pain:
-      answered: true
-      source: "Every sub-agent is locked to the host model. No way to prefer cheaper/faster external models or fall back gracefully when one is unavailable."
-    proposed_direction:
-      answered: true
-      source: "Ranked model preference per agent role in a config file (not hand-edited, set up interactively). Try from top of list, fall back on availability failures (missing key, quota, errors), primary assistant is the guaranteed floor."
-    what_does_success_look_like:
-      answered: true
-      source: "Strategist runs on Gemini, API key expires, silently falls back to host model, session keeps going — no interruption."
 thread_orchestration:
-  active_thread_id: cursor-session-20260415T210500-0300
+  active_thread_id: claude-code-session-20260415T233000-0300
   threads:
-    - thread_id: cursor-session-20260415T210500-0300
-      primary_assistant: cursor
+    - thread_id: claude-code-session-20260415T233000-0300
+      primary_assistant: claude-code
       reporting_owner: pal
       state: active
       approved_execution_path_id: null
       approval_state: not_needed
       shared_context_refs:
-        - .projectpal/artifacts/brief/connector-wiring.md
-      created_at: 2026-04-15T21:05:00-03:00
-      updated_at: 2026-04-15T21:15:00-03:00
+        - .projectpal/parking-lot.md
+      created_at: 2026-04-15T23:30:00-03:00
+      updated_at: 2026-04-15T23:30:00-03:00
   execution_paths: []
   connector_status_snapshots: []
   delegation_tasks: []
   fallback_records: []
 next_steps:
-  - Present Brief to user for review.
-  - On approval, run Refinement (Architect → Manager debate).
+  - Commit the MemPalace removal when ready.
+  - Flow optimization audit (parking lot active item) when you are ready.
+  - Connector-wiring + connector-config-flow — see parking lot P2.

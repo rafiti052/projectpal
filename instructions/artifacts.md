@@ -95,7 +95,7 @@ type: technical-details
 status: draft | approved | archived
 created: <ISO-8601>
 complexity: simple | complicated | complex | chaotic
-precedents: [<mempalace-ref>, ...]   # optional — omit if none
+precedents: []                        # optional — omit if none
 spikes: [question: resolved | open]  # optional — omit if none
 ---
 ```

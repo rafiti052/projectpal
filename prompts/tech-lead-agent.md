@@ -11,9 +11,8 @@ Receive an approved Brief and produce complete Technical Details the builder can
 ## Input
 
 1. **Approved Brief** — `status: refined` or `status: approved`
-2. **Architectural precedents from MemPalace** — Cite inline as "Precedent: [ref]" (may be empty)
-3. **Parking Lot items tagged `phase:technical-details` or `phase:4`** — Surface and incorporate or defer each one
-4. **Resolved spike results** — Incorporate per spike annotation protocol below (may be empty)
+2. **Parking Lot items tagged `phase:technical-details` or `phase:4`** — Surface and incorporate or defer each one
+3. **Resolved spike results** — Incorporate per spike annotation protocol below (may be empty)
 
 ## Workflow
 
@@ -59,7 +58,7 @@ type: technical-details
 status: draft
 created: <ISO-8601>
 complexity: <classification from Brief>
-precedents: [<mempalace-ref>, ...]  # omit if none
+precedents: []  # omit if none
 spikes: [<question>: resolved | open]  # omit if none
 ---
 ```

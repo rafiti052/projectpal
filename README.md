@@ -87,36 +87,10 @@ That regenerates:
 - `AGENTS.md`
 - `skills/projectpal/SKILL.md`
 
-### MemPalace (long-term memory)
-
-The Pal detects MemPalace automatically on first run. If it's not connected, it will explain what it is and offer to install and register it for you — no manual setup required.
-
-If you prefer to set it up manually, install the package first:
-```bash
-pip install mempalace
-```
-
-Then register it with the assistant runtime you are using:
-
-For Codex:
-
-```bash
-codex mcp add mempalace -- python3 -m mempalace.mcp_server
-```
-
-For Claude Code:
-
-```bash
-claude mcp add mempalace --command "python3 -m mempalace.mcp_server"
-```
-
-Then restart your AI assistant and start ProjectPal again.
-
 ### Dependencies
 
 - [Claude Code](https://claude.ai/code) (CLI or desktop)
 - [Codex CLI](https://developers.openai.com/codex/overview)
-- [MemPalace](https://github.com/rafiti052/mempalace) — optional but recommended for cross-session memory
 
 ## Project Structure
 
@@ -134,7 +108,6 @@ projectpal/
 │   └── marketplace.json       ← Optional local Codex marketplace entry
 ├── skills/projectpal/
 │   └── SKILL.md               ← Generated Codex skill entrypoint (local install output, not versioned)
-├── .mcp.json                  ← MemPalace MCP connection
 ├── prompts/
 │   ├── architect-agent.md            ← Internal Architect reviewer prompt
 │   ├── manager-agent.md              ← Internal Manager reviewer prompt
@@ -153,21 +126,21 @@ projectpal/
 
 Generated artifacts (briefs, technical details, tickets) are saved to `.projectpal/artifacts/` within the current project directory — not here.
 
-Repo continuity lives locally first in `.projectpal/state.yml`, with MemPalace available as background continuity and long-term memory under `Projects/<repo-slug>`. Shared knowledge remains in broader MemPalace wings such as `Principles`, `Decisions`, and `Precedents`.
+Repo continuity lives locally in `.projectpal/state.yml`.
 
-Repo detection resolves the git repo root first and uses that directory name as `repo_slug`. If git detection fails, ProjectPal falls back to the current directory name, treats it as low-confidence startup context, and creates a fresh local bridge instead of reusing stale cross-repo state. Multiple worktrees of the same repo share repo-scoped memory while keeping separate `.projectpal/state.yml` bridge files.
+Repo detection resolves the git repo root first and uses that directory name as `repo_slug`. If git detection fails, ProjectPal falls back to the current directory name, treats it as low-confidence startup context, and creates a fresh local bridge. Multiple worktrees of the same repo keep separate `.projectpal/state.yml` bridge files.
 
 ## Milestones
 
 | # | Deliverable | Status |
 |---|------------|--------|
-| M0 | CLAUDE.md + MemPalace connected | ✅ |
+| M0 | CLAUDE.md + local state connected | ✅ |
 | M1 | Complexity Assessment works | ✅ |
 | M2 | Clear-path route keeps the Brief and stays light | ✅ |
 | M3 | Needs-a-plan route: Brief + Refinement | ✅ |
 | M4 | Technical Details + tickets | ✅ |
 | M5 | Parking Lot + session resumption | ✅ |
-| M6 | MemPalace onboarding — graceful detection, install guidance, local-only fallback | ✅ |
+| M6 | Session resumption — graceful detection and local state fallback | ✅ |
 | M7 | Full sub-agent pipeline — seven internal roles wired (Strategist, Architect, Manager, Tech Lead, Scrum Master, Complexity Analyst, Designer) | ✅ |
 | **The Test** | **The website gets rewritten** | **pending** |
 

@@ -82,20 +82,6 @@ Case B — Trust test / intentional vagueness:
 
 ## Phase 1: Brief Protocol
 
-Before generating the internal Brief artifact that powers the user-facing Brief, search MemPalace for relevant past decisions:
-
-*(Skip if `mempalace_available = false`)*
-
-```
-mempalace_search(
-  query="<2-3 key domain terms from the current problem>",
-  wing="Decisions",
-  limit=5
-)
-```
-
-If results are empty or irrelevant, proceed without blocking. Do not mention the search to the user.
-
 **Brief drafting sub-agent protocol:**
 ```
 Agent(Strategist) receives:
@@ -103,7 +89,6 @@ Agent(Strategist) receives:
   - Full Phase 0 conversation transcript (inline)
   - Confirmed complexity assessment (inline)
   - Parking Lot items tagged phase:brief (inline, or "none")
-  - MemPalace search results (inline, or "none")
 
 Pal captures: complete Brief document (with YAML frontmatter)
 Pal runs brevity audit → checks word count → saves to .projectpal/artifacts/brief/<project-name>.md
@@ -160,34 +145,15 @@ When entering Phase 4:
 3. If the user accepts: incorporate and flag the item as "incorporated" in `parking-lot.md`
 4. If the user declines: flag it as "deferred" and do not surface it again
 
-**Parking Lot mirror contract**
+**Parking Lot contract**
 - Every parked item written to `.projectpal/parking-lot.md` must include `repo:<repo-slug>`, optional `feat:<feat-slug>`, and `phase:<phase-tag>`.
-- *(Skip if `mempalace_available = false`)* Mirror the same parked item into `Projects/<repo-slug>` using `kind:parking-lot`.
 - Parking Lot surfacing must filter by current repo before matching by phase.
-- If the local Parking Lot and mirrored memory disagree, prefer the local markdown copy for the live session and reconcile the repo-scoped mirror on the next write.
-
-### Prior context
-
-Before generating the internal technical-details artifact that powers the user-facing Technical Details Check-in, search MemPalace for architectural precedents:
-
-*(Skip if `mempalace_available = false`)*
-
-```
-mempalace_search(
-  query="<2-3 key architectural terms from the Brief>",
-  wing="Precedents",
-  limit=5
-)
-```
-
-If results are empty or irrelevant, proceed without blocking. Do not mention the search to the user.
 
 **Technical Details sub-agent protocol:**
 ```
 Agent(Tech Lead) receives:
   - prompts/tech-lead-agent.md prompt
   - Full approved Brief text (inline — read from .projectpal/artifacts/brief/<name>.md)
-  - MemPalace search results (inline, or "none")
   - Parking Lot items tagged phase:4 or phase:technical-details (inline, or "none")
 
 Pal captures: complete internal Technical Details document (with YAML frontmatter)
@@ -317,10 +283,8 @@ Phase 8 happens after implementation, not after ticket generation.
 2. Optional GitHub PR flow:
    - If the GitHub PR flow feature exists, run it here.
    - If it does not exist yet, skip it silently unless the user asks. Keep the future feature in the Parking Lot.
-   - This hook belongs after implementation review and before MemPalace storage.
 3. Run Decision Routing.
-4. Run Project Wrap-Up and MemPalace storage.
-5. Clean up `.projectpal/artifacts/` only after memory storage is complete or deliberately skipped.
+4. Clean up `.projectpal/artifacts/` only after all routing is complete or deliberately skipped.
 
 ## Phase 8: Decision Routing Protocol
 
@@ -339,15 +303,6 @@ Present decisions one at a time. Wait for the user's reply before showing the ne
 **Rules:**
 - Only surface decisions that required a real choice. Skip minor or obvious ones silently.
 - Present them in the order they were made.
-- Decisions marked **C** are written to the palace after all routing is complete:
-  *(Skip if `mempalace_available = false` — note the decision in the session summary instead)*
-  ```
-  mempalace_add_drawer(
-    wing="Decisions",
-    room="projectpal",
-    content="[project] [date]: <decision summary>",
-    added_by="projectpal"
-  )
-  ```
-- Decisions marked **B** are written to repo-scoped memory in `Projects/<repo-slug>`.
+- Decisions marked **C** are noted in the session wrap-up summary for future reference.
+- Decisions marked **B** are noted in the local bridge summary for this project's future sessions.
 - Decisions marked **A** are not stored beyond the current local artifacts.
