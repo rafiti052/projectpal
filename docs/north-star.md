@@ -364,7 +364,7 @@ No current assistant runtime (Claude Code, Codex, Cursor) supports routing sub-a
 
 - Optional concept brief when authored: `.projectpal/artifacts/brief/connector-wiring.md`
 - A post-setup config flow concept for editing role rankings after install
-- **In-repo inventory (experimental, CLI-oriented):** TypeScript modules such as `src/connector-orchestration.ts`, `src/connector-router.ts`, `src/approval-gate.ts`, `src/register-default-adapters.ts`, `src/adapters/gemini-adapter.ts`, and `scripts/delegate-connector-call.ts` — useful for future wiring work, not required for day-to-day Pal behavior in assistants today.
+- **Implementation inventory (deferred):** connector wiring / routing runtime modules are not shipped in v0.4; this section keeps only the product shape as backlog until later versions.
 
 ### Prerequisites
 

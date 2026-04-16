@@ -58,38 +58,14 @@ Lean v1 stores orchestration data under `thread_orchestration` in `.projectpal/s
 
 - `execution_path_id`
 - `assistant`
-- `connector`
-- `provider`
-- `runtime_path`
 - `model`
-- `quality_tier` = `premium | standard | fast`
-- `auth_scope`
-- `selection_reason`
 - `approved_by_user`
 - `approved_at`
 
 Notes:
 
-- The approved path boundary is defined by `connector`, `provider`, `runtime_path`, `auth_scope`, and `quality_tier`.
-- If any boundary field changes, the candidate path is outside the approved path and `approval_required = true`.
-- A model swap is automatic only when it stays inside the same approved path boundary and the same `quality_tier`.
-
-`ConnectorStatusSnapshot` lives under `thread_orchestration.connector_status_snapshots[]` and carries:
-
-- `connector_identity`
-- `auth_state` = `available | missing | expired | denied | unknown`
-- `availability_state` = `available | degraded | unavailable | unknown`
-- `last_failure_reason` = `none | quota_exhausted | connector_exhausted | auth_failure | runtime_error | unknown`
-- `quota_state` = `available | exhausted | unknown`
-- `checked_at`
-
-Persistence guard:
-
-- `connector_owns_auth` = `true`
-- `allowed_metadata_fields[]` = `auth_state`, `availability_state`, `last_failure_reason`, `quota_state`
-- `connector_identity` and `checked_at` may be stored as non-secret structural context.
-- Never persist raw credentials, token material, token fingerprints, account identity, billing identifiers, or raw quota numbers.
-- If the connector cannot safely expose a metadata field, persist `unknown` instead of inferring detail.
+- The approved path boundary is defined by the thread’s `approved_execution_path_id` matching the candidate `execution_path_id`.
+- If the candidate `execution_path_id` does not match `approved_execution_path_id`, the candidate path is outside the approved boundary and delegated execution must be `approval_required = true`.
 
 `DelegationTask` lives under `thread_orchestration.delegation_tasks[]` and carries:
 
@@ -103,19 +79,6 @@ Persistence guard:
 - `user_visible_emitter` = `primary_assistant`
 - `started_at`
 - `finished_at`
-
-`FallbackRecord` lives under `thread_orchestration.fallback_records[]` and carries:
-
-- `fallback_id`
-- `task_id`
-- `attempt_number`
-- `fallback_type` = `retry_same_path | equivalent_substitution | path_switch_request | none`
-- `from_execution_path_id`
-- `to_execution_path_id`
-- `changed_fields[]`
-- `approval_required`
-- `disclosed_in_next_summary`
-- `outcome` = `succeeded | failed | awaiting_approval | blocked`
 
 Example bridge shape:
 
@@ -135,22 +98,9 @@ thread_orchestration:
   execution_paths:
     - execution_path_id: "<path-id>"
       assistant: "<assistant-id>"
-      connector: "<connector-id>"
-      provider: "<provider-id>"
-      runtime_path: "<runtime-path>"
       model: "<model-id>"
-      quality_tier: "premium | standard | fast"
-      auth_scope: "<coarse boundary label>"
-      selection_reason: "<reason>"
       approved_by_user: false
       approved_at: "<ISO-8601 or null>"
-  connector_status_snapshots:
-    - connector_identity: "<connector-id>"
-      auth_state: "available | missing | expired | denied | unknown"
-      availability_state: "available | degraded | unavailable | unknown"
-      last_failure_reason: "none | quota_exhausted | connector_exhausted | auth_failure | runtime_error | unknown"
-      quota_state: "available | exhausted | unknown"
-      checked_at: "<ISO-8601>"
   delegation_tasks:
     - task_id: "<task-id>"
       thread_id: "<thread-id>"
@@ -162,17 +112,6 @@ thread_orchestration:
       user_visible_emitter: "primary_assistant"
       started_at: "<ISO-8601>"
       finished_at: "<ISO-8601 or null>"
-  fallback_records:
-    - fallback_id: "<fallback-id>"
-      task_id: "<task-id>"
-      attempt_number: 1
-      fallback_type: "retry_same_path | equivalent_substitution | path_switch_request | none"
-      from_execution_path_id: "<path-id or null>"
-      to_execution_path_id: "<path-id or null>"
-      changed_fields: []
-      approval_required: false
-      disclosed_in_next_summary: false
-      outcome: "succeeded | failed | awaiting_approval | blocked"
 ```
 
 ## Partial context schema

@@ -18,16 +18,6 @@ EOF
   exit 0
 fi
 
-ensure_routing_config() {
-  projectpal_home=$HOME/.projectpal
-  routing_path=$projectpal_home/routing.yml
-
-  mkdir -p "$projectpal_home"
-  if [ ! -f "$routing_path" ]; then
-    cp "$SCRIPT_DIR/templates/routing.yml" "$routing_path"
-  fi
-}
-
 # ── Step 1: Generate all runtime surfaces from source ───────────────────────
 
 if ! sh "$SCRIPT_DIR/scripts/generate.sh"; then
@@ -46,8 +36,6 @@ printf '%s\n' "✓ Codex — basic config installed."
 
 sh "$SCRIPT_DIR/scripts/install-cursor.sh"
 printf '%s\n' "✓ Cursor — basic config installed."
-
-ensure_routing_config
 
 # ── Step 3: Primary assistant selection ─────────────────────────────────────
 

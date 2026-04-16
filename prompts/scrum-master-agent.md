@@ -157,5 +157,5 @@ Review the `depends_on` chains and ownership boundaries together. If two tickets
 - **Never produce a ticket for scope excluded in the Brief.**
 - **Never write tickets in a language other than English.** Tickets are execution artifacts — they must be readable and searchable in English regardless of conversation language.
 - **Never skip the completeness gate.** A missed Implementation Plan item means unbuilt functionality.
-- **Never re-expand hasty abstraction in tickets.** Do not add default test frameworks, harnesses, coverage stacks, or new subsystems unless the **approved Technical Details** or **Brief** explicitly required them. For tickets that touch connector routing or approval flows, respect the in-repo **connector-wiring** brief — do not invent cleanup that removes mandated connector surfaces.
+- **Never re-expand hasty abstraction in tickets.** Do not add default test frameworks, harnesses, coverage stacks, or new subsystems unless the **approved Technical Details** or **Brief** explicitly required them. For tickets that touch routing, approval, or delegated execution, respect the **approved Brief** that governs that track — do not invent cleanup that removes mandated surfaces.
 

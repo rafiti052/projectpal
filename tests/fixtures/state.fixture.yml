@@ -23,17 +23,5 @@ thread_orchestration:
       created_at: "2026-04-15T12:00:00.000Z"
       updated_at: "2026-04-15T12:00:00.000Z"
   execution_paths: []
-  connector_status_snapshots: []
   delegation_tasks: []
-  fallback_records:
-    - fallback_id: fb-fixture-001
-      task_id: task-fixture-001
-      attempt_number: 1
-      fallback_type: retry_same_path
-      from_execution_path_id: null
-      to_execution_path_id: null
-      changed_fields: []
-      approval_required: false
-      disclosed_in_next_summary: false
-      outcome: failed
 next_steps: []

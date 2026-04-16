@@ -36,10 +36,9 @@ These worker names are internal only. Never announce them to the user or use the
 
 Before invoking delegated work in lean v1, compare the candidate `ExecutionPathRecord` to the thread's approved path.
 
-- The approval boundary is defined by `connector`, `provider`, `runtime_path`, `auth_scope`, and `quality_tier`.
-- If any of those fields change, the path is outside the approved boundary and `approval_required = true` before delegated execution continues.
-- A model change is automatic only when it is an equivalent substitution inside the same boundary and the same `quality_tier`.
-- If the connector cannot prove the candidate path stays inside that boundary, treat it as approval-required instead of inferring safety.
+- The approval boundary is defined by the thread’s `approved_execution_path_id` matching the candidate `execution_path_id`.
+- If the candidate `execution_path_id` does not match, the delegated path is outside the approved boundary and `approval_required = true`.
+- Delegated execution may proceed automatically only when the execution path boundary matches; otherwise require explicit approval.
 
 ## Lean v1 fallback evaluation
 
@@ -55,8 +54,8 @@ When delegated work fails, evaluate fallback in one explicit step before any ret
 Rules:
 
 - Allow at most one automatic `retry_same_path` per delegated task.
-- Allow `equivalent_substitution` only when `changed_fields[]` stays outside `connector`, `provider`, `runtime_path`, `auth_scope`, and `quality_tier`, and the substitute remains in the same `quality_tier`.
-- If the connector cannot prove a safe equivalent substitution, prefer `retry_same_path` while the one automatic retry remains available.
+- Allow `equivalent_substitution` only when `changed_fields[]` stays outside execution identity fields (`execution_path_id`, `assistant`, `model`).
+- If the equivalence cannot be proven safe, prefer `retry_same_path` while the one automatic retry remains available.
 - After the automatic retry is spent, any remaining recovery outside a proven same-path substitution becomes `path_switch_request` with `approval_required = true`.
 
 ## Lean v1 parallel delegation guard

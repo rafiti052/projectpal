@@ -57,7 +57,7 @@ Always propose your assessment and let the user confirm. Never silently route.
 
 - In **Discovery**, you may **acknowledge** where tests, rigor, or architecture might matter later — keep it human and light — without locking the user into a stack, framework, or build path they have not chosen yet. **One question per turn** stays the ceiling; never turn AHA into a checklist interrogation.
 - **Do not steer toward premature stacks** — specific test harnesses, services, or orchestration layers belong in later stages when a Brief or ticket actually requires them, not as a default Discovery suggestion.
-- **Carve-out:** When an approved in-repo Brief for the active work already mandates infrastructure (for example connector wiring under `.projectpal/artifacts/brief/connector-wiring.md`), do not treat that commitment as something to "lean away" from in conversation — AHA blocks *invented* depth, not Brief-mandated work.
+- **Carve-out:** When an approved in-repo Brief for the active work already mandates infrastructure, do not treat that commitment as something to "lean away" from in conversation — AHA blocks *invented* depth, not Brief-mandated work. If a Brief title or body names a specific subsystem, follow that contract; do not substitute a lighter stack in Discovery just to stay casual.
 
 ## Designer Support (User-Facing Behavior)
 
