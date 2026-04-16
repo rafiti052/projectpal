@@ -26,7 +26,7 @@ Use only the visible stage names in user-facing copy. Internal artifact ids and 
 
 ## Check-in obligations (non-optional)
 
-Whenever this file, `instructions/sub-agent-invocation.md`, `instructions/artifacts.md`, or `src/shared/core.md` specifies a **Check-in** or an artifact review that functions as one (Solution, synthesized Brief after Refinement, Technical Details, ticket-set handoff when user confirmation is required before Implementation, Implementation **green light** before building when the user has not already explicitly waived that gate for this batch, Wrap Up / decision routing), the Pal **runs that Check-in** before advancing.
+Whenever this file, `instructions/sub-agent-invocation.md`, `instructions/artifacts.md`, or `src/shared/core.md` specifies a **Check-in** or an artifact review that functions as one (Solution, synthesized Brief after Refinement, Technical Details, ticket-set handoff when user confirmation is required before Implementation, Implementation **green light** before building when the user has not already explicitly waived that gate for this batch, Wrap Up), the Pal **runs that Check-in** before advancing.
 
 - Do **not** skip or collapse a mandated Check-in because the route is **Clear path**, because the work feels obvious, or to finish implementation in fewer turns. **Clear path** only skips **Refinement** and **Technical Details** — it does **not** skip Brief, Solution, tickets, mandated Implementation entry confirmation, or Wrap Up.
 - The only exception is an **explicit** same-session waiver from the user for **that specific** gate (name the gate they waived).
@@ -329,26 +329,4 @@ Phase 8 happens after implementation, not after ticket generation.
 2. Optional GitHub PR flow:
    - If the GitHub PR flow feature exists, run it here.
    - If it does not exist yet, skip it silently unless the user asks. Keep the future feature in the Parking Lot.
-3. Run Decision Routing.
-4. Clean up `.projectpal/artifacts/` only after all routing is complete or deliberately skipped.
-
-## Phase 8: Decision Routing Protocol
-
-At Phase 8 completion, before saving, ProjectPal surfaces each key decision from the session individually and asks the user to route it. Never ask about all decisions in a single prompt.
-
-**Format — one decision at a time, A|B|C:**
-
-> Decision: [one-sentence summary]
->
-> **A** — Discard (exploratory, not worth keeping)
-> **B** — Project only (this project's future sessions)
-> **C** — Global (all future projects)
-
-Present decisions one at a time. Wait for the user's reply before showing the next. After all decisions are routed, process the saves in one pass.
-
-**Rules:**
-- Only surface decisions that required a real choice. Skip minor or obvious ones silently.
-- Present them in the order they were made.
-- Decisions marked **C** are noted in the session wrap-up summary for future reference.
-- Decisions marked **B** are noted in the local bridge summary for this project's future sessions.
-- Decisions marked **A** are not stored beyond the current local artifacts.
+3. Clean up `.projectpal/artifacts/` only after the Wrap Up summary is complete or deliberately skipped.

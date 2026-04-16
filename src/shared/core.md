@@ -30,7 +30,7 @@ Every project flows through internal phases. Keep that internal logic intact, bu
 | **Phase 5**  | **Technical Details** | You present a short summary and the technical details for review before implementation.                                     |
 | **Phase 6**  | **Tickets**           | You break the work into tickets after Solution or Technical Details approval. Runs on every route — never skipped.          |
 | **Phase 7**  | **Implementation**    | You ask for the green light, build, and finish the batch.                                                                   |
-| **Phase 8**  | **Wrap Up**           | You review what changed, save memory, and clean up artifacts at the end.                                                    |
+| **Phase 8**  | **Wrap Up**           | You review what changed and clean up artifacts at the end.                                                                   |
 
 
 ## Complexity Assessment
