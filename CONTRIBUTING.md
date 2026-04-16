@@ -105,9 +105,19 @@ sh scripts/setup-dev.sh
 |---------|-------------|
 | `pnpm typecheck` | TypeScript type check — zero errors expected |
 | `pnpm test` | Thread isolation tests via vitest |
-| `pnpm check:install` | Install parity check — live `.projectpal/state.yml` + `~/.projectpal/routing.yml` when both exist, otherwise fixtures |
+| `pnpm test:integration` | Generation, audit-sync, install, and onboarding-flow checks (uses a clean temp `HOME`) |
+| `pnpm check:install` | Install parity check — live `.projectpal/state.yml` when both exist, otherwise fixtures |
 | `pnpm check:install --fixture` | Same checks forced against repo fixtures (release gate) |
 | `pnpm tsx scripts/check-install.ts` | Direct invocation; add `--fixture` to match the release gate |
+
+---
+
+## Releasing a version (maintainers)
+
+1. Bump **`package.json`** `version` and **`.codex-plugin/plugin.json`** `version` together (they should match for tagged releases such as **v0.4.0**).
+2. Run **`sh scripts/generate.sh`** after any edit to `src/shared/core.md` or adapter prefix sources so `CLAUDE.md`, `AGENTS.md`, and `skills/projectpal/SKILL.md` stay in sync (generated files are gitignored but must be fresh for installs).
+3. Run the full gate: `pnpm test`, `pnpm typecheck`, `pnpm test:integration`, and `pnpm check:install --fixture`. Record or update the audit in `docs/audits/` when you cut a major readiness pass.
+4. Summarize user-visible changes in **`CHANGELOG.md`** under the correct version heading and refresh **`README.md`** if install paths, structure, or maintainer commands changed.
 
 ---
 

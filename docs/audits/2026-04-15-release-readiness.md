@@ -24,7 +24,7 @@ Two-part audit for the `projectpal` repo: flow optimization (including sub-agent
 
 ### A.4 Connector scaffolding posture (code clarity, not product ship)
 
-- **`src/connector-orchestration.ts`** and **`scripts/delegate-connector-call.ts`** header comments now point to north-star §14 and mark the stack as **experimental / optional** until a ProjectPal-owned CLI exists — reduces confusion with “connector wiring soon” while keeping code for future use.
+- Connector runtime scaffolding is not shipped in v0.4; connector modules and routing/install templates are removed from the install surface. The connector roadmap remains only in `docs/north-star.md` (§14) for later versions.
 
 ### A.5 AHA and phase surfaces (spot check)
 
@@ -62,14 +62,16 @@ pnpm check:install --fixture
 
 Each row is either **Verified** (present in tree and matches the audit intent) or documents an explicit follow-up outside this audit.
 
-| Ref | Topic | Status | Notes |
-| --- | --- | --- | --- |
+
+| Ref | Topic                         | Status       | Notes                                                                                                                                                                                                                                           |
+| --- | ----------------------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | A.1 | Parking lot / roadmap hygiene | **Verified** | Connector product wiring called out only as long-range shape in `docs/north-star.md` §14; `.projectpal/state.yml` `next_steps` reviewed and rewritten so nothing reads as an imminent connector **product** ship (see north-star for schedule). |
-| A.2 | Sub-agent artifact handoff | **Verified** | `instructions/sub-agent-invocation.md` documents staging path + `artifact_draft_path`; Phase 6 / Designer references updated in that file. |
-| A.3 | Repo preparation | **Verified** | `scripts/onboarding-flow.sh` `prepare-repo` creates `.projectpal/staging` and `artifacts/designer-review` with sibling artifact dirs (see script `mkdir -p` block). |
-| A.4 | Connector scaffolding posture | **Verified** | `src/connector-orchestration.ts` and `scripts/delegate-connector-call.ts` headers reference north-star §14 and experimental scope. |
-| A.5 | AHA / phase surfaces | **Verified** | No additional change required per audit; spot-check unchanged. |
-| B | Full testing audit | **Verified** | Commands in §Part B re-run on closure; all **pass** (Vitest 5, `tsc`, integration script, `check:install --fixture`). |
+| A.2 | Sub-agent artifact handoff    | **Verified** | `instructions/sub-agent-invocation.md` documents staging path + `artifact_draft_path`; Phase 6 / Designer references updated in that file.                                                                                                      |
+| A.3 | Repo preparation              | **Verified** | `scripts/onboarding-flow.sh` `prepare-repo` creates `.projectpal/staging` and `artifacts/designer-review` with sibling artifact dirs (see script `mkdir -p` block).                                                                             |
+| A.4 | Connector scaffolding posture | **Verified** | Connector runtime modules are not shipped in v0.4; only north-star backlog remains.                                                                                                              |
+| A.5 | AHA / phase surfaces          | **Verified** | No additional change required per audit; spot-check unchanged.                                                                                                                                                                                  |
+| B   | Full testing audit            | **Verified** | Commands in §Part B re-run on closure; all **pass** (Vitest 5, `tsc`, integration script, `check:install --fixture`).                                                                                                                           |
+
 
 **Open defects from this audit:** none. Optional product follow-ups stay on `.projectpal/parking-lot.md` (e.g. onboarding helpers P2), not in this gate.
 

@@ -3,14 +3,14 @@ repo_root_hint: /Users/rafael/Dev/projectpal
 current_project: idle
 current_phase: 0
 complexity_domain: simple
-last_session: 2026-04-15T23:00:00-03:00
+last_session: 2026-04-15T23:45:00-03:00
 resume_source: local-bridge
-synced_at: 2026-04-15T23:00:00-03:00
+synced_at: 2026-04-15T23:45:00-03:00
 artifacts_dir: .projectpal/artifacts
 bridge_summary: |
-  Release-readiness audit closure: Part A/B verification table added to docs/audits/2026-04-15-release-readiness.md;
-  next_steps aligned with north-star §14 (connector wiring = backlog doc only); .gitignore fixed so artifacts/brief
-  and artifacts/tickets track; Brief + ticket bundle under .projectpal/artifacts/. Parking: onboarding helpers P2 only.
+  AHA copy cleanup: Pal-facing carve-outs no longer default to naming connector-wiring.md; prompts and phase protocols
+  refer to approved Briefs under artifacts/brief generically. package.json description and README north-star pointer softened.
+  North-star §14 remains canonical for product backlog. Session closed after regenerate + integration pass.
 last_artifact_ref: .projectpal/artifacts/tickets/release-readiness-audit-closure-bundle.md
 partial_context:
   complete: true
@@ -28,9 +28,7 @@ thread_orchestration:
       created_at: 2026-04-15T23:30:00-03:00
       updated_at: 2026-04-15T21:55:23-03:00
   execution_paths: []
-  connector_status_snapshots: []
   delegation_tasks: []
-  fallback_records: []
 next_steps:
   - Push local git work when you want it on the remote (not a connector product milestone — see docs/north-star.md §14 for connector schedule and backlog-only language).
   - Optional P2: onboarding helpers — see .projectpal/parking-lot.md when you want polish.

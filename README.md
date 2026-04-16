@@ -13,7 +13,7 @@ It works through conversation, not forms. It remembers context between sessions.
 1. **Talk to the Pal** — describe your idea however it comes out
 2. **Complexity Assessment** — the Pal names the safest route: Clear path, Needs a plan, Needs discovery, On fire, or Still unclear
 3. **Brief → Solution** — the Pal turns the conversation into a first clear draft and brings it back for review
-4. **Refinement → Planning → Technical Details when needed** — bounded work stays light; heavier work gets the extra pressure test and technical planning pass
+4. **Refinement → Planning → Technical Details when the route needs them** — Clear path skips these; heavier routes keep the extra pressure test and technical planning pass
 5. **Tickets → Implementation** — the work is broken into tickets before the real green light to build
 6. **Wrap Up** — changes are reviewed, state is saved locally first, and long-term memory sync stays in the background
 
@@ -44,7 +44,7 @@ Supported assistants right now:
 - Claude Code
 - Cursor
 
-The installer always refreshes the generated runtime surfaces from `src/` first, installs the assistant-specific integrations, and creates `~/.projectpal/routing.yml` if it does not exist yet.
+The installer always refreshes the generated runtime surfaces from `src/` first, installs the assistant-specific integrations, and writes the assistant primary hint to `~/.projectpal/primary-assistant`.
 
 ### Codex
 
@@ -87,6 +87,20 @@ That regenerates:
 - `AGENTS.md`
 - `skills/projectpal/SKILL.md`
 
+### Maintainer checks (TypeScript tree)
+
+From a clone with Node 20+ and pnpm:
+
+```bash
+pnpm install
+pnpm test
+pnpm typecheck
+pnpm test:integration
+pnpm check:install --fixture
+```
+
+The last command matches the recorded **v0.4.0** release gate in [docs/audits/2026-04-15-release-readiness.md](docs/audits/2026-04-15-release-readiness.md).
+
 ### Dependencies
 
 - [Claude Code](https://claude.ai/code) (CLI or desktop)
@@ -101,7 +115,7 @@ projectpal/
 ├── CLAUDE.md                  ← Generated Claude runtime surface (local install output, not versioned)
 ├── AGENTS.md                  ← Generated agents-compatible runtime surface (local install output, not versioned)
 ├── scripts/                   ← Contributor tools (generate, install, test, audit)
-├── templates/                 ← Install-time templates such as routing.yml and Cursor rules
+├── templates/                 ← Install-time templates such as Cursor rules
 ├── .codex-plugin/
 │   └── plugin.json            ← Codex plugin manifest
 ├── .agents/plugins/
@@ -117,14 +131,19 @@ projectpal/
 │   ├── tech-lead-agent.md            ← Technical Details drafting prompt
 │   └── scrum-master-agent.md         ← Ticket generation prompt
 ├── docs/
+│   ├── audits/                ← Release readiness and other audits (see v0.4.0 gate doc)
 │   ├── maintainer-codex-reinstall.md ← Maintainer-only clean reinstall guide
-│   └── north-star.md          ← Current product direction note
+│   └── north-star.md          ← Long-range product direction (delegation / CLI shape in §14)
+├── instructions/              ← Phase protocols, artifacts, session schema, sub-agent contracts
 └── .projectpal/               ← Local bridge state (managed by the Pal, per project)
     ├── state.yml              ← Repo-local bridge state for startup/resume
-    └── parking-lot.md         ← Repo-scoped parked items with feat/phase tags
+    ├── parking-lot.md         ← Repo-scoped parked items with feat/phase tags
+    └── artifacts/             ← brief/ + tickets/ may be committed; other subtrees stay local
+        ├── brief/
+        └── tickets/
 ```
 
-Generated artifacts (briefs, technical details, tickets) are saved to `.projectpal/artifacts/` within the current project directory — not here.
+Generated work artifacts (briefs, technical details, tickets) default to `.projectpal/artifacts/` in the active repo. This repository also tracks example or batch artifacts under `artifacts/brief/` and `artifacts/tickets/` when they are part of the shipped Pal workflow.
 
 Repo continuity lives locally in `.projectpal/state.yml`.
 
@@ -147,3 +166,7 @@ Repo detection resolves the git repo root first and uses that directory name as 
 ## The North Star
 
 The current direction note lives in [docs/north-star.md](docs/north-star.md).
+
+## Release notes
+
+Shipped versions are listed in [CHANGELOG.md](CHANGELOG.md). The **v0.4.0** verification record and closure table live in [docs/audits/2026-04-15-release-readiness.md](docs/audits/2026-04-15-release-readiness.md). The Codex plugin manifest at `.codex-plugin/plugin.json` carries the same semver as `package.json` for each release.

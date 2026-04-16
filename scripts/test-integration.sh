@@ -107,8 +107,6 @@ assert_file_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "## Design
 assert_file_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "**Check-ins are conversations, not forms.** \"Here's what I got. Sound right?\""
 assert_file_not_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "$legacy_scope_framing"
 assert_file_not_contains "$claude_home/.codex/skills/projectpal/SKILL.md" "$legacy_old_guidance_line"
-assert_file_contains "$claude_home/.projectpal/routing.yml" "preferred_model: gemini-fast"
-assert_file_contains "$claude_home/.projectpal/routing.yml" "task_type: refinement"
 assert_file_contains "$claude_home/.cursor/mcp.json" "\"projectpal\""
 assert_file_contains "$claude_home/.cursor/mcp.json" "\"connector\": \"cursor\""
 

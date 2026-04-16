@@ -14,7 +14,6 @@ The goal is to stop treating generated runtime files as the source of truth and 
 ```text
 src/
   README.md
-  fallback-handler.md
   shared/
     core.md
     runtime-index.md
@@ -22,10 +21,8 @@ src/
     claude.md
     codex.md
     cursor.md
-    gemini.md
     runtime-output-prefix.md
     codex-skill-header.md
-    codex-skill-footer.md
   generation/
     contract.md
     mapping.md
@@ -48,8 +45,8 @@ src/
 - `adapters/runtime-output-prefix.md`
   Shared generated-file prefix used by runtime outputs so they clearly identify the neutral source.
 
-- `adapters/codex-skill-header.md` and `adapters/codex-skill-footer.md`
-  Codex skill-specific wrapper snippets that surround the shared core body.
+- `adapters/codex-skill-header.md`
+  Codex skill-specific wrapper snippet that surrounds the shared core body.
 
 - `generation/contract.md`
   Source-first generation rules: what gets generated, in what order, and what verification is required after changes.
@@ -59,9 +56,8 @@ src/
 
 ## Scope
 
-This source tree is still centered on the shipped Claude and Codex runtime surfaces, but it now also carries the contract and install-source material for Gemini routing and Cursor setup.
+This source tree is centered on the shipped Claude and Codex runtime surfaces, plus the source material for Cursor setup.
 
 That means the shared source owns:
 - generated Claude and Codex runtime instructions
-- adapter contracts for Gemini and Cursor
-- repo-install templates such as `templates/routing.yml` and `templates/cursor-rules-projectpal.md`
+- repo-install templates such as `templates/cursor-rules-projectpal.md`

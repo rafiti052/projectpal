@@ -31,7 +31,7 @@ Write the technical details. Respect the Brief scope — do not gold-plate. Pref
 **Step 4 — AHA self-audit (Avoid Hasty Abstractions) on your drafted output.**
 Scan the **drafted** Technical Details (all sections, especially Implementation Plan, Dependencies & Stack, Key Technical Decisions, and Risks) for: (a) **premature test infrastructure** — frameworks, harnesses, coverage gates, CI matrices not required by the Brief or proven failure mode; (b) **speculative architectural layers** — new services, indirection, or patterns the Brief did not ask for; (c) **over-engineered scaffolding** — machinery that exceeds current scope. For each hit in **your output**: remove it, shrink to the Brief's intent, or rewrite as a short **Risks & Unknowns** line that *names* a future fork without building it.
 
-**Before suggesting removal of existing repo contracts:** Read `.projectpal/artifacts/brief/connector-wiring.md` and any other **approved in-repo Brief** that mandates infrastructure. **Do not** treat connector-mandated surfaces (router, approval gate, fallback, session fields tied to that track) as AHA "cleanup" targets — AHA trims **new** plan text that exceeds Brief scope, not shipped contracts another Brief still needs.
+**Before suggesting removal of existing repo contracts:** Read every **approved in-repo Brief** under `.projectpal/artifacts/brief/` that applies to this workstream, including any Brief that explicitly mandates routing, approval, delegation, or session fields. **Do not** treat those mandated surfaces as AHA "cleanup" targets — AHA trims **new** plan text that exceeds Brief scope, not shipped contracts another Brief still needs.
 
 **Step 5 — Size all Implementation Plan items.**
 Each item must be sized S (~~15 min) or M (~~45 min). If any item is L (>45 min): decompose it inline into ≥2 ordered S/M sub-steps before finalizing. Label decomposed sub-steps clearly with the parent item's name.
@@ -88,6 +88,6 @@ spikes: [<question>: resolved | open]  # omit if none
 - **Never include a mermaid diagram for a simple system.** The threshold is ≥3 components with non-obvious interactions.
 - **Never default in test frameworks, harnesses, or coverage machinery** unless the Brief or an explicit quality bar in scope requires them — smallest verification that fits the work wins.
 - **Never add architectural layers or services** the Brief did not ask for — acknowledge scaling paths in Risks; do not build them in the Implementation Plan without demonstrated need.
-- **Never use AHA to strip Brief-mandated infrastructure** — e.g. connector wiring and lean v1 contracts documented in `.projectpal/artifacts/brief/connector-wiring.md` stay unless a superseding Brief says otherwise.
+- **Never use AHA to strip Brief-mandated infrastructure** — lean v1 contracts and any subsystem an approved Brief names stay unless a superseding Brief says otherwise.
 - **Never satisfy AHA cosmetically** — renaming "framework setup" to "quality work" without shrinking scope is still hasty abstraction.
 

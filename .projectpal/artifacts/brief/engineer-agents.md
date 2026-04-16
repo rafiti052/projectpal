@@ -57,7 +57,7 @@ The Engineer closes the last gap in the ProjectPal agent pipeline. Today the sys
 - Automatic rollback when a parallel ticket fails (blocker stops that ticket; others continue unless they depend on it)
 - Quality-based rerouting or automatic rollback
 - Changes to the Scrum Master's ticket format beyond what the Engineer needs to read
-- Multi-model routing for the Engineer (covered by the connector-wiring project)
+- Multi-model routing for the Engineer (covered by any approved infrastructure Brief that governs delegation, if one exists for the repo)
 - Designer review protocol changes (already handled in Phase 7)
 
 ## Risks & Open Questions

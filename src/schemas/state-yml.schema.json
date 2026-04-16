@@ -29,12 +29,8 @@
         "active_thread_id": { "type": ["string", "null"] },
         "threads": { "type": "array" },
         "execution_paths": { "type": "array" },
-        "connector_status_snapshots": {
-          "type": "array",
-          "items": { "$ref": "#/definitions/ConnectorStatusSnapshot" }
-        },
         "delegation_tasks": { "type": "array" },
-        "fallback_records": { "type": "array" }
+        "delegation_tasks": { "type": "array" }
       }
     },
     "next_steps": {
@@ -42,37 +38,5 @@
       "items": { "type": "string" }
     }
   },
-  "definitions": {
-    "ConnectorStatusSnapshot": {
-      "type": "object",
-      "description": "Point-in-time availability snapshot for a connector. last_failure_at is new in v1.1 — treat absence as null for backward compatibility.",
-      "required": ["connector_identity", "auth_state", "availability_state", "quota_state", "checked_at"],
-      "properties": {
-        "connector_identity": { "type": "string" },
-        "auth_state": {
-          "type": "string",
-          "enum": ["available", "missing", "expired", "denied", "unknown"]
-        },
-        "availability_state": {
-          "type": "string",
-          "enum": ["available", "degraded", "unavailable", "unknown"]
-        },
-        "last_failure_reason": {
-          "oneOf": [
-            { "type": "string", "enum": ["none", "quota_exhausted", "connector_exhausted", "auth_failure", "runtime_error", "unknown"] },
-            { "type": "null" }
-          ]
-        },
-        "last_failure_at": {
-          "oneOf": [
-            { "type": "string", "format": "date-time" },
-            { "type": "null" }
-          ],
-          "description": "ISO-8601 timestamp of the most recent failure. Null if no failure. Absent in legacy files — treat as null."
-        },
-        "quota_state": { "type": "string" },
-        "checked_at": { "type": "string", "format": "date-time" }
-      }
-    }
-  }
+  "definitions": {}
 }

@@ -12,12 +12,12 @@ Define the v1 Cursor adapter boundary. Cursor is a first-class assistant install
 
 ```
 CursorAdapter:
-  invoke(task: DelegationTask, model_override: string | null) → DelegationResult
-  check_status() → ConnectorStatusSnapshot
+  invoke(task: DelegationTask, model_override: string | null) → InvocationResult
+  check_status() → { reachable: boolean; last_checked_at: string | null; last_failure_at: string | null }
   heartbeat_hook(elapsed_seconds: int) → void
 ```
 
-The shared shape definitions live in `src/adapters/connector-adapter.md`.
+The shared shape definitions live in the deferred connector contract (not required for v0.4 install surfaces).
 
 ---
 
@@ -47,7 +47,7 @@ The registration entry should also retain enough metadata to point back to the P
 Return:
 
 ```
-DelegationResult:
+InvocationResult:
   result_state: "skipped"
   output: null
   failure_reason: "cursor adapter is not routable"
@@ -89,7 +89,7 @@ The method exists only to satisfy the shared connector interface.
 
 - No routing logic in v1
 - No writes to `.projectpal/state.yml`
-- No writes to `~/.projectpal/routing.yml`
+- No writes to connector routing configuration (connector runtime is deferred in v0.4).
 - Global registration must be idempotent
 - Repo-local rules creation belongs to repo-preparation / install flow, not `check_status()`
 

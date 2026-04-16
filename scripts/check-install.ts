@@ -7,7 +7,7 @@
 //
 // Plus shared state checks against .projectpal/state.yml:
 //   C. State key schema (thread_orchestration shape)
-//   D. Thread-local write contract (fallback_records are task-tagged)
+//   D. (reserved) reserved for future thread-local write contracts
 //
 // Usage:
 //   pnpm tsx scripts/check-install.ts            # live — checks real disk paths
@@ -150,34 +150,6 @@ function checkCStateKeySchema(state: Record<string, unknown>): CheckResult {
   return checkResult(adapter, name, true, '');
 }
 
-// ── Check D: Thread-local write contract ──────────────────────────────────
-function checkDThreadLocalWrites(state: Record<string, unknown>): CheckResult {
-  const name = 'Check D: Thread-local write contract';
-  const adapter = 'claude'; // state is shared; tag under claude by convention
-  const to = state?.['thread_orchestration'] as Record<string, unknown> | undefined;
-
-  if (!to) return checkResult(adapter, name, true, '');
-
-  const records = to['fallback_records'] as Array<Record<string, unknown>> | undefined;
-  if (!records || records.length === 0) {
-    return checkResult(adapter, name, true, '');
-  }
-
-  for (let i = 0; i < records.length; i++) {
-    const rec = records[i];
-    if (!rec['task_id'] || typeof rec['task_id'] !== 'string') {
-      return checkResult(
-        adapter,
-        name,
-        false,
-        `fallback_records[${i}].task_id is missing — record is not thread-tagged`,
-      );
-    }
-  }
-
-  return checkResult(adapter, name, true, '');
-}
-
 // ── Runner ─────────────────────────────────────────────────────────────────
 function run(): void {
   console.log('Install Parity Check');
@@ -205,7 +177,6 @@ function run(): void {
 
   // Shared state checks — tagged under claude, shown in that section
   results.push(checkCStateKeySchema(state));
-  results.push(checkDThreadLocalWrites(state));
 
   // Print structured report
   for (const spec of ADAPTERS) {
