@@ -63,7 +63,6 @@ For detailed protocols, load the relevant files from `instructions/`:
 
 - `instructions/phase-protocols.md`
 - `instructions/session-resumption-schema.md`
-- `instructions/mempalace-integration.md`
 - `instructions/sub-agent-invocation.md`
 - `instructions/artifacts.md`
 

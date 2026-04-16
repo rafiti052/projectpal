@@ -28,8 +28,7 @@ Use `rejected` only when you cannot reconcile feedback without inventing scope.
 1. **Phase 0 transcript** — The full conversation between Pal and user (required in Draft mode; required in Revision mode as the anchor for voice).
 2. **Complexity assessment** — Confirmed by user (`Clear path` | `Needs a plan` | `Needs discovery` | `On fire`)
 3. **Parking Lot items** — Items captured during Phase 0 tagged for `phase:brief` (may be empty)
-4. **MemPalace decisions** — Relevant past decisions (may be empty)
-5. **Revision mode extras** — Latest Brief markdown; Architect/Manager rejection or concern reasons (Revision mode only)
+4. **Revision mode extras** — Latest Brief markdown; Architect/Manager rejection or concern reasons (Revision mode only)
 
 **Precondition:** Phase 0 must be complete and the route must be clear enough to leave Discovery. All four readiness dimensions must be answered in the transcript: who has the problem, what's the pain, proposed direction, success shape. If any are missing, or if the assessment is still unclear, do not generate the Brief. Return: "Phase 0 incomplete — missing: [dimension(s)]. Resume Phase 0 before generating."
 
@@ -41,10 +40,7 @@ Confirm all four readiness dimensions are present in the transcript. If not, sto
 **Step 2 — Surface Parking Lot items.**
 Identify any Parking Lot items tagged `phase:brief`. Incorporate each into the relevant section and note: "(from Parking Lot)".
 
-**Step 3 — Pull MemPalace decisions.**
-For each relevant MemPalace decision, note it inline: "Prior decision: [content]". If none are relevant, skip silently.
-
-**Step 4 — Draft sections, calibrated by the confirmed complexity assessment.**
+**Step 3 — Draft sections, calibrated by the confirmed complexity assessment.**
 Write each of the 7 sections. Calibrate Proposed Solution depth by complexity zone:
 
 - **Clear path** → One tight paragraph plus the three mandatory subsections (`User Goals`, `UX Outcomes`, `Value Framing`).
@@ -54,10 +50,10 @@ Write each of the 7 sections. Calibrate Proposed Solution depth by complexity zo
 
 For Kill Criteria: calibrate depth but never omit the section.
 
-**Step 5 — AHA pass (Avoid Hasty Abstractions).**
+**Step 4 — AHA pass (Avoid Hasty Abstractions).**
 Before self-verify: scan **Proposed Solution**, **Scope**, and **Success Criteria** for depth the transcript did not earn — (a) test frameworks, harnesses, or coverage plans with no user basis; (b) services, platforms, or architectural layers not grounded in what was said; (c) speculative scaling commitments presented as decided work. For each hit: remove it, tighten to intent, or move **one** honest sentence to **Risks & Open Questions** as *where complexity might live later* — **note, don't build**. AHA is about **depth of commitment**, not facts: **Never invent requirements** still wins; this step only strips *extra* implementation or test rigging the transcript does not support.
 
-**Step 6 — Self-verify before finalizing.**
+**Step 5 — Self-verify before finalizing.**
 Check: (a) no invented requirements — every claim traces to a user utterance; (b) all four readiness dimensions appear in ≥1 section; (c) every gap is flagged explicitly with "This wasn't discussed yet: [topic]"; (d) the three Proposed Solution subsections exist and are non-placeholder unless gaps are explicitly flagged there too; (e) the AHA pass did not reintroduce hasty abstraction after you trimmed it.
 
 ## Output

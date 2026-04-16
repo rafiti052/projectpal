@@ -12,7 +12,6 @@ usage:
   sh scripts/onboarding-flow.sh resolve-repo-context [cwd]
   sh scripts/onboarding-flow.sh read-resume-bridge <state-path> [cwd]
   sh scripts/onboarding-flow.sh probe-assistants [cwd]
-  sh scripts/onboarding-flow.sh probe-mempalace [cwd]
   sh scripts/onboarding-flow.sh prepare-repo [cwd]
   sh scripts/onboarding-flow.sh onboarding-flow [cwd]
   sh scripts/onboarding-flow.sh artifact-budget-check <markdown-path> [budget-limit] [exception-note-file] [compact-summary-file]
@@ -313,49 +312,6 @@ assistant_handoff_message() {
   esac
 }
 
-command_probe_mempalace() {
-  if [ "$#" -gt 1 ]; then
-    usage
-  fi
-
-  target_dir=$(canonical_dir "${1:-.}")
-  available=false
-  reason=missing
-  fallback_mode=local-only
-  timeout_ms=1500
-
-  if [ -n "${PROJECTPAL_MEMPALACE_MODE:-}" ]; then
-    case "$PROJECTPAL_MEMPALACE_MODE" in
-      available)
-        available=true
-        reason=ok
-        fallback_mode=shared-memory
-        ;;
-      missing)
-        available=false
-        reason=missing
-        ;;
-      *)
-        available=false
-        reason=$PROJECTPAL_MEMPALACE_MODE
-        ;;
-    esac
-  elif [ -f "$target_dir/.mcp.json" ] && grep -q 'mempalace' "$target_dir/.mcp.json"; then
-    available=true
-    reason=ok
-    fallback_mode=shared-memory
-  elif [ -f "$target_dir/.gemini/settings.json" ] && grep -q 'mempalace' "$target_dir/.gemini/settings.json"; then
-    available=true
-    reason=ok
-    fallback_mode=shared-memory
-  fi
-
-  printf '%s\n' "available: $available"
-  printf '%s\n' "reason: $reason"
-  printf '%s\n' "timeout_ms: $timeout_ms"
-  printf '%s\n' "fallback_mode: $fallback_mode"
-}
-
 command_prepare_repo() {
   if [ "$#" -gt 1 ]; then
     usage
@@ -472,11 +428,6 @@ command_onboarding_flow() {
   assistant_confidence=$(printf '%s\n' "$assistant_probe" | awk -F': ' '/^confidence:/ { print $2; exit }')
   assistant_fallback=$(printf '%s\n' "$assistant_probe" | awk -F': ' '/^fallback_used:/ { print $2; exit }')
 
-  mempalace_probe=$(command_probe_mempalace "$target_dir")
-  mempalace_available=$(printf '%s\n' "$mempalace_probe" | awk -F': ' '/^available:/ { print $2; exit }')
-  mempalace_reason=$(printf '%s\n' "$mempalace_probe" | awk -F': ' '/^reason:/ { print $2; exit }')
-  mempalace_mode=$(printf '%s\n' "$mempalace_probe" | awk -F': ' '/^fallback_mode:/ { print $2; exit }')
-
   prepare_output=$(command_prepare_repo "$target_dir")
   repo_ready=$(printf '%s\n' "$prepare_output" | awk -F': ' '/^ok:/ { print $2; exit }')
   state_path=$(printf '%s\n' "$prepare_output" | awk -F': ' '/^state_path:/ { print $2; exit }')
@@ -485,7 +436,7 @@ command_onboarding_flow() {
   blocker_next_step=$(printf '%s\n' "$prepare_output" | awk -F': ' '/^blocker_next_step:/ { print $2; exit }')
 
   handoff_message=$(assistant_handoff_message "$preferred_assistant")
-  bridge_summary="This repo is ready for ProjectPal. Local state is set up, MemPalace is connected for longer-term memory. Next step: $handoff_message"
+  bridge_summary="This repo is ready for ProjectPal. Local state is set up. Next step: $handoff_message"
   next_step=$handoff_message
   current_phase=onboarding
   last_blocker=none
@@ -495,8 +446,6 @@ command_onboarding_flow() {
     bridge_summary="This repo is almost ready for ProjectPal. One blocker still needs attention: $blocker_detail Next step: $blocker_next_step"
     next_step=$blocker_next_step
     last_blocker=$blocker_name
-  elif [ "$mempalace_available" = "false" ]; then
-    bridge_summary="This repo is ready for ProjectPal. Local state is set up here, so you can keep going in this repo today and pick it back up here later. MemPalace would add longer-term memory across sessions and repos. Next step: $handoff_message"
   fi
 
   if [ -f "$state_path" ]; then
@@ -507,9 +456,6 @@ command_onboarding_flow() {
   printf '%s\n' "assistant_preferred: $preferred_assistant"
   printf '%s\n' "assistant_confidence: $assistant_confidence"
   printf '%s\n' "assistant_fallback_used: $assistant_fallback"
-  printf '%s\n' "mempalace_available: $mempalace_available"
-  printf '%s\n' "mempalace_reason: $mempalace_reason"
-  printf '%s\n' "mempalace_mode: $mempalace_mode"
   printf '%s\n' "repo_ready: $repo_ready"
   if [ "$repo_ready" = "false" ]; then
     printf '%s\n' "blocker_name: $blocker_name"
@@ -1079,7 +1025,6 @@ case "$command" in
   resolve-repo-context) command_resolve_repo_context "$@" ;;
   read-resume-bridge) command_read_resume_bridge "$@" ;;
   probe-assistants) command_probe_assistants "$@" ;;
-  probe-mempalace) command_probe_mempalace "$@" ;;
   prepare-repo) command_prepare_repo "$@" ;;
   onboarding-flow) command_onboarding_flow "$@" ;;
   artifact-budget-check) command_artifact_budget_check "$@" ;;

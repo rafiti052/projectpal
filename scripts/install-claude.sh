@@ -31,9 +31,7 @@ cat >> "$SKILL_FILE" << 'FOOTER'
 - Parking Lot: `.projectpal/parking-lot.md`
 - Artifacts: `.projectpal/artifacts/` for Briefs, Technical Details, Tickets, and refinement records
 
-**Global** (`MemPalace` and `~/.projectpal/` helper files):
-- Repo-scoped continuity: `Projects/<repo-slug>` in MemPalace
-- Shared knowledge: `Principles`, `Decisions`, and `Precedents` wings in MemPalace
+**Global** (`~/.projectpal/` helper files):
 - Internal review log: stored under `~/.projectpal/`
 
 If `.projectpal/artifacts/` does not exist in the current project, create it before saving. Never use `~/.projectpal/` for session state, artifacts, or parking-lot.

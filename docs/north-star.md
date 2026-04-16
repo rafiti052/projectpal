@@ -199,7 +199,6 @@ The current product is a lean CLI-centered implementation designed to validate t
 
 - prompt-driven behavior instead of a custom orchestration runtime
 - sub-agents for Brief drafting, Refinement, Technical Details, and ticket generation
-- MemPalace for long-term memory when available
 - `.projectpal/` inside the active repo for local bridge state and artifacts
 - launcher adapters for Claude, Codex, and Gemini around the same source instructions
 
@@ -239,58 +238,30 @@ ProjectPal resolves continuity from the active repo first, not from one shared g
 
 ### Continuity sources
 
-- **Repo-scoped memory:** `Projects/<repo-slug>` in MemPalace when available
 - **Local bridge:** `.projectpal/state.yml` inside the active repo
 - **Local Parking Lot:** `.projectpal/parking-lot.md`
 
 ### Precedence
 
 1. active repo detection
-2. repo-scoped memory for that repo
-3. local bridge for that same repo
-4. broader fallback only when repo-local continuity is unavailable
+2. local bridge for that repo
+3. fresh start if no local bridge exists
 
 ### Why this matters
 
-It prevents stale state from leaking across repos and lets multiple worktrees of the same repo share durable continuity without pretending they are the same local working copy.
+It prevents stale state from leaking across repos and lets multiple worktrees keep independent local working copies.
 
 ---
 
 ## 10. Memory Model
 
-ProjectPal uses two memory layers.
-
-### Long-term memory
-
-MemPalace stores durable context when available.
-
-- repo continuity in `Projects/<repo-slug>`
-- broader reusable decisions in shared wings like `Decisions`, `Precedents`, and `Principles`
+ProjectPal uses local bridge memory only.
 
 ### Local bridge memory
 
-`.projectpal/state.yml` is the repo-local bridge that keeps the current session resumable even when long-term memory is unavailable or before sync happens.
+`.projectpal/state.yml` is the repo-local bridge that keeps the current session resumable.
 
 ### Required schemas
-
-#### RepoAnchor
-
-- `repo_slug`
-- `repo_root_hint`
-- `last_phase`
-- `last_resume_summary`
-- `last_next_step`
-- `last_seen_at`
-- `memory_refs[]`
-
-#### FeatureScope
-
-- `repo_slug`
-- `feat_slug`
-- `phase`
-- `status`
-- `summary`
-- `updated_at`
 
 #### ResumeBridge
 
@@ -306,21 +277,10 @@ MemPalace stores durable context when available.
 - `partial_context`
 - `next_steps[]`
 
-### Search and write order
+### Write order
 
-Search order:
-
-1. repo room
-2. matching feature tags in that room
-3. repo Parking Lot mirrors
-4. local bridge
-5. global fallback
-
-Write order when MemPalace is available:
-
-1. repo-scoped memory
-2. local bridge
-3. local Parking Lot markdown when relevant
+1. local bridge (`.projectpal/state.yml`)
+2. local Parking Lot markdown when relevant
 
 ---
 
@@ -330,7 +290,7 @@ ProjectPal may later ship a public global Node CLI named `projectpal`, but that 
 
 ### Packaging rule
 
-The launcher resolves repo context from the caller's current working directory, then delegates continuity to repo-local state plus optional MemPalace.
+The launcher resolves repo context from the caller's current working directory, then delegates continuity to repo-local state.
 
 ### Implications
 
