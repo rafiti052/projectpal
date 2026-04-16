@@ -13,8 +13,8 @@
     "product",
     "planning",
     "brief",
-    "tickets",
-    "adhd"
+    "parallelization",
+    "orchestration"
   ],
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
@@ -24,14 +24,9 @@
     "longDescription": "ProjectPal is a patient product companion for turning non-linear ideas into a clear route, a Brief, Technical Details when needed, and small execution tickets without forcing structured intake. In Codex, launch it with `ProjectPal`.",
     "developerName": "Rafael",
     "category": "Productivity",
-    "capabilities": [
-      "Interactive",
-      "Write"
-    ],
+    "capabilities": ["Interactive", "Write"],
     "websiteURL": "https://github.com/rafiti052/projectpal",
-    "defaultPrompt": [
-      "ProjectPal"
-    ],
+    "defaultPrompt": ["ProjectPal"],
     "brandColor": "#2563EB"
   }
 }

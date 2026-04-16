@@ -8,10 +8,11 @@ resume_source: local-bridge
 synced_at: 2026-04-15T23:45:00-03:00
 artifacts_dir: .projectpal/artifacts
 bridge_summary: |
-  AHA copy cleanup: Pal-facing carve-outs no longer default to naming connector-wiring.md; prompts and phase protocols
-  refer to approved Briefs under artifacts/brief generically. package.json description and README north-star pointer softened.
-  North-star §14 remains canonical for product backlog. Session closed after regenerate + integration pass.
-last_artifact_ref: .projectpal/artifacts/tickets/release-readiness-audit-closure-bundle.md
+  Two batches shipped this session. Batch 1: phase gate hard-stop block in always-loaded surfaces, install-claude.sh
+  hardened, check-install.ts tightened (Check D + threshold 0), generate.sh now manages .cursor/rules/projectpal.md.
+  Batch 2: Engineer dispatch summary in src/shared/core.md, lean v1 guard contradiction resolved, Wrap Up cleanup gate
+  added to phase-protocols.md. All 13 tickets complete, 0 failures. Staging cleaned. Open source / MIT parked.
+last_artifact_ref: .projectpal/artifacts/tickets/bundle-phase-gate-drift-01.md
 partial_context:
   complete: true
 thread_orchestration:
