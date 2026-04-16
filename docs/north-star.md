@@ -344,7 +344,36 @@ If those survive, the implementation can change without the product losing itsel
 
 ---
 
-## 14. Canonical Decision
+## 14. Future: External Model Routing (Connector Wiring)
+
+When ProjectPal ships its own CLI tool with MCP support and orchestration machinery that runs outside the assistant runtimes, external model routing becomes viable.
+
+### The idea
+
+Role-scoped ranked model preferences per agent role, configured via a config file (not hand-edited — set up interactively). Each sub-agent tries from the top of its preference list, falls back on availability failures (missing key, quota, errors), with the primary assistant model as the guaranteed floor.
+
+### Why it's deferred
+
+No current assistant runtime (Claude Code, Codex, Cursor) supports routing sub-agent calls to external models. This requires a thin orchestration layer that makes API calls to external providers — which means ProjectPal needs its own execution surface first.
+
+### What exists
+
+- A Brief draft at `.projectpal/artifacts/brief/connector-wiring.md`
+- A post-setup config flow concept for editing role rankings after install
+
+### Prerequisites
+
+- ProjectPal CLI tool with its own process boundary
+- MCP server integration for model provider access
+- Interactive setup flow that survives dropout at any step
+
+### Success shape
+
+Strategist runs on Gemini, API key expires, silently falls back to host model, session keeps going — no interruption.
+
+---
+
+## 15. Canonical Decision
 
 **ProjectPal is defined by its user-facing behavior and continuity guarantees, not by a specific orchestration framework.**
 

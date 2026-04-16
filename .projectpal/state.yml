@@ -1,38 +1,39 @@
 repo_slug: projectpal
 repo_root_hint: /Users/rafael/Dev/projectpal
-current_project: remove-mempalace
-current_phase: 7
+current_project: idle
+current_phase: 0
 complexity_domain: simple
-last_session: 2026-04-15T23:30:00-03:00
+last_session: 2026-04-15T21:48:30-03:00
 resume_source: local-bridge
-synced_at: 2026-04-15T23:30:00-03:00
+synced_at: 2026-04-15T21:48:30-03:00
 artifacts_dir: .projectpal/artifacts
 bridge_summary: |
-  MemPalace removal complete. Deleted .mcp.json, instructions/mempalace-onboarding.md,
-  instructions/mempalace-integration.md. Stripped all MemPalace references from 18 files
-  across source, generated surfaces, instructions, prompts, scripts, and docs.
-  Integration tests pass. Installed skill synced. Only CHANGELOG.md retains history.
+  Engineer agent batch closed in Wrap Up and committed. Shipped: prompts/engineer-agent.md
+  (fast executor, 3-attempt blocker protocol, allowed_writes); sub-agent invocation entry 8 with
+  wave-level parallel rules; Phase 7 protocol extended for Engineer dispatch and wave transitions;
+  connector orchestration scaffolding and dependency bumps. Parking lot marks engineer-agents as
+  incorporated. Working tree clean on feat/agent-platform-linux (ahead of origin by 6).
 last_artifact_ref: .projectpal/parking-lot.md
 partial_context:
   complete: true
 thread_orchestration:
-  active_thread_id: claude-code-session-20260415T233000-0300
+  active_thread_id: null
   threads:
     - thread_id: claude-code-session-20260415T233000-0300
       primary_assistant: claude-code
       reporting_owner: pal
-      state: active
+      state: completed
       approved_execution_path_id: null
       approval_state: not_needed
       shared_context_refs:
         - .projectpal/parking-lot.md
       created_at: 2026-04-15T23:30:00-03:00
-      updated_at: 2026-04-15T23:30:00-03:00
+      updated_at: 2026-04-15T21:46:17-03:00
   execution_paths: []
   connector_status_snapshots: []
   delegation_tasks: []
   fallback_records: []
 next_steps:
-  - Commit the MemPalace removal when ready.
-  - Flow optimization audit (parking lot active item) when you are ready.
-  - Connector-wiring + connector-config-flow — see parking lot P2.
+  - Push feat/agent-platform-linux when you want it on the remote.
+  - Flow optimization audit (parking lot P1) when you are ready.
+  - Connector-wiring + connector-config-flow — see parking lot / north-star when you pick that up.

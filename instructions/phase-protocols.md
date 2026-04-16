@@ -227,6 +227,42 @@ After tickets are generated and saved, implementation begins. Do not clean up ar
 - Before any likely interruption point or long-running batch, sync `.projectpal/state.yml` so resume starts from the latest finished wave or ticket group.
 - If a ticket cannot be implemented in the current session, leave artifacts intact and write the exact next ticket or action to the diary.
 
+### Engineer invocation protocol
+
+The Pal orchestrates all Engineer work. Engineers never self-dispatch.
+
+**Prompt and dispatch:**
+```
+Agent(Engineer) receives:
+  - prompts/engineer-agent.md prompt
+  - Ticket content (inline — read from .projectpal/artifacts/tickets/<ticket-id>.md)
+  - Any resolved spike data or dependency outputs referenced by the ticket
+
+Pal dispatches one Engineer per runnable ticket in the current wave.
+```
+
+**Wave reading:** Before dispatching Engineers, the Pal reads the ticket bundle in wave order and identifies every ticket in the current wave whose `depends_on` chain is satisfied and whose `allowed_writes` do not overlap with another running ticket's exclusive write surface. Only those tickets are dispatched.
+
+**Completion signals:** Each Engineer reports back to the Pal with one of:
+- `complete` — ticket work is done, changed files listed, verification result (if any).
+- `blocked` — ticket cannot proceed; blocker description and the exact dependency or constraint that caused the block are included.
+- `failed` — an unrecoverable error occurred; error detail and partial-progress summary are included.
+
+The Pal updates ticket state in the bundle (`complete`, `blocked`, or `deferred`) as each signal arrives.
+
+**Blocker surfacing:** When an Engineer reports `blocked` or `failed`:
+1. The Pal records the blocker in the ticket's frontmatter.
+2. If the blocker is resolvable within the current wave (e.g., a dependency ticket just needs to finish first), the Pal holds the blocked ticket and re-evaluates after the blocking ticket completes.
+3. If the blocker requires a user decision or is outside the approved path boundary, the Pal surfaces it immediately: *"Ticket [id] hit a blocker: [one-line description]. How do you want to handle it?"*
+4. The blocked ticket stays `blocked` until the user or a resolved dependency clears it.
+
+**Wave transitions:** A wave is eligible to close when every ticket in it is `complete`, explicitly `deferred`, or `blocked` with a recorded reason. The Pal must not start dispatching tickets from the next wave until the current wave's exit criteria are met. When a wave closes:
+1. The Pal writes a wave summary to the ticket bundle.
+2. If `designer_opt_in=true`, the Designer review gate (below) runs before the next wave.
+3. The Pal reads the next wave from the bundle and begins the dispatch cycle again.
+
+**Handoff discipline:** Engineers hand control back to the Pal after completing their assigned ticket(s). Engineers do not read the next wave, dispatch other Engineers, or modify tickets outside their `allowed_writes`. The Pal is the sole wave lifecycle owner.
+
 ### Designer review-pass completion gate (when opted in)
 
 If `designer_opt_in=true` for the active thread:
