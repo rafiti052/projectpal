@@ -46,6 +46,8 @@ Supported assistants right now:
 
 The installer always refreshes the generated runtime surfaces from `src/` first, installs the assistant-specific integrations, and writes the assistant primary hint to `~/.projectpal/primary-assistant`.
 
+Note: `build/` outputs are intentionally not committed. The installer will build the platform artifacts (Claude/Codex/Cursor) automatically on each install.
+
 ### Codex
 
 Codex is the primary path for new GitHub users.
@@ -126,6 +128,7 @@ The Codex maintainer path is documented in [docs/maintainer-codex-reinstall.md](
 ```
 projectpal/
 ├── src/                       ← Neutral ProjectPal source for generated runtime surfaces
+├── platforms/                 ← Platform-owned adapter inputs (Claude, Codex, Cursor)
 ├── install-projectpal.sh      ← Single install entrypoint that prompts for Claude, Codex, or Cursor
 ├── CLAUDE.md                  ← Generated Claude runtime surface (local install output, not versioned)
 ├── AGENTS.md                  ← Generated agents-compatible runtime surface (local install output, not versioned)
@@ -134,10 +137,9 @@ projectpal/
 ├── .codex-plugin/
 │   └── plugin.json            ← Repo-local Codex wrapper manifest pointing at build/codex
 ├── build/
-│   └── codex/
-│       ├── AGENTS.md          ← Generated Codex runtime mirror
-│       ├── skills/projectpal/SKILL.md
-│       └── .codex-plugin/plugin.json
+│   ├── claude/                ← Generated Claude artifacts (installed into ~/.claude)
+│   ├── codex/                 ← Generated Codex artifacts (installed into ~/.codex)
+│   └── cursor/                ← Generated Cursor artifacts (installed/registered in ~/.cursor)
 ├── .agents/plugins/
 │   └── marketplace.json       ← Optional local Codex marketplace entry
 ├── skills/projectpal/
