@@ -22,7 +22,7 @@ Lean “ships-a-surface” release: installable ProjectPal surfaces for Claude C
 ### Added
 
 - Lean v0.4 scope posture: connector runtime work (routing/connector execution) is deferred to the next version and not part of the shipped install surface.
-- `scripts/check-install.ts` — install parity checker across adapters; fixture mode for CI and release gates.
+- `scripts/check-install.ts` — install parity checker across adapters; supports fixture mode for deterministic CI checks.
 - `tests/fixtures/` — fixture state for deterministic install parity checks.
 - Cursor MCP integration installed via `scripts/install-cursor.sh` (global `~/.cursor/mcp.json` + Cursor repo rule template).
 - `templates/cursor-rules-projectpal.md` — Cursor rules template, copied to repos on prep.
@@ -30,19 +30,18 @@ Lean “ships-a-surface” release: installable ProjectPal surfaces for Claude C
 - `scripts/setup-dev.sh` — opinionated nvm shortcut for contributors on Linux, WSL, and macOS (verified on Amazon Linux 2023).
 - `.nvmrc` — pins Node 20 LTS; auto-detected by nvm, fnm, and volta.
 - Sub-agent artifact staging — `instructions/sub-agent-invocation.md` and `instructions/artifacts.md` document `.projectpal/staging/`, `artifact_draft_path`, and Pal promotion into `.projectpal/artifacts/`.
-- `docs/audits/2026-04-15-release-readiness.md` — release readiness audit (flow handoff + full test gate) with an accountable closure table.
 - **Phase protocol hardening** — `instructions/phase-protocols.md` defines non-optional Check-ins (including Implementation entry / green light) and ties them to Clear path vs full route behavior.
 
 ### Changed
 
-- `package.json` `check:install` invokes `tsx scripts/check-install.ts` without hardcoding `--fixture`; use `pnpm check:install --fixture` for the deterministic release gate.
+- `package.json` `check:install` invokes `tsx scripts/check-install.ts` without hardcoding `--fixture`; use `pnpm check:install --fixture` for deterministic fixture runs when needed.
 - `CONTRIBUTING.md` and `scripts/setup-dev.sh` document live versus fixture behavior for install parity.
 - `scripts/onboarding-flow.sh` `prepare-repo` creates `.projectpal/staging` and `artifacts/designer-review` with the rest of the documented artifact layout.
 - `docs/north-star.md` keeps connector product wiring as long-range backlog (§14), not a near-term ship commitment.
 - Connector execution remains deferred to the next version; v0.4 ships only installable assistant surfaces.
 - `.gitignore` still ignores most of `.projectpal/`; selectively tracks `artifacts/brief/` and `artifacts/tickets/` for committed Pal artifacts while leaving other artifact subtrees and staging local-only.
 - `src/shared/core.md` Check-in UX rule references phase-protocol obligations; regenerated `CLAUDE.md`, `AGENTS.md`, and `skills/projectpal/SKILL.md` via `scripts/generate.sh`.
-- **README** — structure and release pointers updated for v0.4.0.
+- **README** — structure and install pointers updated.
 - **Codex plugin manifest** — version `0.4.0`.
 
 ### Fixed
@@ -58,7 +57,6 @@ Lean “ships-a-surface” release: installable ProjectPal surfaces for Claude C
 
 - Active prompt names, artifact contracts, and maintainer docs now use `Brief`, `Refinement`, `Planning`, `Technical Details`, `Architect`, and `Manager` consistently across the live repo.
 - Internal artifact directories and frontmatter types now use `brief`, `technical-details`, and `refinement` instead of the older legacy ids.
-- `docs/projectpal-ui-labels.en.json` now records canonical labels directly instead of keeping the old reviewer and artifact terms as reference keys.
 - README version bumped to `v0.3.6`.
 - Codex plugin manifest version bumped to `0.3.6`.
 
@@ -123,7 +121,6 @@ Lean “ships-a-surface” release: installable ProjectPal surfaces for Claude C
 ### Added
 
 - `install-projectpal.sh` as the single installer entrypoint that prompts for Codex or Claude and refreshes generated runtime surfaces before install.
-- `docs/maintainer-codex-reinstall.md` for the maintainer-only clean Codex reinstall test.
 - `scripts/projectpal-runtime-tests.sh` for repeatable generation and install-freshness verification across Codex and Claude runtime outputs.
 
 ### Changed

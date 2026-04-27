@@ -11,3 +11,7 @@ platforms/cursor/cursor-mcp/node_modules/
 /CLAUDE.md
 /AGENTS.md
 /skills/projectpal/SKILL.md
+
+# Keep only north star docs versioned; everything else in docs/ is local-only.
+/docs/*
+!/docs/north-star.md

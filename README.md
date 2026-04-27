@@ -1,4 +1,4 @@
-# ProjectPal `v0.4.0`
+# ProjectPal
 
 A patient AI companion that turns chaotic ideas into shipped projects.
 
@@ -22,7 +22,6 @@ It works through conversation, not forms. It remembers context between sessions.
 `src/` is the neutral ProjectPal source in this repo.
 
 The launcher-specific files for Claude Code and Codex CLI are generated runtime surfaces. `CLAUDE.md` and `AGENTS.md` are outputs, not the authoring center.
-`docs/projectpal-ui-labels.en.json` is the label reference. If wording needs to ship through install or sync, change the source in `src/` and regenerate instead of patching the generated outputs directly.
 
 ## Setup
 
@@ -106,8 +105,6 @@ pnpm test:integration
 pnpm check:install --fixture
 ```
 
-The last command matches the recorded **v0.4.0** release gate in [docs/audits/2026-04-15-release-readiness.md](docs/audits/2026-04-15-release-readiness.md).
-
 For the packaged multi-platform contract, also run:
 
 ```bash
@@ -115,8 +112,6 @@ sh scripts/validate-platform.sh codex
 sh tests/smoke/codex-build.sh
 sh scripts/smoke-install.sh
 ```
-
-The Codex maintainer path is documented in [docs/maintainer-codex-reinstall.md](docs/maintainer-codex-reinstall.md).
 
 ### Dependencies
 
@@ -153,8 +148,6 @@ projectpal/
 │   ├── tech-lead-agent.md            ← Technical Details drafting prompt
 │   └── scrum-master-agent.md         ← Ticket generation prompt
 ├── docs/
-│   ├── audits/                ← Release readiness and other audits (see v0.4.0 gate doc)
-│   ├── maintainer-codex-reinstall.md ← Maintainer-only clean reinstall guide
 │   └── north-star.md          ← Long-range product direction (delegation / CLI shape in §14)
 ├── instructions/              ← Phase protocols, artifacts, session schema, sub-agent contracts
 └── .projectpal/               ← Local bridge state (managed by the Pal, per project)
@@ -191,4 +184,4 @@ The current direction note lives in [docs/north-star.md](docs/north-star.md).
 
 ## Release notes
 
-Shipped versions are listed in [CHANGELOG.md](CHANGELOG.md). The **v0.4.0** verification record and closure table live in [docs/audits/2026-04-15-release-readiness.md](docs/audits/2026-04-15-release-readiness.md). The packaged Codex manifest at `build/codex/.codex-plugin/plugin.json` carries the same semver as `package.json` for each release, and the repo-local `.codex-plugin/plugin.json` wrapper should continue to point at that generated build tree.
+Shipped versions are listed in [CHANGELOG.md](CHANGELOG.md). The packaged Codex manifest at `build/codex/.codex-plugin/plugin.json` carries the same semver as `package.json` for each release, and the repo-local `.codex-plugin/plugin.json` wrapper should continue to point at that generated build tree.
