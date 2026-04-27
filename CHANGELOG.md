@@ -90,7 +90,6 @@ Lean “ships-a-surface” release: installable ProjectPal surfaces for Claude C
 
 ### Changed
 
-- MemPalace onboarding now explains local-only continuity in repo-first terms, including that `.projectpal/state.yml` still lets the same repo pick back up later.
 - Onboarding bridge summaries now save calm repo handoff context instead of setup jargon such as memory mode or assistant metadata.
 - User-facing stage descriptions now keep the friendly visible names aligned with the quieter voice system, using softer descriptions like scoped draft, build plan, and build steps.
 - Generated runtime surfaces were refreshed from `src/shared/core.md` after the user-facing naming cleanup.
@@ -99,8 +98,6 @@ Lean “ships-a-surface” release: installable ProjectPal surfaces for Claude C
 
 ### Fixed
 
-- Local-only onboarding no longer implies that same-repo continuity is lost when MemPalace is unavailable.
-- MemPalace intro copy now uses calmer, more grounded language instead of the older setup-heavy phrasing.
 - Runtime and flow shell tests now assert the updated continuity and stage-copy wording so stale expectations are caught by default.
 
 ---
@@ -113,7 +110,6 @@ Lean “ships-a-surface” release: installable ProjectPal surfaces for Claude C
 - Clear-path work now keeps the Brief, skips the extra refinement and technical-details review, and goes straight from `Solution` to the `Implementation` check-in.
 - Workflow-mode messages now use the `👷 ProjectPal` shell, with `Current / Next / Later` reserved for orientation and artifact reviews using the compact summary pattern.
 - Local state remains the primary continuity layer, while wrap-up artifacts now consistently record approved and completed status across the Brief, UI companion, ticket bundle, and ticket set.
-- MemPalace setup guidance is now assistant-aware across the live onboarding instructions, README, and reviewed copy surfaces.
 - README version bumped to `v0.3.0`.
 - Codex plugin manifest version bumped to `0.3.0`.
 
@@ -172,7 +168,6 @@ Lean “ships-a-surface” release: installable ProjectPal surfaces for Claude C
 
 ### Changed
 
-- ProjectPal instructions now treat repo-scoped MemPalace continuity as the source of truth for resume behavior, with `.projectpal/state.yml` reduced to a project-local bridge.
 - Parking Lot guidance now uses repo/feat/phase scoping instead of phase-only capture.
 - Global memory routing now distinguishes repo continuity in `Projects/<repo-slug>` from shared knowledge in broader wings such as `Principles`, `Decisions`, and `Precedents`.
 - README version bumped to `v0.2.2`.
@@ -189,7 +184,7 @@ Lean “ships-a-surface” release: installable ProjectPal surfaces for Claude C
 ### Fixed
 
 - Phase 6 now generates tickets only; ProjectPal no longer routes directly to wrap-up or artifact cleanup before implementation.
-- Added Phase 7 implementation and Phase 8 review/wrap-up so tickets remain available while work is implemented, verified, reviewed, optionally prepared for PR flow, saved to MemPalace, and only then cleaned up.
+- Added Phase 7 implementation and Phase 8 review/wrap-up so tickets remain available while work is implemented, verified, reviewed, optionally prepared for PR flow, and only then cleaned up.
 
 ### Changed
 
@@ -215,29 +210,20 @@ Lean “ships-a-surface” release: installable ProjectPal surfaces for Claude C
 
 ### Added
 
-- **MemPalace onboarding flow** — when MemPalace isn't connected, the Pal now detects it, explains what it is, and offers to install/register it or continue in local-only mode. No more silent degradation.
-  - Detection via attempt-based diary read (try → fail → explain)
-  - Two-case branching: never installed vs. installed but not connected this session
-  - Install path: `claude mcp add` first, settings path discovery fallback, manual walkthrough last resort
-  - Post-install guard: diary/drawer calls disabled until restart
-  - Local-only mode: full session with `state.yml` only, all MemPalace calls silently skipped
 - **Full sub-agent pipeline** — all six generation steps are now proper isolated sub-agent invocations (matching the Architect/Manager review pattern):
   - Cynefin Classifier (`prompts/cynefin-classify.md`) — invoked at Phase 0 completion
   - Brief Generator (`prompts/brief-generate.md`) — invoked at Phase 1
   - Technical Details Generator (`prompts/technical-details-generate.md`) — invoked at Phase 4
   - Ticket Generator (`prompts/tickets-generate.md`) — invoked at Phase 6
-- **MemPalace availability gating** — all diary and drawer calls are gated on `mempalace_available` flag (session-scoped, never persisted)
 
 ### Changed
 
 - Session Resumption restructured — diary read now doubles as the availability detection call (no duplicate calls)
-- README updated: setup instructions reflect onboarding flow; MemPalace listed as optional but guided
 - `docs/v4-mvp.md` status updated to "Approved — Shipped as v0.1"; Task tool references corrected to Agent tool; artifacts directory path corrected
 
 ### Fixed
 
-- Silent MemPalace failures no longer leave the user with a blank session and no explanation
-- `mempalace_available` flag is session-scoped only — eliminated stale-state bug where a prior local-only session could block MemPalace on the next run
+- Availability gating is session-scoped only — eliminated stale-state bug where a prior local-only session could block optional integrations on the next run
 
 ---
 
@@ -249,8 +235,6 @@ Lean “ships-a-surface” release: installable ProjectPal surfaces for Claude C
 - Cynefin classification with user confirmation
 - Multi-agent refinement system: Architect + Manager sub-agents
 - Parking Lot — silent capture of out-of-phase ideas
-- Session resumption via MemPalace diary + local `state.yml`
 - Phase 6 decision routing (A|B|C) and project wrap-up
 - `sync-claude-skill.sh` — deploys Pal as a Claude Code slash command (`/projectpal`)
 - Persona label system: Low hanging fruit / Needs a plan / Uncharted territory / On fire / Can't read it yet
-

@@ -37,7 +37,6 @@ These files support runtime operation but are not themselves the authoring sourc
 
 | File                               | Role                                | Classification        |
 | ---------------------------------- | ----------------------------------- | --------------------- |
-| `.mcp.json`                        | project MCP server wiring           | operational config    |
 | `.claude/settings.local.json`      | local Claude permissions/settings   | local runtime config  |
 | `scripts/install-cursor.sh`        | legacy Cursor installer wrapper     | wrapper tooling       |
 | `scripts/generate.sh`              | legacy repo-root generation wrapper | wrapper tooling       |

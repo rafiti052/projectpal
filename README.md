@@ -63,7 +63,7 @@ ProjectPal
 That is the canonical Codex entrypoint.
 
 The generated Codex package lives in `build/codex/`, and its packaged manifest lives at `build/codex/.codex-plugin/plugin.json`.
-The repo-local Codex wrapper manifest at `.codex-plugin/plugin.json` delegates to `build/codex/skills/projectpal/SKILL.md` and keeps the repo-local `.mcp.json` reference.
+The repo-local Codex wrapper manifest at `.codex-plugin/plugin.json` delegates to `build/codex/skills/projectpal/SKILL.md`.
 
 ProjectPal does **not** claim that `/projectpal` is a native Codex slash command.
 

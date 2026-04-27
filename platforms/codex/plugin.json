@@ -14,7 +14,6 @@
     "orchestration"
   ],
   "skills": "./skills/",
-  "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "ProjectPal",
     "shortDescription": "Turns messy ideas into a clear route, a solid solution, and 15-minute tickets.",
