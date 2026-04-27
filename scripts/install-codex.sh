@@ -22,7 +22,11 @@ command=${1:-install}
 case "$command" in
   install|update)
     if [ ! -f "$BUILD_DIR/AGENTS.md" ] || [ ! -f "$BUILD_DIR/skills/projectpal/SKILL.md" ] || [ ! -f "$BUILD_DIR/.codex-plugin/plugin.json" ]; then
-      printf '%s\n' "install-codex: missing build/codex outputs; run scripts/build-platform.sh codex first" >&2
+      sh scripts/build-platform.sh codex >/dev/null
+    fi
+
+    if [ ! -f "$BUILD_DIR/AGENTS.md" ] || [ ! -f "$BUILD_DIR/skills/projectpal/SKILL.md" ] || [ ! -f "$BUILD_DIR/.codex-plugin/plugin.json" ]; then
+      printf '%s\n' "install-codex: missing build/codex outputs; build failed (tried scripts/build-platform.sh codex)" >&2
       exit 1
     fi
 

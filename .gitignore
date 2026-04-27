@@ -3,7 +3,7 @@ node_modules/
 dist/
 pnpm-lock.yaml
 /build/
-cursor-mcp/node_modules/
+platforms/cursor/cursor-mcp/node_modules/
 /rules/
 .projectpal/*
 .cursor/

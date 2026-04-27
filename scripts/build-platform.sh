@@ -84,10 +84,19 @@ build_codex() {
 build_cursor() {
   build_dir="$ROOT_DIR/build/cursor"
   rules_dir="$build_dir/.cursor/rules"
+  launcher_src="$ROOT_DIR/platforms/cursor/cursor-mcp"
+  launcher_dst="$build_dir/cursor-mcp"
 
   mkdir -p "$rules_dir"
 
   cp "$ROOT_DIR/platforms/cursor/rules/projectpal.md" "$rules_dir/projectpal.md"
+
+  mkdir -p "$launcher_dst/bin" "$launcher_dst/rules"
+  cp "$launcher_src/package.json" "$launcher_dst/package.json"
+  cp "$launcher_src/bin/projectpal-cursor-mcp" "$launcher_dst/bin/projectpal-cursor-mcp"
+  chmod +x "$launcher_dst/bin/projectpal-cursor-mcp"
+  # Keep the launcher package self-contained: Cursor can point at the package root.
+  cp "$ROOT_DIR/platforms/cursor/rules/projectpal.md" "$launcher_dst/rules/projectpal.md"
 
   BUILD_ROOT="$ROOT_DIR" python3 <<'PY'
 from pathlib import Path

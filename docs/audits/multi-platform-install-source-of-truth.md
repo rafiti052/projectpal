@@ -43,7 +43,7 @@ This audit inventories the current install and bootstrap scaffold before the rep
 | --- | --- | --- | --- | --- |
 | `bin/pp-compress` | Claude hook helper | `migrate` | `platforms/claude/hooks/pp-compress` | Host-specific hook logic should live with the Claude adapter, not as a loose root-level script. |
 | `.claude/settings.local.json` | Claude hook config reference | `remove` | `~/.claude/settings.json` or future installer-managed Claude config | The file is referenced by `bin/pp-compress`, but it is not present in the repo and should not be treated as a tracked install artifact. |
-| `cursor-mcp/` | Cursor launcher scaffold | `migrate` | `platforms/cursor/` and `build/cursor/` | This directory is a transitional Cursor package skeleton; it should become the explicit Cursor adapter/build surface. |
+| `platforms/cursor/cursor-mcp/` | Cursor launcher scaffold | `keep` | `platforms/cursor/` and `build/cursor/` | Cursor ships a host-native launcher package that is built into `build/cursor/cursor-mcp/` and installed into `~/.cursor/projectpal/`. |
 | `.agents/plugins/marketplace.json` | optional Codex marketplace bootstrap | `keep-with-wrapper` | `platforms/codex/` and `build/codex/` | Local marketplace wiring can stay as a wrapper for now, but it is not canonical source. |
 | `.claude-plugin/` | transitional plugin scaffold | `remove` | none | Empty wrapper directory; no shipped payload found. |
 | `.cursor-plugin/` | transitional plugin scaffold | `remove` | none | Empty wrapper directory; no shipped payload found. |

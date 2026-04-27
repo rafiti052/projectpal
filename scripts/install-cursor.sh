@@ -13,6 +13,25 @@ PACKAGE_SRC="$REPO_ROOT/build/cursor/cursor-mcp"
 PACKAGE_DST="$INSTALL_ROOT/cursor-mcp"
 RULES_DST="$INSTALL_ROOT/rules"
 
+ensure_build() {
+  if [ ! -f "$REPO_ROOT/build/cursor/mcp.json" ] \
+    || [ ! -f "$REPO_ROOT/build/cursor/.cursor/rules/projectpal.md" ] \
+    || [ ! -f "$PACKAGE_SRC/package.json" ] \
+    || [ ! -f "$PACKAGE_SRC/bin/projectpal-cursor-mcp" ]; then
+    sh "$REPO_ROOT/scripts/build-platform.sh" cursor >/dev/null
+  fi
+
+  if [ ! -f "$REPO_ROOT/build/cursor/mcp.json" ] \
+    || [ ! -f "$REPO_ROOT/build/cursor/.cursor/rules/projectpal.md" ] \
+    || [ ! -f "$PACKAGE_SRC/package.json" ] \
+    || [ ! -f "$PACKAGE_SRC/bin/projectpal-cursor-mcp" ]; then
+    printf '%s\n' "install-cursor: missing build/cursor outputs; build failed (tried scripts/build-platform.sh cursor)" >&2
+    exit 1
+  fi
+}
+
+ensure_build
+
 mkdir -p "$CURSOR_DIR" "$PACKAGE_DST/bin" "$RULES_DST"
 
 cp "$PACKAGE_SRC/package.json" "$PACKAGE_DST/package.json"

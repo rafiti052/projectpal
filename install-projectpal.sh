@@ -26,6 +26,10 @@ if ! sh "$SCRIPT_DIR/scripts/generate.sh"; then
   exit 1
 fi
 
+# Build all platform artifacts. `build/` is intentionally not committed, so a fresh
+# clone must generate it before the per-host installers can copy files out.
+sh "$SCRIPT_DIR/scripts/build-platform.sh" all >/dev/null
+
 # ── Step 2: Install global skill for all assistants ─────────────────────────
 
 sh "$SCRIPT_DIR/scripts/install-claude.sh"

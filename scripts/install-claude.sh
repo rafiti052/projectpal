@@ -24,7 +24,11 @@ command=${1:-install}
 case "$command" in
   install|update)
     if [ ! -f "$BUILD_DIR/skills/projectpal/SKILL.md" ] || [ ! -f "$BUILD_DIR/hooks/pp-compress" ]; then
-      printf '%s\n' "install-claude: missing build/claude outputs; run scripts/build-platform.sh claude first" >&2
+      sh scripts/build-platform.sh claude >/dev/null
+    fi
+
+    if [ ! -f "$BUILD_DIR/skills/projectpal/SKILL.md" ] || [ ! -f "$BUILD_DIR/hooks/pp-compress" ]; then
+      printf '%s\n' "install-claude: missing build/claude outputs; build failed (tried scripts/build-platform.sh claude)" >&2
       exit 1
     fi
 
