@@ -1,0 +1,9 @@
+PLATFORM_NAME='claude'
+PLATFORM_INPUTS='src/shared/core.md
+src/adapters/runtime-output-prefix.md
+platforms/claude/skill-header.md
+platforms/claude/skill-footer.md
+platforms/claude/hooks/pp-compress'
+PLATFORM_OUTPUTS='build/claude/CLAUDE.md
+build/claude/skills/projectpal/SKILL.md
+build/claude/hooks/pp-compress'

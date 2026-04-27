@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -eu
+
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+PACKAGE_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
+
+case "${1:-}" in
+  --print-package-root)
+    printf '%s\n' "$PACKAGE_ROOT"
+    ;;
+  --print-rules-path)
+    printf '%s\n' "$PACKAGE_ROOT/rules/projectpal.md"
+    ;;
+  *)
+    printf '%s\n' "$PACKAGE_ROOT"
+    ;;
+esac

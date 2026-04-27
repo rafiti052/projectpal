@@ -1,4 +1,4 @@
-# ProjectPal `v0.3.6`
+# ProjectPal
 
 A patient AI companion that turns chaotic ideas into shipped projects.
 
@@ -13,7 +13,7 @@ It works through conversation, not forms. It remembers context between sessions.
 1. **Talk to the Pal** — describe your idea however it comes out
 2. **Complexity Assessment** — the Pal names the safest route: Clear path, Needs a plan, Needs discovery, On fire, or Still unclear
 3. **Brief → Solution** — the Pal turns the conversation into a first clear draft and brings it back for review
-4. **Refinement → Planning → Technical Details when needed** — bounded work stays light; heavier work gets the extra pressure test and technical planning pass
+4. **Refinement → Planning → Technical Details when the route needs them** — Clear path skips these; heavier routes keep the extra pressure test and technical planning pass
 5. **Tickets → Implementation** — the work is broken into tickets before the real green light to build
 6. **Wrap Up** — changes are reviewed, state is saved locally first, and long-term memory sync stays in the background
 
@@ -22,7 +22,6 @@ It works through conversation, not forms. It remembers context between sessions.
 `src/` is the neutral ProjectPal source in this repo.
 
 The launcher-specific files for Claude Code and Codex CLI are generated runtime surfaces. `CLAUDE.md` and `AGENTS.md` are outputs, not the authoring center.
-`docs/projectpal-ui-labels.en.json` is the label reference. If wording needs to ship through install or sync, change the source in `src/` and regenerate instead of patching the generated outputs directly.
 
 ## Setup
 
@@ -42,8 +41,11 @@ sh ./install-projectpal.sh
 Supported assistants right now:
 - Codex
 - Claude Code
+- Cursor
 
-The installer always refreshes the generated runtime surfaces from `src/` first, then installs the assistant-specific integration you choose.
+The installer always refreshes the generated runtime surfaces from `src/` first, installs the assistant-specific integrations, and writes the assistant primary hint to `~/.projectpal/primary-assistant`.
+
+Note: `build/` outputs are intentionally not committed. The installer will build the platform artifacts (Claude/Codex/Cursor) automatically on each install.
 
 ### Codex
 
@@ -59,114 +61,127 @@ ProjectPal
 
 That is the canonical Codex entrypoint.
 
-Codex reads the plugin manifest from `.codex-plugin/plugin.json`, which points at `skills/projectpal/SKILL.md` and the repo-local `.mcp.json`.
+The generated Codex package lives in `build/codex/`, and its packaged manifest lives at `build/codex/.codex-plugin/plugin.json`.
+The repo-local Codex wrapper manifest at `.codex-plugin/plugin.json` delegates to `build/codex/skills/projectpal/SKILL.md`.
 
 ProjectPal does **not** claim that `/projectpal` is a native Codex slash command.
 
 ### Claude Code
 
-```bash
-sh ./install-projectpal.sh claude
-```
+Run the installer, choose `claude` when prompted, then open Claude Code and run `/projectpal`.
 
-Then open Claude Code and run `/projectpal`.
+### Cursor
+
+Run the installer, choose `cursor` when prompted, then open a prepared repo in Cursor.
+
+ProjectPal's global Cursor registration is written to `~/.cursor/mcp.json`, and repo-local rules are copied into `.cursor/rules/projectpal.md` when the repo is prepared through the ProjectPal flow.
 
 ### Refresh Generated Surfaces
 
 If you are changing the neutral source or runtime wrappers directly:
 
 ```bash
-sh ./sync-codex-plugin.sh
+sh scripts/generate.sh
+sh scripts/build-platform.sh codex
 ```
 
 That regenerates:
 - `CLAUDE.md`
 - `AGENTS.md`
 - `skills/projectpal/SKILL.md`
+- `build/codex/AGENTS.md`
+- `build/codex/skills/projectpal/SKILL.md`
+- `build/codex/.codex-plugin/plugin.json`
 
-### MemPalace (long-term memory)
+### Maintainer checks (TypeScript tree)
 
-The Pal detects MemPalace automatically on first run. If it's not connected, it will explain what it is and offer to install and register it for you — no manual setup required.
-
-If you prefer to set it up manually, install the package first:
-```bash
-pip install mempalace
-```
-
-Then register it with the assistant runtime you are using:
-
-For Codex:
+From a clone with Node 20+ and pnpm:
 
 ```bash
-codex mcp add mempalace -- python3 -m mempalace.mcp_server
+pnpm install
+pnpm test
+pnpm typecheck
+pnpm test:integration
+pnpm check:install --fixture
 ```
 
-For Claude Code:
+For the packaged multi-platform contract, also run:
 
 ```bash
-claude mcp add mempalace --command "python3 -m mempalace.mcp_server"
+sh scripts/validate-platform.sh codex
+sh tests/smoke/codex-build.sh
+sh scripts/smoke-install.sh
 ```
-
-Then restart your AI assistant and start ProjectPal again.
 
 ### Dependencies
 
 - [Claude Code](https://claude.ai/code) (CLI or desktop)
 - [Codex CLI](https://developers.openai.com/codex/overview)
-- [MemPalace](https://github.com/rafiti052/mempalace) — optional but recommended for cross-session memory
 
 ## Project Structure
 
 ```
 projectpal/
 ├── src/                       ← Neutral ProjectPal source for generated runtime surfaces
-├── install-projectpal.sh      ← Single install entrypoint that prompts for Claude or Codex
+├── platforms/                 ← Platform-owned adapter inputs (Claude, Codex, Cursor)
+├── install-projectpal.sh      ← Single install entrypoint that prompts for Claude, Codex, or Cursor
 ├── CLAUDE.md                  ← Generated Claude runtime surface (local install output, not versioned)
 ├── AGENTS.md                  ← Generated agents-compatible runtime surface (local install output, not versioned)
-├── sync-claude-skill.sh       ← Install generated Claude runtime surface into Claude Code
-├── sync-codex-plugin.sh       ← Generate Claude and Codex runtime surfaces from src/
+├── scripts/                   ← Contributor tools (generate, install, test, audit)
+├── templates/                 ← Install-time templates such as Cursor rules
 ├── .codex-plugin/
-│   └── plugin.json            ← Codex plugin manifest
+│   └── plugin.json            ← Repo-local Codex wrapper manifest pointing at build/codex
+├── build/
+│   ├── claude/                ← Generated Claude artifacts (installed into ~/.claude)
+│   ├── codex/                 ← Generated Codex artifacts (installed into ~/.codex)
+│   └── cursor/                ← Generated Cursor artifacts (installed/registered in ~/.cursor)
 ├── .agents/plugins/
 │   └── marketplace.json       ← Optional local Codex marketplace entry
 ├── skills/projectpal/
-│   └── SKILL.md               ← Generated Codex skill entrypoint (local install output, not versioned)
-├── .mcp.json                  ← MemPalace MCP connection
+│   └── SKILL.md               ← Legacy generated Codex skill mirror kept for compatibility
 ├── prompts/
 │   ├── architect-agent.md            ← Internal Architect reviewer prompt
 │   ├── manager-agent.md              ← Internal Manager reviewer prompt
-│   ├── brief-generate.md             ← Internal Brief drafting prompt
-│   ├── technical-details-generate.md ← Internal Technical Details drafting prompt
-│   ├── tickets-generate.md           ← Ticket generation prompt
-│   └── cynefin-classify.md           ← Domain classification prompt
+│   ├── strategist-agent.md           ← Strategist Brief drafting prompt
+│   ├── designer-agent.md             ← Designer wave-review prompt
+│   ├── complexity-analyst.md         ← Complexity classification prompt
+│   ├── tech-lead-agent.md            ← Technical Details drafting prompt
+│   └── scrum-master-agent.md         ← Ticket generation prompt
 ├── docs/
-│   ├── maintainer-codex-reinstall.md ← Maintainer-only clean reinstall guide
-│   └── north-star.md          ← Current product direction note
+│   └── north-star.md          ← Long-range product direction (delegation / CLI shape in §14)
+├── instructions/              ← Phase protocols, artifacts, session schema, sub-agent contracts
 └── .projectpal/               ← Local bridge state (managed by the Pal, per project)
     ├── state.yml              ← Repo-local bridge state for startup/resume
-    └── parking-lot.md         ← Repo-scoped parked items with feat/phase tags
+    ├── parking-lot.md         ← Repo-scoped parked items with feat/phase tags
+    └── artifacts/             ← brief/ + tickets/ may be committed; other subtrees stay local
+        ├── brief/
+        └── tickets/
 ```
 
-Generated artifacts (briefs, technical details, tickets) are saved to `.projectpal/artifacts/` within the current project directory — not here.
+Generated work artifacts (briefs, technical details, tickets) default to `.projectpal/artifacts/` in the active repo. This repository also tracks example or batch artifacts under `artifacts/brief/` and `artifacts/tickets/` when they are part of the shipped Pal workflow.
 
-Repo continuity lives locally first in `.projectpal/state.yml`, with MemPalace available as background continuity and long-term memory under `Projects/<repo-slug>`. Shared knowledge remains in broader MemPalace wings such as `Principles`, `Decisions`, and `Precedents`.
+Repo continuity lives locally in `.projectpal/state.yml`.
 
-Repo detection resolves the git repo root first and uses that directory name as `repo_slug`. If git detection fails, ProjectPal falls back to the current directory name, treats it as low-confidence startup context, and creates a fresh local bridge instead of reusing stale cross-repo state. Multiple worktrees of the same repo share repo-scoped memory while keeping separate `.projectpal/state.yml` bridge files.
+Repo detection resolves the git repo root first and uses that directory name as `repo_slug`. If git detection fails, ProjectPal falls back to the current directory name, treats it as low-confidence startup context, and creates a fresh local bridge. Multiple worktrees of the same repo keep separate `.projectpal/state.yml` bridge files.
 
 ## Milestones
 
 | # | Deliverable | Status |
 |---|------------|--------|
-| M0 | CLAUDE.md + MemPalace connected | ✅ |
+| M0 | CLAUDE.md + local state connected | ✅ |
 | M1 | Complexity Assessment works | ✅ |
 | M2 | Clear-path route keeps the Brief and stays light | ✅ |
 | M3 | Needs-a-plan route: Brief + Refinement | ✅ |
 | M4 | Technical Details + tickets | ✅ |
 | M5 | Parking Lot + session resumption | ✅ |
-| M6 | MemPalace onboarding — graceful detection, install guidance, local-only fallback | ✅ |
-| M7 | Full sub-agent pipeline — all 6 internal roles wired, with shipped labels aligned to Problem Solver, Architect, Manager, and Tech Lead | ✅ |
+| M6 | Session resumption — graceful detection and local state fallback | ✅ |
+| M7 | Full sub-agent pipeline — seven internal roles wired (Strategist, Architect, Manager, Tech Lead, Scrum Master, Complexity Analyst, Designer) | ✅ |
 | **The Test** | **The website gets rewritten** | **pending** |
 
 ## The North Star
 
 The current direction note lives in [docs/north-star.md](docs/north-star.md).
+
+## Release notes
+
+Shipped versions are listed in [CHANGELOG.md](CHANGELOG.md). The packaged Codex manifest at `build/codex/.codex-plugin/plugin.json` carries the same semver as `package.json` for each release, and the repo-local `.codex-plugin/plugin.json` wrapper should continue to point at that generated build tree.

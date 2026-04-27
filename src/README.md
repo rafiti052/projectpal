@@ -1,12 +1,13 @@
-<!-- Ownership: This directory is the planned neutral source of truth for ProjectPal behavior and runtime generation. -->
+<!-- Ownership: This directory is the canonical shared source of truth for ProjectPal behavior. -->
 
 # ProjectPal Neutral Source
 
-This directory is the future authoring center for ProjectPal.
+This directory is the shared authoring center for ProjectPal.
 
-The goal is to stop treating generated runtime files as the source of truth and instead maintain:
+The repo now separates:
 - shared ProjectPal behavior in neutral Markdown
-- runtime-specific wrapper content in explicit adapter files
+- host-specific wrapper and packaging content in `platforms/<host>/`
+- generated host outputs in `build/<host>/`
 - generation rules separately from product behavior
 
 ## Layout
@@ -15,38 +16,48 @@ The goal is to stop treating generated runtime files as the source of truth and 
 src/
   README.md
   shared/
-    layer0.md
-    layer1-index.md
+    core.md
+    runtime-index.md
   adapters/
     claude.md
     codex.md
+    cursor.md
     runtime-output-prefix.md
     codex-skill-header.md
-    codex-skill-footer.md
   generation/
     contract.md
     mapping.md
+
+platforms/
+  claude/
+  codex/
+  cursor/
+
+build/
+  claude/
+  codex/
+  cursor/
 ```
 
 ## Responsibilities
 
-- `shared/layer0.md`
+- `shared/core.md`
   Canonical shared runtime body for the always-loaded ProjectPal surface. This is the content that should generate `CLAUDE.md`, `AGENTS.md`, and the shared body inside `skills/projectpal/SKILL.md`.
 
-- `shared/layer1-index.md`
+- `shared/runtime-index.md`
   Neutral index of deferred instruction files and their responsibilities. This keeps the source aware of the split between shared runtime behavior and the detailed files under `instructions/`.
 
-- `adapters/claude.md`
-  Claude-only wrapper rules. This should stay minimal because Claude currently uses the shared body with little or no runtime-specific wrapping.
-
-- `adapters/codex.md`
-  Codex-only wrapper rules, including skill packaging context, invocation guidance, and generated surface notes that should not pollute the shared behavior.
-
 - `adapters/runtime-output-prefix.md`
-  Shared generated-file prefix used by runtime outputs so they clearly identify the neutral source.
+  Shared generated-file prefix used by runtime outputs so they clearly identify the shared source.
 
-- `adapters/codex-skill-header.md` and `adapters/codex-skill-footer.md`
-  Codex skill-specific wrapper snippets that surround the shared Layer 0 body.
+- `adapters/*.md`
+  Transitional bridge docs for the legacy top-level wrappers. These stay under `src/` until the wrapper scripts are fully repointed at `platforms/<host>/`.
+
+- `platforms/<host>/`
+  Host-owned adapter inputs. Each host manifest lists the exact files that host may read and the exact outputs it may write under `build/<host>/`.
+
+- `build/<host>/`
+  Generated host package roots. Shared install and validation flows should target these outputs instead of mixing generated files into the repo root.
 
 - `generation/contract.md`
   Source-first generation rules: what gets generated, in what order, and what verification is required after changes.
@@ -56,6 +67,11 @@ src/
 
 ## Scope
 
-This source tree is currently scoped to the shipped Claude and Codex surfaces only.
+This source tree owns only shared behavior and shared generation rules.
 
-Future runtimes such as Gemini or Cursor may get adapters later, but they are intentionally out of scope for this phase so the neutral source does not get abstract too early.
+That means `src/` owns:
+- canonical shared ProjectPal behavior
+- shared generated-file identity text
+- bridge documentation for the legacy wrapper surfaces
+
+Host packaging glue, install metadata, and generated host artifacts belong under `platforms/` and `build/`, not in the repo root.

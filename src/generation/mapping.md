@@ -1,44 +1,57 @@
-<!-- Ownership: Current-state mapping from shipped runtime files into shared behavior and runtime-specific wrappers. -->
+
 
 # Current-State Mapping
 
 ## Shared behavior inventory
 
-These are currently shared ProjectPal behavior blocks that should move into the neutral source:
+These are the shared ProjectPal behavior blocks that belong in `src/`:
 
-| Current file | Current block | Classification | Planned neutral home |
-|--------------|---------------|----------------|----------------------|
-| `CLAUDE.md` | Full Layer 0 runtime body | Shared | `src/shared/layer0.md` |
-| `AGENTS.md` | Full Layer 0 runtime body | Shared generated mirror | `src/shared/layer0.md` |
-| `skills/projectpal/SKILL.md` | Embedded ProjectPal runtime body copied from `CLAUDE.md` | Shared generated body | `src/shared/layer0.md` |
-| `instructions/*.md` | Detailed deferred protocols and contracts | Shared deferred detail | referenced by `src/shared/layer1-index.md` |
+
+| Current file                 | Current block                                            | Classification          | Planned neutral home                        |
+| ---------------------------- | -------------------------------------------------------- | ----------------------- | ------------------------------------------- |
+| `CLAUDE.md`                  | Full core runtime body                                   | Shared                  | `src/shared/core.md`                        |
+| `AGENTS.md`                  | Full core runtime body                                   | Shared generated mirror | `src/shared/core.md`                        |
+| `skills/projectpal/SKILL.md` | Embedded ProjectPal runtime body copied from `CLAUDE.md` | Shared generated body   | `src/shared/core.md`                        |
+| `instructions/*.md`          | Detailed deferred protocols and contracts                | Shared deferred detail  | referenced by `src/shared/runtime-index.md` |
+
 
 ## Runtime-specific wrapper inventory
 
-These blocks should remain outside the shared neutral source:
+These blocks should remain outside the shared shared source and now belong under `platforms/<host>/`:
 
-| Current file | Current block | Classification | Planned adapter home |
-|--------------|---------------|----------------|----------------------|
-| `skills/projectpal/SKILL.md` | skill frontmatter | Codex wrapper | `src/adapters/codex.md` |
-| `skills/projectpal/SKILL.md` | Codex adapter preamble | Codex wrapper | `src/adapters/codex.md` |
-| `skills/projectpal/SKILL.md` | Codex packaging footer | Codex wrapper | `src/adapters/codex.md` |
-| `.codex-plugin/plugin.json` | plugin metadata and prompt triggers | Codex wrapper metadata | `src/adapters/codex.md` |
-| `CLAUDE.md` | ownership comment and file identity | Claude wrapper, minimal | `src/adapters/claude.md` |
+
+| Current file                  | Current block                       | Classification           | Planned adapter home                   |
+| ----------------------------- | ----------------------------------- | ------------------------ | -------------------------------------- |
+| `skills/projectpal/SKILL.md`  | skill frontmatter and host preamble | Codex wrapper            | `platforms/codex/skill-header.md`      |
+| `.codex-plugin/plugin.json`   | plugin metadata and prompt triggers | Codex wrapper metadata   | `platforms/codex/plugin.json`          |
+| `CLAUDE.md`                   | Claude skill wrapper and footer     | Claude wrapper           | `platforms/claude/skill-*.md`          |
+| `bin/pp-compress`             | Claude hook helper                  | Claude hook glue         | `platforms/claude/hooks/pp-compress`   |
+| `~/.cursor/mcp.json`          | Cursor registration metadata        | Cursor install wrapper   | `platforms/cursor/mcp.json.template`   |
+| `.cursor/rules/projectpal.md` | repo-local Cursor context           | Cursor repo template     | `platforms/cursor/rules/projectpal.md` |
+
 
 ## Non-source operational files
 
 These files support runtime operation but are not themselves the authoring source:
 
-| File | Role | Classification |
-|------|------|----------------|
-| `.mcp.json` | project MCP server wiring | operational config |
-| `.claude/settings.local.json` | local Claude permissions/settings | local runtime config |
-| `.gemini/commands/projectpal.toml` | current Gemini adapter command | future adapter surface, out of scope for this phase |
-| `.gemini/settings.json` | Gemini MCP/config state | future runtime config, out of scope for this phase |
-| `sync-codex-plugin.sh` | current direct generation script | generation tooling, to be migrated to the neutral-source contract |
+
+| File                               | Role                                | Classification        |
+| ---------------------------------- | ----------------------------------- | --------------------- |
+| `.claude/settings.local.json`      | local Claude permissions/settings   | local runtime config  |
+| `scripts/install-cursor.sh`        | legacy Cursor installer wrapper     | wrapper tooling       |
+| `scripts/generate.sh`              | legacy repo-root generation wrapper | wrapper tooling       |
+
 
 ## Minimum wrapper boundary summary
 
 - Claude: effectively no behavioral wrapper, only file-level identity.
 - Codex: frontmatter, invocation preamble, plugin metadata, and packaging footer are the true wrapper boundary.
-- Gemini: currently points at `CLAUDE.md` and remains out of scope for this phase so the neutral source can focus on shipped Claude and Codex outputs first.
+- Cursor: registration metadata and repo-local rules template are wrapper-owned outside the shared body.
+- Connector runtime (routing/connector delegation) is intentionally deferred; v0.4 ships only the always-loaded Claude/Codex surfaces plus Cursor MCP registration.
+
+## Canonical layout summary
+
+- Shared product behavior lives under `src/`.
+- Host-owned adapter inputs live under `platforms/claude`, `platforms/codex`, and `platforms/cursor`.
+- Generated host outputs live under `build/claude`, `build/codex`, and `build/cursor`.
+- Legacy root-level wrappers stay in place only until later tickets repoint them at the generated host trees.

@@ -1,0 +1,27 @@
+{
+  "name": "projectpal",
+  "version": "0.4.0",
+  "description": "A patient product companion that turns messy ideas into a clear route, a solid solution, and 15-minute execution tickets.",
+  "author": {
+    "name": "ProjectPal Contributors"
+  },
+  "license": "MIT",
+  "keywords": [
+    "product",
+    "planning",
+    "brief",
+    "parallelization",
+    "orchestration"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "ProjectPal",
+    "shortDescription": "Turns messy ideas into a clear route, a solid solution, and 15-minute tickets.",
+    "longDescription": "ProjectPal is a patient product companion for turning non-linear ideas into a clear route, a Brief, Technical Details when needed, and small execution tickets without forcing structured intake. In Codex, launch it with `ProjectPal`.",
+    "developerName": "ProjectPal Contributors",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "defaultPrompt": ["ProjectPal"],
+    "brandColor": "#2563EB"
+  }
+}

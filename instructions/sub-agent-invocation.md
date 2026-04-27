@@ -1,36 +1,71 @@
-<!-- Ownership: Layer 1 sub-agent contracts live here; source text originates in CLAUDE.md and is loaded when agent orchestration detail is needed. -->
+
 
 # Sub-Agent Invocation
 
 Use the **Agent** tool (not Task) to invoke all sub-agents. Agent is always available — Task requires schema loading and should not be used here.
 
-Six sub-agents are active in the pipeline. All receive their input inline — never by file reference alone.
+Eight sub-agents are active in the pipeline. All receive their input inline — never by file reference alone.
 
 These worker names are internal only. Never announce them to the user or use them as progress labels. User-facing updates should stay in the visible stage language: `Discovery`, `Brief`, `Refinement`, `Solution`, `Planning`, `Technical Details`, `Tickets`, `Implementation`, and `Wrap Up`.
+
+## Sub-agent artifact handoff (staging)
+
+**Why:** Large structured outputs should not rely on pasting full documents into chat for the Pal to re-save. Prefer a **staging file** plus a short completion signal.
+
+**Staging path:** `.projectpal/staging/<agent-slug>-<draft-id>.md`
+
+- **`agent-slug`** — one of: `complexity-analyst`, `strategist`, `architect`, `manager`, `tech-lead`, `scrum-master`, `designer`, `engineer`.
+- **`draft-id`** — short unique suffix chosen by the Pal (time fragment, random token, or monotonic counter). Use lowercase ASCII and hyphens only.
+
+**Pal before dispatch (when using staging):** `mkdir -p .projectpal/staging`. Give the agent the exact repo-relative path to write.
+
+**Agent completion signal:** End with a compact reply that includes `artifact_draft_path: <repo-relative path>` to the staging file, plus any persona-mandated lines (verdict, sign-off, blocker, etc.).
+
+**Pal after return:**
+
+1. Read the staging file; confirm it is non-empty and matches the expected shape (YAML frontmatter when required for that artifact type).
+2. **Validate** against the active phase, Engineer `allowed_writes` when relevant, and canonical placement in `instructions/artifacts.md`.
+3. **Promote** to the final path (for example `.projectpal/artifacts/brief/…`, `technical-details/…`, `tickets/<NNN>.md`, `refinement/…`, `designer-review/…`). Prefer replacing the staging file with a move into the canonical tree; otherwise copy then delete the staging file.
+4. If validation fails, keep the staging file, explain the gap, and do not promote partial content.
+
+**Inline output:** Still valid for small payloads or when file writes are unavailable. Staging applies to **outputs** only — **inputs** to agents stay inline as stated above.
+
+**Engineer:** Primary work is still repo changes under `allowed_writes`. Use staging only when the ticket expects a long structured report separate from code edits.
 
 ## Lean v1 execution path contract
 
 Before invoking delegated work in lean v1, compare the candidate `ExecutionPathRecord` to the thread's approved path.
 
-- The approval boundary is defined by `connector`, `provider`, `runtime_path`, `auth_scope`, and `quality_tier`.
-- If any of those fields change, the path is outside the approved boundary and `approval_required = true` before delegated execution continues.
-- A model change is automatic only when it is an equivalent substitution inside the same boundary and the same `quality_tier`.
-- If the connector cannot prove the candidate path stays inside that boundary, treat it as approval-required instead of inferring safety.
+- The approval boundary is defined by the thread’s `approved_execution_path_id` matching the candidate `execution_path_id`.
+- If the candidate `execution_path_id` does not match, the delegated path is outside the approved boundary and `approval_required = true`.
+- Delegated execution may proceed automatically only when the execution path boundary matches; otherwise require explicit approval.
+
+## Discovery-exit delegation gate
+
+ProjectPal asks the user once between **Discovery** and **Brief** whether specialist passes should run behind the scenes.
+
+- Store the answer on the active thread as `delegation_preference = enabled | disabled`.
+- The **Complexity Analyst** is the only delegated worker allowed before this gate.
+- Strategist, Architect, Manager, Tech Lead, Scrum Master, and Designer require `delegation_preference: enabled` before they are invoked automatically.
+- If `delegation_preference: disabled`, keep Phase 1 to Phase 6 work Pal-owned unless the user later gives a fresh yes for delegation.
+- Phase 7 Engineer dispatch is still gated by the explicit Implementation green light in `instructions/phase-protocols.md`. That stage-specific approval may authorize Engineer delegation even if earlier specialist delegation was declined.
 
 ## Lean v1 fallback evaluation
 
 When delegated work fails, evaluate fallback in one explicit step before any retry or substitution happens.
 
 `evaluate_fallback` returns:
+
 - `fallback_type` = `retry_same_path | equivalent_substitution | path_switch_request | none`
 - `attempt_number`
 - `changed_fields[]`
 - `approval_required`
 
 Rules:
+
 - Allow at most one automatic `retry_same_path` per delegated task.
-- Allow `equivalent_substitution` only when `changed_fields[]` stays outside `connector`, `provider`, `runtime_path`, `auth_scope`, and `quality_tier`, and the substitute remains in the same `quality_tier`.
-- If the connector cannot prove a safe equivalent substitution, prefer `retry_same_path` while the one automatic retry remains available.
+- Allow `equivalent_substitution` only when `changed_fields[]` stays outside execution identity fields (`execution_path_id`, `assistant`, `model`).
+- If the equivalence cannot be proven safe, prefer `retry_same_path` while the one automatic retry remains available.
 - After the automatic retry is spent, any remaining recovery outside a proven same-path substitution becomes `path_switch_request` with `approval_required = true`.
 
 ## Lean v1 parallel delegation guard
@@ -42,97 +77,171 @@ Rules:
 
 ---
 
-### 1. Complexity Classifier
+### 1. Complexity Analyst
+
 Invoked at Phase 0 completion (see Phase 0 Protocol above).
+
 ```
-Agent(Cynefin Classifier):
-  input:  prompts/cynefin-classify.md + Phase 0 transcript (inline)
+Agent(Complexity Analyst):
+  input:  prompts/complexity-analyst.md + Phase 0 transcript (inline)
   output: complexity zone, confidence, plain-terms summary, route sentence
 ```
 
 ---
 
-### 2. Problem Solver
+### 2. Strategist
+
 Invoked at Phase 1 (see Phase 1 Brief Protocol above).
+
 ```
-Agent(Problem Solver):
-  input:  prompts/brief-generate.md + transcript + confirmed complexity assessment
-          + Parking Lot items (phase:brief) + MemPalace results (inline)
-  output: complete Brief document with YAML frontmatter
+Agent(Strategist):
+  input:  prompts/strategist-agent.md + transcript + confirmed complexity assessment
+          + Parking Lot items (phase:brief) (inline)
+  output: complete Brief document with YAML frontmatter (opinionated product Brief, including User Goals / UX Outcomes / Value Framing subsections)
 ```
+
+Invoke only when `delegation_preference: enabled`.
+
 Pre-Refinement brevity audit: always run the brevity audit before Architect/Manager. If output remains >2,000 words after the audit, surface warning before Refinement.
 
 ---
 
 ### 3. Architect
+
 Invoked at Phase 2. Skipped for Clear path problems.
+
 ```
 Agent(Architect):
   input:  prompts/architect-agent.md + full Brief text (inline)
   output: structured review with verdict [PASS | PASS WITH REVISIONS | NEEDS REWORK]
+          + **Sign-off** line (approved | approved-with-concern | rejected)
 ```
+
+Invoke only when `delegation_preference: enabled`.
 
 ---
 
 ### 4. Manager
+
 Invoked at Phase 2, only after the Architect returns PASS or PASS WITH REVISIONS.
+
 ```
 Agent(Manager):
   input:  prompts/manager-agent.md + full Brief text + Architect output (inline)
-  output: Manager Deliberation + Final Brief (Refined) under exact header ## Final Brief (Refined)
+  output: Manager Deliberation + **Sign-off** line (approved | approved-with-concern | rejected)
+          + synthesis recommendations for the Pal (no standalone Final Brief — the Pal writes the approved Brief to the artifact)
 ```
 
-**6-step Refinement protocol:**
+Invoke only when `delegation_preference: enabled`.
+
+**Debate protocol (bounded, max 3 rounds):**
+
 ```
-Step 1: Problem Solver sub-agent completes → brevity audit → word count check → saved to artifacts
+Step 1: Agent(Strategist) drafts Brief → brevity audit → word count check → save working Brief (inline or staging handoff)
 Step 2: If >2,000 words after brevity audit: warn user before proceeding
-        Agent(Architect) receives: architect-agent.md + full Brief text (inline)
-Step 3: Pal captures Architect output
-Step 4: NEEDS REWORK routing:
-        - PASS or PASS WITH REVISIONS → proceed to Step 5
-        - NEEDS REWORK → stop, surface the Architect's top issue, revise the Brief. Return to Phase 1.
-Step 5: Agent(Manager) receives: manager-agent.md + full Brief text + Architect output (inline)
-Step 6: Pal saves the refined Brief (status: refined) → presents at the Solution Check-in with a short summary of the refined outcome
-        - Blockers must be answered explicitly before proceeding
-        - Non-blocker concerns must be surfaced one by one and explicitly passed, revised, or deferred by the user
-        - After the summary, ask only one question at a time
+Step 3: Agent(Architect) receives: architect-agent.md + full Brief (inline) → critique + sign-off
+Step 4: Agent(Manager) receives: manager-agent.md + full Brief + Architect output (inline) → deliberation + sign-off
+Step 5: Evaluate sign-offs:
+        All approved or approved-with-concern → Pal synthesizes final Brief, persists debate record (see artifacts.md debate-record template)
+        Any rejected → collect rejection reasons, proceed to Step 6
+Step 6: Agent(Strategist) receives: strategist-agent.md + Brief + rejection reasons (inline) → revised Brief
+        Increment round counter. Return to Step 2.
+Step 7: If round 3 is exhausted without consensus → Pal escalates to user with unresolved summary
 ```
 
-**Re-refinement rule:** If a refined Brief is changed before the Solution Check-in is approved, and the change is substantial enough to alter a requirement, persona, assumption, success criterion, risk, or scope boundary, return the Brief to Phase 2 and rerun the Architect and Manager before presenting it again. Minor wording cleanup that preserves meaning does not require a fresh refinement pass.
+**Re-refinement rule:** If a refined Brief is changed before the Solution Check-in is approved, and the change is substantial enough to alter a requirement, persona boundary, assumption, success criterion, risk, or scope boundary, return the Brief to Phase 2 and rerun the debate loop (Architect → Manager → Strategist as needed) before presenting it again. Minor wording cleanup that preserves meaning does not require a fresh refinement pass.
 
 ---
 
-### 5. Technical Details Generator
+### 5. Tech Lead
+
 Invoked at Phase 4 when the route is Needs a plan (see Phase 4 Planning Protocol above).
+
 ```
-Agent(Technical Details Generator):
-  input:  prompts/technical-details-generate.md + full approved Brief text
-          + MemPalace results + Parking Lot items (phase:4 / phase:technical-details) (inline)
+Agent(Tech Lead):
+  input:  prompts/tech-lead-agent.md + full approved Brief text
+          + Parking Lot items (phase:4 / phase:technical-details) (inline)
   output: complete internal Technical Details document with YAML frontmatter
 ```
 
+Invoke only when `delegation_preference: enabled`.
+
 ---
 
-### 6. Ticket Generator
+### 6. Scrum Master
+
 Invoked at Phase 6 after the last Planning or Technical Details Check-in is approved.
+
 ```
-Agent(Ticket Generator):
-  input:  prompts/tickets-generate.md + full approved Technical Details artifact text
+Agent(Scrum Master):
+  input:  prompts/scrum-master-agent.md + full approved Technical Details artifact text
           + Parking Lot items (phase:6 / phase:execution) (inline)
-  output: complete ordered ticket set, one ticket per Implementation Plan item
+  output: complete ordered ticket set, one ticket per Implementation Plan item, each with explicit allowed_writes for Engineer execution
 ```
 
+Invoke only when `delegation_preference: enabled`.
+
 **Phase 6 ticket protocol:**
+
 ```
 Step 1: Read the approved planning artifact set
         - Needs a plan: read approved Technical Details artifact from .projectpal/artifacts/technical-details/<name>.md
         - Clear path: derive tickets from the approved Brief and the already-bounded route
 Step 2: Read Parking Lot items tagged phase:6 or phase:execution
-Step 3: Agent(Ticket Generator) receives: tickets-generate.md + technical-details artifact + parking lot (inline)
-Step 4: Pal captures ticket set output
-Step 5: Save each ticket as individual file: .projectpal/artifacts/tickets/<project-id>-NNN.md
-        (zero-padded 3-digit numbers, e.g. myproject-001.md)
+Step 3: Agent(Scrum Master) receives: scrum-master-agent.md + technical-details artifact + parking lot (inline)
+Step 4: Pal captures ticket set output (inline or from `artifact_draft_path` when the Scrum Master used staging)
+Step 5: Save each ticket as individual file: .projectpal/artifacts/tickets/<NNN>.md (zero-padded 3-digit numbers)
 Step 6: Proceed to Phase 7 Implementation Protocol
 ```
 
-For Clear path problems: keep the Problem Solver, skip the Architect, Manager, and Technical Details Generator, then move through Phase 3 → Phase 6 → Phase 7 → Phase 8.
+---
+
+### 7. Designer
+
+Invoked in Phase 7 after each **wave** of Implementation tickets completes when `designer_opt_in=true` on the thread or batch.
+
+```
+Agent(Designer):
+  input:  prompts/designer-agent.md + combined wave output (diffs or Pal summary) + approved Brief + Technical Details / tech spec (inline)
+  output: Designer Review Record at .projectpal/artifacts/designer-review/<project>-wave-<id>.md (write via staging handoff when the record is long, then Pal promotes)
+```
+
+Invoke only when `designer_opt_in=true` and `delegation_preference: enabled`, unless the user explicitly re-enables delegation at Implementation time.
+
+Gate: a `changes-requested` verdict blocks starting the next wave until the Pal resolves the listed changes (new tickets or direct fixes).
+
+---
+
+### 8. Engineer
+
+Invoked at Phase 7 for each ticket in the implementation batch. The Pal dispatches one ticket at a time; the Engineer executes the work scoped by that ticket and hands back to the Pal when finished.
+
+```
+Agent(Engineer):
+  input:  prompts/engineer-agent.md + ticket content (inline) + project context
+  output: completed ticket work + status update + blocker report (if any)
+```
+
+After completing its ticket, the Engineer returns control to the Pal, which updates the ticket status and decides whether to dispatch the next ticket or surface a blocker to the user.
+
+**Phase 7 wave-level parallel execution:**
+
+The Pal may spawn one Engineer agent per ticket within a wave when both conditions hold:
+
+1. The ticket's `depends_on` chain is fully satisfied (all upstream tickets are `complete`).
+2. The ticket's `allowed_writes` do not overlap on an exclusive write surface with any other currently running Engineer instance.
+
+When either condition is not met, the Pal falls back to sequential dispatch for the affected tickets.
+
+Rules for parallel Engineer execution:
+
+- Each Engineer instance only writes within its own ticket's `allowed_writes` scope. No Engineer may revert or modify another Engineer's output.
+- The Pal orchestrates the wave lifecycle: it spawns Engineers, tracks their status, and collects results. The Engineer hands back to the Pal after completing its ticket — it does not spawn further work or advance the wave on its own.
+- Write ownership must stay clear: each running Engineer gets a distinct file or module responsibility as defined by its ticket's `allowed_writes`.
+- This parallel pattern applies specifically to Phase 7 wave execution and does not override the lean v1 parallel delegation guard. The lean v1 guard blocks general parallel delegated work across the system; Engineer wave parallelism is an internal Phase 7 orchestration concern managed entirely by the Pal within a single active thread.
+
+---
+
+For Clear path problems: keep the **Strategist**, skip the Architect, Manager, and Tech Lead, then move through Phase 3 → Phase 6 → Phase 7 → Phase 8.
+
+The **Engineer** runs in Phase 7 on every route — Clear path included. Whenever Implementation begins, the Pal dispatches tickets to the Engineer regardless of complexity assessment.

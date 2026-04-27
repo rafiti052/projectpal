@@ -1,0 +1,8 @@
+{
+  "name": "@projectpal/cursor-mcp",
+  "private": true,
+  "version": "0.0.0",
+  "bin": {
+    "projectpal-cursor-mcp": "bin/projectpal-cursor-mcp"
+  }
+}

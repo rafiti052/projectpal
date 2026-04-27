@@ -104,7 +104,7 @@ These are non-negotiable.
 
 ## 5. Decision Architecture
 
-ProjectPal routes work by problem shape, using Cynefin as a practical decision model for developer work.
+ProjectPal routes work by problem shape, using a complexity model for developer work.
 
 | Domain | Meaning | Default handling |
 | --- | --- | --- |
@@ -199,7 +199,6 @@ The current product is a lean CLI-centered implementation designed to validate t
 
 - prompt-driven behavior instead of a custom orchestration runtime
 - sub-agents for Brief drafting, Refinement, Technical Details, and ticket generation
-- MemPalace for long-term memory when available
 - `.projectpal/` inside the active repo for local bridge state and artifacts
 - launcher adapters for Claude, Codex, and Gemini around the same source instructions
 
@@ -239,58 +238,30 @@ ProjectPal resolves continuity from the active repo first, not from one shared g
 
 ### Continuity sources
 
-- **Repo-scoped memory:** `Projects/<repo-slug>` in MemPalace when available
 - **Local bridge:** `.projectpal/state.yml` inside the active repo
 - **Local Parking Lot:** `.projectpal/parking-lot.md`
 
 ### Precedence
 
 1. active repo detection
-2. repo-scoped memory for that repo
-3. local bridge for that same repo
-4. broader fallback only when repo-local continuity is unavailable
+2. local bridge for that repo
+3. fresh start if no local bridge exists
 
 ### Why this matters
 
-It prevents stale state from leaking across repos and lets multiple worktrees of the same repo share durable continuity without pretending they are the same local working copy.
+It prevents stale state from leaking across repos and lets multiple worktrees keep independent local working copies.
 
 ---
 
 ## 10. Memory Model
 
-ProjectPal uses two memory layers.
-
-### Long-term memory
-
-MemPalace stores durable context when available.
-
-- repo continuity in `Projects/<repo-slug>`
-- broader reusable decisions in shared wings like `Decisions`, `Precedents`, and `Principles`
+ProjectPal uses local bridge memory only.
 
 ### Local bridge memory
 
-`.projectpal/state.yml` is the repo-local bridge that keeps the current session resumable even when long-term memory is unavailable or before sync happens.
+`.projectpal/state.yml` is the repo-local bridge that keeps the current session resumable.
 
 ### Required schemas
-
-#### RepoAnchor
-
-- `repo_slug`
-- `repo_root_hint`
-- `last_phase`
-- `last_resume_summary`
-- `last_next_step`
-- `last_seen_at`
-- `memory_refs[]`
-
-#### FeatureScope
-
-- `repo_slug`
-- `feat_slug`
-- `phase`
-- `status`
-- `summary`
-- `updated_at`
 
 #### ResumeBridge
 
@@ -298,7 +269,7 @@ MemPalace stores durable context when available.
 - `repo_root_hint`
 - `current_project`
 - `current_phase`
-- `cynefin_domain`
+- `complexity_domain`
 - `last_session`
 - `resume_source`
 - `synced_at`
@@ -306,21 +277,10 @@ MemPalace stores durable context when available.
 - `partial_context`
 - `next_steps[]`
 
-### Search and write order
+### Write order
 
-Search order:
-
-1. repo room
-2. matching feature tags in that room
-3. repo Parking Lot mirrors
-4. local bridge
-5. global fallback
-
-Write order when MemPalace is available:
-
-1. repo-scoped memory
-2. local bridge
-3. local Parking Lot markdown when relevant
+1. local bridge (`.projectpal/state.yml`)
+2. local Parking Lot markdown when relevant
 
 ---
 
@@ -330,7 +290,7 @@ ProjectPal may later ship a public global Node CLI named `projectpal`, but that 
 
 ### Packaging rule
 
-The launcher resolves repo context from the caller's current working directory, then delegates continuity to repo-local state plus optional MemPalace.
+The launcher resolves repo context from the caller's current working directory, then delegates continuity to repo-local state.
 
 ### Implications
 
@@ -345,7 +305,7 @@ The launcher resolves repo context from the caller's current working directory, 
 ### In scope now
 
 - the conversational core loop
-- Cynefin-informed routing
+- complexity-informed routing
 - Brief drafting and Refinement
 - Technical Details generation
 - granular tickets
@@ -375,7 +335,7 @@ The core product should remain stable across that evolution:
 
 - the Pal relationship
 - one-question conversation
-- Cynefin-based routing
+- complexity-based routing
 - Refinement before commitment
 - repo-first continuity
 - Parking Lot as protected flow control
@@ -384,7 +344,41 @@ If those survive, the implementation can change without the product losing itsel
 
 ---
 
-## 14. Canonical Decision
+## 14. Future: External Model Routing (Connector Wiring)
+
+When ProjectPal ships its own CLI tool with MCP support and orchestration machinery that runs outside the assistant runtimes, external model routing becomes viable.
+
+### Near-term schedule (explicit)
+
+**Connector wiring is not a near-term release target.** It stays in this document as the long-range product shape only. The repo may still carry small, experimental routing and adapter scaffolding toward a future CLI — that is **not** a promise to finish end-to-end connector wiring inside current assistant runtimes on any fixed horizon. Release checklists, parking-lot items, and `.projectpal/state.yml` **next_steps** should treat connector wiring as **backlog documented here**, not as an imminent ship commitment.
+
+### The idea
+
+Role-scoped ranked model preferences per agent role, configured via a config file (not hand-edited — set up interactively). Each sub-agent tries from the top of its preference list, falls back on availability failures (missing key, quota, errors), with the primary assistant model as the guaranteed floor.
+
+### Why it's deferred
+
+No current assistant runtime (Claude Code, Codex, Cursor) supports routing sub-agent calls to external models. This requires a thin orchestration layer that makes API calls to external providers — which means ProjectPal needs its own execution surface first.
+
+### What exists
+
+- Optional concept brief when authored: `.projectpal/artifacts/brief/connector-wiring.md`
+- A post-setup config flow concept for editing role rankings after install
+- **Implementation inventory (deferred):** connector wiring / routing runtime modules are not shipped in v0.4; this section keeps only the product shape as backlog until later versions.
+
+### Prerequisites
+
+- ProjectPal CLI tool with its own process boundary
+- MCP server integration for model provider access
+- Interactive setup flow that survives dropout at any step
+
+### Success shape
+
+Strategist runs on Gemini, API key expires, silently falls back to host model, session keeps going — no interruption.
+
+---
+
+## 15. Canonical Decision
 
 **ProjectPal is defined by its user-facing behavior and continuity guarantees, not by a specific orchestration framework.**
 

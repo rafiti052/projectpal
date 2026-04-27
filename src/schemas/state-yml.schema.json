@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "state-yml.schema.json",
+  "title": "ProjectPal state.yml",
+  "description": "Schema for .projectpal/state.yml — per-session, per-repo project state. Connector status snapshots include last_failure_at (ISO-8601 | null). Absence of this field in existing files must be treated as null at read time — never error.",
+  "type": "object",
+  "properties": {
+    "repo_slug": { "type": "string" },
+    "repo_root_hint": { "type": "string" },
+    "current_project": { "type": ["string", "null"] },
+    "current_phase": { "type": ["integer", "null"] },
+    "complexity_domain": { "type": ["string", "null"] },
+    "last_session": { "type": ["string", "null"] },
+    "resume_source": { "type": ["string", "null"] },
+    "synced_at": { "type": ["string", "null"] },
+    "artifacts_dir": { "type": ["string", "null"] },
+    "bridge_summary": { "type": ["string", "null"] },
+    "last_artifact_ref": { "type": ["string", "null"] },
+    "partial_context": {
+      "type": ["object", "null"],
+      "properties": {
+        "complete": { "type": "boolean" },
+        "readiness": { "type": "object" }
+      }
+    },
+    "thread_orchestration": {
+      "type": ["object", "null"],
+      "properties": {
+        "active_thread_id": { "type": ["string", "null"] },
+        "threads": { "type": "array" },
+        "execution_paths": { "type": "array" },
+        "delegation_tasks": { "type": "array" },
+        "delegation_tasks": { "type": "array" }
+      }
+    },
+    "next_steps": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "definitions": {}
+}
