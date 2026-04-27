@@ -34,6 +34,15 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile=false
 
+      - name: Generate Runtime Surfaces
+        run: sh scripts/generate.sh
+
+      - name: Claude Surface Quality Check
+        run: sh scripts/audit-sync.sh "$PWD/CLAUDE.md" "$PWD/AGENTS.md" "$PWD/skills/projectpal/SKILL.md" "$PWD/instructions" "$PWD/README.md" "$PWD/CONTRIBUTING.md"
+
+      - name: GitHub Install Parity Quality Check
+        run: pnpm check:install --fixture
+
       - name: Typecheck
         run: pnpm typecheck
 
