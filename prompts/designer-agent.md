@@ -12,7 +12,7 @@ After a wave’s tickets are complete, receive:
 
 Produce exactly **one** Designer Review Record per wave at:
 
-`.projectpal/artifacts/designer-review/<project>-wave-<wave-id>.md`
+`.projectpal/artifacts/designer-review/designer-review-<work-summary>-wave-<wave-id>.md`
 
 ## Guideline checks (advisory, distilled)
 

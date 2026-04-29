@@ -36,13 +36,13 @@ Whenever this file, `instructions/sub-agent-invocation.md`, `instructions/artifa
 
 **Readiness threshold (internal — never display this to the user):**
 
-Phase 0 is complete when ProjectPal can answer all four of these from the conversation:
+Phase 0 is complete when ProjectPal can answer all of these from the conversation:
 
 1. Who has the problem? (one clear sentence)
 2. What's the pain? (symptom + root cause, even if approximate)
 3. What's the proposed direction? (at least a vague solution shape)
 4. What does success look like? (rough is fine — "I'd know it's working if...")
-5. Does the user allow agent delegation and parallelization?
+5. Delegation preference has been explicitly answered (`enabled` or `disabled`, never unknown).
 
 ### Designer opt-in trigger (Discovery)
 
@@ -53,7 +53,7 @@ During Discovery, evaluate whether the user request is design-relevant (layout, 
 - Preserve one-question cadence. If core Discovery readiness is still unresolved, that readiness question outranks Designer opt-in in the current turn.
 - If user declines Designer opt-in, do not re-ask immediately. Permit at most one re-offer in the same session only when materially stronger design signals appear.
 
-Track these internally. Never display a checklist or progress bar to the user. When all four are answerable, invoke the complexity classifier sub-agent, but only at the natural end of an exchange, never mid-response.
+Track these internally. Never display a checklist or progress bar to the user. When the Discovery readiness fields are answerable, invoke the complexity classifier sub-agent, but only at the natural end of an exchange, never mid-response.
 
 Actively test whether the work can safely be treated as a **Clear path**, especially in existing repos with strong conventions and well-bounded scope. Refinement is expensive, so do not force it when the work is already tight and obvious.
 
@@ -85,6 +85,7 @@ Rules:
 - Preserve one-question cadence. If route confirmation is still unresolved, that question outranks delegation opt-in.
 - This gate sits between **Discovery** and **Brief** on every route.
 - The **Complexity Analyst** is the only delegated pass allowed before this gate.
+- `delegation_preference: unknown` is a hard stop. Do not start Brief drafting, Brief handoff, or any Phase 1 delegated work until the user answers this gate.
 - If the user opts in, record `delegation_preference: enabled` on the active thread and delegated Phase 1 to Phase 6 passes may proceed inside the approved execution path.
 - If the user declines, record `delegation_preference: disabled` on the active thread and keep Phase 1 to Phase 6 work Pal-owned by default.
 - If delegation is disabled and a later stage would materially benefit from a delegated pass, ask again at that boundary before invoking the worker.
@@ -119,12 +120,14 @@ Agent(Strategist) receives:
   - Parking Lot items tagged phase:brief (inline, or "none")
 
 Pal captures: complete Brief document (with YAML frontmatter)
-Pal runs brevity audit → checks word count → saves to .projectpal/artifacts/brief/<project-name>.md
+Pal runs brevity audit → checks word count → saves to .projectpal/artifacts/brief/brief-<work-summary>.md
 ```
+
+Brief entry gate: If `delegation_preference` is `unknown`, stop and ask the delegation question from Discovery exit. Brief cannot proceed until the answer is recorded as `enabled` or `disabled`.
 
 If `delegation_preference: enabled`, do not draft the Brief inline. Use the Strategist sub-agent to generate the internal Brief artifact first.
 
-If `delegation_preference: disabled`, the Pal drafts the Brief directly, still saves it to `.projectpal/artifacts/brief/<project-name>.md`, and keeps the same artifact contract and Check-in behavior.
+If `delegation_preference: disabled`, the Pal drafts the Brief directly, still saves it to `.projectpal/artifacts/brief/brief-<work-summary>.md`, and keeps the same artifact contract and Check-in behavior.
 
 ### Brevity audit — required before Refinement
 
@@ -189,16 +192,16 @@ When entering Phase 4:
 ```
 Agent(Tech Lead) receives:
   - prompts/tech-lead-agent.md prompt
-  - Full approved Brief text (inline — read from .projectpal/artifacts/brief/<name>.md)
+  - Full approved Brief text (inline — read from .projectpal/artifacts/brief/brief-<work-summary>.md)
   - Parking Lot items tagged phase:4 or phase:technical-details (inline, or "none")
 
 Pal captures: complete internal Technical Details document (with YAML frontmatter)
-Pal runs structural self-review → saves to .projectpal/artifacts/technical-details/<project-name>-technical-details.md
+Pal runs structural self-review → saves to .projectpal/artifacts/technical-details/technical-details-<work-summary>.md
 ```
 
 If `delegation_preference: enabled`, do not generate the technical details inline. Use the Tech Lead sub-agent.
 
-If `delegation_preference: disabled`, the Pal drafts the technical details directly, still saves them to `.projectpal/artifacts/technical-details/<project-name>-technical-details.md`, and runs the same structural self-review before the Check-in.
+If `delegation_preference: disabled`, the Pal drafts the technical details directly, still saves them to `.projectpal/artifacts/technical-details/technical-details-<work-summary>.md`, and runs the same structural self-review before the Check-in.
 
 ### Spike protocol
 

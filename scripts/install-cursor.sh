@@ -1,5 +1,5 @@
 #!/bin/sh
-# Install the ProjectPal Cursor registration into ~/.cursor/mcp.json.
+# Manage the generated Cursor runtime surface in ~/.cursor.
 
 set -eu
 
@@ -12,6 +12,13 @@ INSTALL_ROOT="$CURSOR_DIR/projectpal"
 PACKAGE_SRC="$REPO_ROOT/build/cursor/cursor-mcp"
 PACKAGE_DST="$INSTALL_ROOT/cursor-mcp"
 RULES_DST="$INSTALL_ROOT/rules"
+
+usage() {
+  cat <<'EOF'
+usage:
+  sh scripts/install-cursor.sh [install|update|uninstall|validate]
+EOF
+}
 
 ensure_build() {
   if [ ! -f "$REPO_ROOT/build/cursor/mcp.json" ] \
@@ -30,16 +37,20 @@ ensure_build() {
   fi
 }
 
-ensure_build
+command=${1:-install}
 
-mkdir -p "$CURSOR_DIR" "$PACKAGE_DST/bin" "$RULES_DST"
+case "$command" in
+  install|update)
+    ensure_build
 
-cp "$PACKAGE_SRC/package.json" "$PACKAGE_DST/package.json"
-cp "$PACKAGE_SRC/bin/projectpal-cursor-mcp" "$PACKAGE_DST/bin/projectpal-cursor-mcp"
-chmod +x "$PACKAGE_DST/bin/projectpal-cursor-mcp"
-cp "$REPO_ROOT/build/cursor/.cursor/rules/projectpal.md" "$RULES_DST/projectpal.md"
+    mkdir -p "$CURSOR_DIR" "$PACKAGE_DST/bin" "$RULES_DST"
 
-MCP_FILE="$MCP_FILE" PROJECTPAL_INSTALL_ROOT="$INSTALL_ROOT" python3 <<'PY'
+    cp "$PACKAGE_SRC/package.json" "$PACKAGE_DST/package.json"
+    cp "$PACKAGE_SRC/bin/projectpal-cursor-mcp" "$PACKAGE_DST/bin/projectpal-cursor-mcp"
+    chmod +x "$PACKAGE_DST/bin/projectpal-cursor-mcp"
+    cp "$REPO_ROOT/build/cursor/.cursor/rules/projectpal.md" "$RULES_DST/projectpal.md"
+
+    MCP_FILE="$MCP_FILE" PROJECTPAL_INSTALL_ROOT="$INSTALL_ROOT" python3 <<'PY'
 import json
 import os
 from pathlib import Path
@@ -79,4 +90,54 @@ mcp_servers["projectpal"] = {
 mcp_path.write_text(json.dumps(data, indent=2) + "\n")
 PY
 
-echo "Installed Cursor ProjectPal registration -> $MCP_FILE"
+    printf '%s\n' "Installed Cursor ProjectPal registration -> $MCP_FILE"
+    ;;
+  uninstall)
+    rm -rf "$INSTALL_ROOT"
+
+    MCP_FILE="$MCP_FILE" python3 <<'PY'
+import json
+import os
+from pathlib import Path
+
+mcp_path = Path(os.environ["MCP_FILE"])
+if not mcp_path.exists():
+    raise SystemExit(0)
+
+raw = mcp_path.read_text()
+if not raw.strip():
+    raise SystemExit(0)
+
+data = json.loads(raw)
+if not isinstance(data, dict):
+    raise SystemExit(0)
+
+mcp_servers = data.get("mcpServers")
+if isinstance(mcp_servers, dict) and "projectpal" in mcp_servers:
+    del mcp_servers["projectpal"]
+    mcp_path.write_text(json.dumps(data, indent=2) + "\n")
+PY
+
+    printf '%s\n' "Uninstalled Cursor runtime surface from $INSTALL_ROOT"
+    printf '%s\n' "Removed ProjectPal registration from $MCP_FILE"
+    ;;
+  validate)
+    if [ ! -f "$REPO_ROOT/build/cursor/mcp.json" ] \
+      || [ ! -f "$REPO_ROOT/build/cursor/.cursor/rules/projectpal.md" ] \
+      || [ ! -f "$PACKAGE_SRC/package.json" ] \
+      || [ ! -f "$PACKAGE_SRC/bin/projectpal-cursor-mcp" ]; then
+      printf '%s\n' "install-cursor: build/cursor is incomplete; run scripts/build-platform.sh cursor first" >&2
+      exit 1
+    fi
+
+    printf '%s\n' "Validated Cursor build artifacts -> $REPO_ROOT/build/cursor"
+    ;;
+  -h|--help)
+    usage
+    ;;
+  *)
+    printf '%s\n' "install-cursor: unknown command '$command'" >&2
+    usage >&2
+    exit 1
+    ;;
+esac

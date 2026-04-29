@@ -16,7 +16,7 @@ Receive approved Technical Details and produce a full ordered set of tickets plu
 Generate two layers of output:
 
 1. **Bundle artifact** — the project-level ticket bundle that defines waves, ownership boundaries, and the final integration report scaffold.
-2. **Individual ticket files** — zero-padded markdown tickets (`001.md`, `002.md`, etc.) that follow the bundle contract exactly.
+2. **Individual ticket files** — zero-padded markdown tickets (`ticket-<work-summary>-001.md`, `ticket-<work-summary>-002.md`, etc.) that follow the bundle contract exactly.
 
 The bundle is the canonical Phase 6 artifact. Phase 7 must be able to read it and decide:
 
@@ -70,7 +70,9 @@ Sort tickets by topological dependency order: tickets with no dependencies first
 
 ## Ticket Format
 
-Individual ticket files named with zero-padded 3-digit numbers: `001.md`, `002.md`, etc.
+Bundle filename: `tickets-<work-summary>-bundle.md`
+
+Individual ticket files named with zero-padded 3-digit numbers after the prefix + summary slug: `ticket-<work-summary>-001.md`, `ticket-<work-summary>-002.md`, etc.
 
 ```yaml
 ---

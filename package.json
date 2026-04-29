@@ -1,6 +1,6 @@
 {
   "name": "projectpal",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "ProjectPal runtime — workflow continuity, install checks, and optional delegated-execution helpers",
   "private": true,
   "scripts": {

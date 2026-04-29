@@ -65,6 +65,7 @@ Lean v1 stores orchestration data under `thread_orchestration` in `.projectpal/s
 
 Notes:
 
+- `delegation_preference` must be resolved to `enabled` or `disabled` before Brief starts. `unknown` means Discovery is not ready to transition and must trigger the explicit delegation gate question.
 - The approved path boundary is defined by the thread’s `approved_execution_path_id` matching the candidate `execution_path_id`.
 - If the candidate `execution_path_id` does not match `approved_execution_path_id`, the candidate path is outside the approved boundary and delegated execution must be `approval_required = true`.
 

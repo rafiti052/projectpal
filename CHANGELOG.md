@@ -12,6 +12,7 @@ The format is loosely [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). 
 
 - Pal-facing AHA guidance (`src/shared/core.md`, `instructions/phase-protocols.md`, Tech Lead / Scrum Master prompts) no longer uses connector-specific filenames as the default carve-out example; Brief-mandated infrastructure stays explicit without front-loading connector product language in Discovery.
 - Wrap Up no longer includes a Decision Routing phase; Phase 8 now closes after wrap-up summary and artifact cleanup.
+- Release line prepared for `0.4.1` patch fixes.
 
 ---
 

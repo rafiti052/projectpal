@@ -47,6 +47,14 @@ The installer always refreshes the generated runtime surfaces from `src/` first,
 
 Note: `build/` outputs are intentionally not committed. The installer will build the platform artifacts (Claude/Codex/Cursor) automatically on each install.
 
+### Uninstall
+
+To remove ProjectPal integrations from all supported assistants:
+
+```bash
+sh ./uninstall-projectpal.sh
+```
+
 ### Codex
 
 Codex is the primary path for new GitHub users.

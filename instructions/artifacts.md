@@ -16,6 +16,19 @@ All generated documents go to `.projectpal/artifacts/` in the current project di
 
 If `.projectpal/artifacts/` does not exist, create it before saving. If you use the staging handoff, create `.projectpal/staging/` before the agent writes. All artifact paths are relative to the current working directory.
 
+## Naming contract
+
+Use **artifact-type prefix + post-Discovery work summary slug** as the base naming pattern for every artifact:
+
+- Brief: `.projectpal/artifacts/brief/brief-<work-summary>.md`
+- Technical Details: `.projectpal/artifacts/technical-details/technical-details-<work-summary>.md`
+- Ticket bundle: `.projectpal/artifacts/tickets/tickets-<work-summary>-bundle.md`
+- Individual tickets: `.projectpal/artifacts/tickets/ticket-<work-summary>-NNN.md`
+- Debate record: `.projectpal/artifacts/refinement/debate-record-<work-summary>.md`
+- Designer review record: `.projectpal/artifacts/designer-review/designer-review-<work-summary>-wave-<id>.md`
+
+`<work-summary>` is a concise slug produced after Discovery confirms scope. Use lowercase ASCII and hyphens.
+
 ## Staging drafts and promotion
 
 Sub-agents may write large drafts under `.projectpal/staging/<agent-slug>-<draft-id>.md` and return `artifact_draft_path` in their completion signal. The Pal validates content, then **promotes** into the canonical tree under `artifacts/` (see templates above). Staging files are disposable after a successful promotion; do not treat them as user-facing artifacts.
@@ -59,7 +72,7 @@ Artifact review pattern:
 
 Mandated Check-ins named in `instructions/phase-protocols.md` (see **Check-in obligations**) use this shape unless that document specifies a different rhythm.
 
-**Debate record template** (save to `.projectpal/artifacts/refinement/<project-name>-debate.md`):
+**Debate record template** (save to `.projectpal/artifacts/refinement/debate-record-<work-summary>.md`):
 
 ```yaml
 ---
@@ -79,7 +92,7 @@ concerns: []  # optional — omit if none
 
 Body holds per-round critique narrative. The Pal synthesizes the user-facing Brief from this record; never show the debate body proactively.
 
-**Designer review template** (save to `.projectpal/artifacts/designer-review/<project-name>-wave-<id>.md`):
+**Designer review template** (save to `.projectpal/artifacts/designer-review/designer-review-<work-summary>-wave-<id>.md`):
 
 ```yaml
 ---

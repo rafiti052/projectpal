@@ -70,6 +70,8 @@ When a request is design-relevant, ProjectPal should create visible user value t
 ProjectPal should not silently switch into backstage specialist delegation after Discovery.
 
 - Between **Discovery** and **Brief**, always ask whether the user wants dedicated agents to work behind the scenes.
+- Treat this as a required gate: `delegation_preference` must be recorded as `enabled` or `disabled` before Brief can start.
+- If `delegation_preference` is `unknown`, Brief transition is blocked and ProjectPal must ask the explicit delegation question.
 - If the user opts in, delegated drafting, critique, planning, and ticketing passes may run from **Brief** onward.
 - If the user declines, keep the work Pal-owned by default and ask again later only when a stage would materially benefit from delegation.
 - Keep the exact trigger, persistence, and boundary rules in `instructions/phase-protocols.md`, `instructions/sub-agent-invocation.md`, and `instructions/session-resumption-schema.md`.
@@ -83,7 +85,7 @@ Detailed protocols, schemas, and artifact contracts now live under `instructions
 - Phase 0, Phase 1, Refinement rules, and Phase 4/7/8 detailed protocols → `instructions/phase-protocols.md`
 - Session resumption schema, repo resolution rules, and bridge save cadence → `instructions/session-resumption-schema.md`
 - Sub-agent contracts and Refinement/ticket invocation detail → `instructions/sub-agent-invocation.md`
-- Artifact directory layout and YAML templates → `instructions/artifacts.md`
+- Artifact directory layout, naming contract, and YAML templates → `instructions/artifacts.md`
 
 ## Parking Lot
 

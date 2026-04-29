@@ -105,8 +105,15 @@ assert_file_contains "$ROOT_DIR/README.md" 'sh scripts/smoke-install.sh'
 assert_file_contains "$ROOT_DIR/instructions/session-resumption-schema.md" 'Read `.projectpal/state.yml` for the current repo first.'
 assert_file_contains "$ROOT_DIR/instructions/phase-protocols.md" "### Delegation opt-in gate (Discovery exit)"
 assert_file_contains "$ROOT_DIR/instructions/phase-protocols.md" "delegation_preference: enabled"
+assert_file_contains "$ROOT_DIR/instructions/phase-protocols.md" "delegation_preference: unknown"
 assert_file_contains "$ROOT_DIR/instructions/sub-agent-invocation.md" "## Discovery-exit delegation gate"
+assert_file_contains "$ROOT_DIR/instructions/sub-agent-invocation.md" "blocks the Discovery → Brief transition"
 assert_file_contains "$ROOT_DIR/instructions/session-resumption-schema.md" "delegation_preference"
+assert_file_contains "$ROOT_DIR/instructions/session-resumption-schema.md" 'delegation_preference` must be resolved to `enabled` or `disabled` before Brief starts'
+assert_file_contains "$ROOT_DIR/instructions/artifacts.md" "brief-<work-summary>.md"
+assert_file_contains "$ROOT_DIR/instructions/artifacts.md" "technical-details-<work-summary>.md"
+assert_file_contains "$ROOT_DIR/instructions/artifacts.md" "tickets-<work-summary>-bundle.md"
+assert_file_contains "$ROOT_DIR/instructions/artifacts.md" "ticket-<work-summary>-NNN.md"
 install_output=$(HOME="$default_home" sh "$ROOT_DIR/install-projectpal.sh")
 assert_contains "$install_output" "ProjectPal is ready in all supported assistants."
 
